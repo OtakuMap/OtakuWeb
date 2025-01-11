@@ -36,7 +36,6 @@ const MapPage = () => {
             lat: 34.72145462036133,
             lng: 135.3616485595703,
           }}
-          zoom={17}
         />
         <FilterButton onFilterChange={handleFilterChange} />
       </MapWrapper>

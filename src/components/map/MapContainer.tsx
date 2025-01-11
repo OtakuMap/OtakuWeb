@@ -83,9 +83,9 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 const MapContainer: React.FC<MapContainerProps> = ({
   apiKey,
   center,
-  zoom = 14,
+  zoom = 17,
   mapId = 'DEMO_MAP_ID',
-  markerTitle = 'My location',
+  // markerTitle = 'My location',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
@@ -102,14 +102,14 @@ const MapContainer: React.FC<MapContainerProps> = ({
           mapId,
         });
 
-        const { AdvancedMarkerElement } = window.google.maps.marker;
-        if (AdvancedMarkerElement) {
-          new AdvancedMarkerElement({
-            map: mapInstance.current,
-            position: center,
-            title: markerTitle,
-          });
-        }
+        // const { AdvancedMarkerElement } = window.google.maps.marker;
+        // if (AdvancedMarkerElement) {
+        //   new AdvancedMarkerElement({
+        //     map: mapInstance.current,
+        //     position: center,
+        //     title: markerTitle,
+        //   });
+        // }
       } else {
         mapInstance.current.setCenter(center);
         mapInstance.current.setZoom(zoom);
@@ -117,7 +117,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  }, [center, zoom, mapId, markerTitle]);
+  }, [center, zoom, mapId]);
 
   useEffect(() => {
     const setupMap = async () => {
