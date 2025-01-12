@@ -14,10 +14,10 @@ export const FilterContainer = styled.div`
   padding-left: 11px;
 `;
 
-export const ToggleButton = styled.div<{ isActive: boolean }>`
+export const ToggleButton = styled.div<{ $isActive: boolean }>`
   width: 75px;
   height: 35px;
-  background: ${(props) => (props.isActive ? '#9A86D3' : 'transparent')};
+  background: ${(props) => (props.$isActive ? '#9A86D3' : 'transparent')};
   border-radius: 15px;
   cursor: pointer;
   transition: background-color 0.2s;

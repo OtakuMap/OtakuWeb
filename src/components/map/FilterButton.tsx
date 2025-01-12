@@ -16,7 +16,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({ onFilterChange }) => {
 
   return (
     <S.FilterContainer>
-      <S.ToggleButton isActive={isActive} onClick={handleToggle} />
+      <S.ToggleButton $isActive={isActive} onClick={handleToggle} />
       <S.FilterText>명소만</S.FilterText>
     </S.FilterContainer>
   );

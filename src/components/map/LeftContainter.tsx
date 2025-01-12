@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as S from '../../styles/map/LeftContainer.styles';
 import Search from '../common/Search';
+import BackButton from '../common/BackButton';
 import { RecommendationItem } from '../../types/map/recommendation';
 
 // 임시 데이터
@@ -22,6 +23,11 @@ const recommendationData: RecommendationItem[] = [
 const LeftContainer = () => {
   // 최근 검색어를 관리하는 상태
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  // 뒤로가기 처리
+  const handleBack = () => {
+    window.history.back();
+  };
 
   // 검색 처리
   const handleSearch = (value: string) => {
@@ -60,6 +66,7 @@ const LeftContainer = () => {
 
   return (
     <S.Container>
+      <BackButton onClick={handleBack} />
       <Search onSearch={handleSearch} />
       <S.ButtonContainer>
         <S.SavedRoutesButton>저장한 루트 보기</S.SavedRoutesButton>

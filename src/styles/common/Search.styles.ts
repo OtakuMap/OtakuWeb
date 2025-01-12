@@ -33,6 +33,7 @@ export const SearchIcon = styled.div`
   width: 25px;
   height: 25px;
   background: url('/src/assets/search.png') no-repeat center / contain;
+  cursor: pointer;
 `;
 
 export const SearchLine = styled.div`

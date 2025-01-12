@@ -83,7 +83,7 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 const MapContainer: React.FC<MapContainerProps> = ({
   apiKey,
   center,
-  zoom = 17,
+  zoom = 16,
   mapId = 'DEMO_MAP_ID',
   // markerTitle = 'My location',
 }) => {
