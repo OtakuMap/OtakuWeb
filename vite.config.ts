@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   css: {
     modules: {
-      scopeBehaviour: 'local',
+      scopeBehaviour: 'local', // CSS 모듈 사용 설정
     },
   },
   resolve: {
