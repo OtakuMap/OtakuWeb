@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import logoImage from '../../assets/logo.png';
 import searchIcon from '../../assets/search.png';
@@ -69,3 +70,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
