@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import RouteManagement from './components/RouteManagement';
 import Navbar from './components/common/Navbar';
 import MapPage from './pages/map/MapPage';
+import RoutePage from './pages/map/RoutePage';
 
 const AppContainer = styled.div`
   position: relative;
@@ -14,7 +15,9 @@ const AppContainer = styled.div`
 // Navbar를 조건부로 렌더링하는 컴포넌트
 const NavigationWrapper = () => {
   const location = useLocation();
-  return location.pathname !== '/map' ? <Navbar /> : null;
+  const hideNavbarPaths = ['/map', '/route'];
+
+  return hideNavbarPaths.includes(location.pathname) ? null : <Navbar />;
 };
 
 const App: React.FC = () => {
@@ -25,6 +28,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<RouteManagement />} />
           <Route path="/map" element={<MapPage />} />
+          <Route path="/route" element={<RoutePage />} />
         </Routes>
       </AppContainer>
     </BrowserRouter>
