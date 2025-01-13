@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -7,6 +8,11 @@ export default defineConfig({
   css: {
     modules: {
       scopeBehaviour: 'local', // CSS 모듈 사용 설정
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
   },
 });
