@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation  } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import './App.css';
 import LoginPage from './pages/login';
@@ -17,7 +17,6 @@ const AppContainer = styled.div`
   background-color: #0c004b;
 `;
 
-
 // Navbar를 조건부로 렌더링하는 컴포넌트
 const NavigationWrapper = () => {
   const location = useLocation();
@@ -28,31 +27,30 @@ const NavigationWrapper = () => {
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-return (
-  <BrowserRouter>
-    {!isLoggedIn ? (
-      <Routes>
-        <Route
-          path="/"
-          element={<LoginPage onLogin={() => setIsLoggedIn(true)} />}
-        />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/search-id-pw" element={<SearchIdPWPage />} />
-        <Route path="/newsetpw" element={<NewSetPWPage />} />
-      </Routes>
-    ) : (
-      <AppContainer>
-        <NavigationWrapper />
+
+  return (
+    <BrowserRouter>
+      {!isLoggedIn ? (
         <Routes>
-          <Route path="/" element={<RouteManagement />} />
+          <Route path="/" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/search-id-pw" element={<SearchIdPWPage />} />
+          <Route path="/newsetpw" element={<NewSetPWPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/route" element={<RoutePage />} />
         </Routes>
-      </AppContainer>
-    )}
-  </BrowserRouter>
-);
+      ) : (
+        <AppContainer>
+          <NavigationWrapper />
+          <Routes>
+            <Route path="/" element={<RouteManagement />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/route" element={<RoutePage />} />
+          </Routes>
+        </AppContainer>
+      )}
+    </BrowserRouter>
+  );
 };
 
 export default App;

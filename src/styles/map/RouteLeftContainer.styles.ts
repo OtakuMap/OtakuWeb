@@ -5,7 +5,7 @@ export const Container = styled.div`
   width: 400px;
   height: 100vh;
   background: #101148;
-  padding: 20px;
+  padding: 31px;
 `;
 
 export const Title = styled.h1`
@@ -16,11 +16,16 @@ export const Title = styled.h1`
   line-height: 22.5px;
   color: #ffffff;
   margin-top: 30px;
+  width: 340px;
 `;
 
 export const Description = styled.div`
   position: relative;
   margin-top: 10px;
+  width: 340px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
 
   p {
     font-family: 'Gothic A1';
@@ -29,7 +34,8 @@ export const Description = styled.div`
     font-size: 30px;
     line-height: 37.5px;
     color: #ffffff;
-    padding-right: 30px;
+    margin: 0;
+    word-break: keep-all;
   }
 `;
 
@@ -37,9 +43,7 @@ export const EditButton = styled.img`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  margin-bottom: 6px;
 `;
 
 export const Divider = styled.hr`
@@ -55,7 +59,7 @@ export const Divider = styled.hr`
 export const RouteList = styled.div`
   position: absolute;
   left: 31px;
-  top: 250px;
+  top: 270px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -66,6 +70,10 @@ export const RouteItem = styled.div`
   position: relative;
   width: 337px;
   height: 48px;
+  cursor: pointer;
+  &:active {
+    cursor: grabbing;
+  }
 `;
 
 export const NumberBox = styled.div`
@@ -98,7 +106,7 @@ export const LocationBox = styled.div`
   padding: 0 15px;
   font-family: 'Gothic A1';
   font-weight: 600;
-  font-size: 23px;
+  font-size: 20px;
   color: #000000;
 `;
 
@@ -146,10 +154,8 @@ export const SaveButton = styled.button`
 
 export const DeleteButton = styled.button`
   position: absolute;
-  width: 96px;
-  height: 19px;
-  left: 267px;
-  bottom: 120px;
+  right: 21px;
+  bottom: 110px;
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
@@ -158,5 +164,9 @@ export const DeleteButton = styled.button`
   color: #ffffff;
   background: none;
   border: none;
+  outline: none;
   cursor: pointer;
+  &:focus {
+    outline: none;
+  }
 `;

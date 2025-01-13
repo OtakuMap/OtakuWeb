@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import * as S from '../../styles/map/MapContainer.styles';
+import { RouteLocation } from '../../types/map/route';
 
 interface MapContainerProps {
   apiKey: string;
@@ -9,34 +10,13 @@ interface MapContainerProps {
   };
   zoom?: number;
   mapId?: string;
-  markerTitle?: string;
+  locations?: RouteLocation[];
+  onMarkerClick?: (location: RouteLocation) => void;
 }
 
 declare global {
   interface Window {
-    google: {
-      maps: {
-        Map: {
-          new (
-            container: HTMLElement,
-            options: {
-              center: { lat: number; lng: number };
-              zoom: number;
-              mapId: string;
-            },
-          ): google.maps.Map;
-        };
-        marker: {
-          AdvancedMarkerElement: {
-            new (options: {
-              map: google.maps.Map;
-              position: { lat: number; lng: number };
-              title: string;
-            }): google.maps.marker.AdvancedMarkerElement;
-          };
-        };
-      };
-    };
+    google: any;
   }
 }
 
@@ -60,7 +40,7 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 
   const script = document.createElement('script');
   script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=beta`;
-  script.async = true; // async 설정
+  script.async = true;
 
   GOOGLE_MAPS_LOADING_STATE.promise = new Promise((resolve, reject) => {
     script.addEventListener('load', () => {
@@ -83,12 +63,84 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 const MapContainer: React.FC<MapContainerProps> = ({
   apiKey,
   center,
-  zoom = 16,
+  zoom = 12,
   mapId = 'DEMO_MAP_ID',
-  // markerTitle = 'My location',
+  locations = [],
+  onMarkerClick,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const polylineRef = useRef<google.maps.Polyline | null>(null);
+
+  // 경로 라인 업데이트 함수
+  const updatePolyline = useCallback(() => {
+    if (!mapInstance.current || !window.google?.maps) return;
+
+    // 기존 라인 제거
+    if (polylineRef.current) {
+      polylineRef.current.setMap(null);
+    }
+
+    // 새로운 경로 좌표 생성
+    const path = locations.map((location) => ({
+      lat: location.latitude,
+      lng: location.longitude,
+    }));
+
+    // 새로운 라인 생성
+    polylineRef.current = new window.google.maps.Polyline({
+      path: path,
+      geodesic: true,
+      strokeColor: '#252660',
+      strokeOpacity: 1,
+      strokeWeight: 8,
+      map: mapInstance.current,
+    });
+  }, [locations]);
+
+  // 마커 생성 함수
+  const createMarker = useCallback(
+    (location: RouteLocation) => {
+      if (!mapInstance.current) return null;
+
+      const marker = new window.google.maps.Marker({
+        position: { lat: location.latitude, lng: location.longitude },
+        map: mapInstance.current,
+        icon: {
+          url: '/src/assets/pin.png',
+          scaledSize: new window.google.maps.Size(54, 104),
+        },
+      });
+
+      marker.addListener('click', () => {
+        if (onMarkerClick) {
+          onMarkerClick(location);
+        }
+      });
+
+      return marker;
+    },
+    [onMarkerClick],
+  );
+
+  // 마커 업데이트
+  const updateMarkers = useCallback(() => {
+    // 기존 마커 제거
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+
+    // 새 마커 생성
+    locations.forEach((location) => {
+      const marker = createMarker(location);
+      if (marker) {
+        markersRef.current.push(marker);
+      }
+    });
+
+    // 경로 라인 업데이트
+    updatePolyline();
+  }, [locations, createMarker, updatePolyline]);
 
   const initializeMap = useCallback(async () => {
     const mapContainer = mapContainerRef.current;
@@ -101,23 +153,16 @@ const MapContainer: React.FC<MapContainerProps> = ({
           zoom,
           mapId,
         });
-
-        // const { AdvancedMarkerElement } = window.google.maps.marker;
-        // if (AdvancedMarkerElement) {
-        //   new AdvancedMarkerElement({
-        //     map: mapInstance.current,
-        //     position: center,
-        //     title: markerTitle,
-        //   });
-        // }
+        updateMarkers();
       } else {
         mapInstance.current.setCenter(center);
         mapInstance.current.setZoom(zoom);
+        updateMarkers();
       }
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  }, [center, zoom, mapId]);
+  }, [center, zoom, mapId, updateMarkers]);
 
   useEffect(() => {
     const setupMap = async () => {
@@ -132,11 +177,23 @@ const MapContainer: React.FC<MapContainerProps> = ({
     setupMap();
 
     return () => {
+      if (polylineRef.current) {
+        polylineRef.current.setMap(null);
+      }
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
       if (mapInstance.current) {
         mapInstance.current = null;
       }
     };
   }, [apiKey, initializeMap]);
+
+  // locations가 변경될 때마다 마커와 경로 라인 업데이트
+  useEffect(() => {
+    if (mapInstance.current) {
+      updateMarkers();
+    }
+  }, [locations, updateMarkers]);
 
   return <S.MapDiv ref={mapContainerRef} />;
 };
