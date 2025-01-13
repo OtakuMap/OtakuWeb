@@ -59,3 +59,4 @@ const Cover: React.FC = () => {
 };
 
 export default Cover;
+
