@@ -10,6 +10,11 @@ import RouteManagement from './components/RouteManagement';
 import Navbar from './components/common/Navbar';
 import MapPage from './pages/map/MapPage';
 import RoutePage from './pages/map/RoutePage';
+import ReviewPage1 from './pages/ReviewPage1';
+import ReviewPage2 from './pages/ReviewPage2';
+import ReviewPage3 from './pages/ReviewPage3';
+import ReviewPage4 from './pages/ReviewPage4';
+import ReviewPage5 from './pages/ReviewPage5';
 
 const AppContainer = styled.div`
   position: relative;
@@ -46,6 +51,11 @@ const App: React.FC = () => {
             <Route path="/" element={<RouteManagement />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/route" element={<RoutePage />} />
+            <Route path="/review1" element={<ReviewPage1 />} />
+            <Route path="/review2" element={<ReviewPage2 />} />
+            <Route path="/review3" element={<ReviewPage3 />} />
+            <Route path="/review4" element={<ReviewPage4 />} />
+            <Route path="/review5" element={<ReviewPage5 />} />
           </Routes>
         </AppContainer>
       )}
