@@ -17,42 +17,42 @@ export const ButtonContainer = styled.div`
   top: 105px;
 `;
 
-export const SavedRoutesButton = styled.button`
+export const SavedRoutesButton = styled.button<{ isActive?: boolean }>`
   width: 160px;
   height: 96px;
-  background: #d1c1ff;
+  background: ${(props) => (props.isActive ? '#8B7BD8' : '#d1c1ff')};
   border-radius: 15px;
   border: none;
   cursor: pointer;
-
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 700;
   font-size: 20px;
   line-height: 25px;
   text-align: center;
-  color: #101148;
+  color: ${(props) => (props.isActive ? '#FFFFFF' : '#101148')};
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     opacity: 0.9;
   }
 `;
 
-export const FavoritePlacesButton = styled.button`
+export const FavoritePlacesButton = styled.button<{ isActive?: boolean }>`
   width: 155px;
   height: 96px;
-  background: #fff5d5;
+  background: ${(props) => (props.isActive ? '#D4B654' : '#fff5d5')};
   border-radius: 15px;
   border: none;
   cursor: pointer;
-
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 700;
   font-size: 20px;
   line-height: 25px;
   text-align: center;
-  color: #101148;
+  color: ${(props) => (props.isActive ? '#FFFFFF' : '#101148')};
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     opacity: 0.9;
@@ -68,7 +68,7 @@ export const RecentSearchesTitle = styled.h2`
   position: absolute;
   white-space: nowrap; // 줄바꿈 방지
   left: 55px;
-  top: 370px;
+  bottom: 235px;
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
@@ -82,7 +82,7 @@ export const RecentSearchesBox = styled.div`
   width: 338px;
   height: 202px;
   left: 32px;
-  top: 410px;
+  bottom: 20px;
   background: #252660;
   border-radius: 25px;
   filter: blur(5px);
@@ -92,7 +92,7 @@ export const RecentSearchList = styled.div`
   position: absolute;
   width: 178px;
   left: 61px;
-  top: 429px;
+  bottom: 40px;
   display: flex;
   flex-direction: column;
   gap: 10px;
