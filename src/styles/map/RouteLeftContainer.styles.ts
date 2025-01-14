@@ -155,7 +155,7 @@ export const SaveButton = styled.button`
 export const DeleteButton = styled.button`
   position: absolute;
   right: 21px;
-  bottom: 110px;
+  top: 570px;
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
