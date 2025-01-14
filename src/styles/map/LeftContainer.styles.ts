@@ -32,9 +32,21 @@ export const SavedRoutesButton = styled.button<{ isActive?: boolean }>`
   text-align: center;
   color: ${(props) => (props.isActive ? '#FFFFFF' : '#101148')};
   transition: all 0.2s ease-in-out;
+  outline: none;
 
   &:hover {
     opacity: 0.9;
+    border: none;
+    outline: none;
+  }
+  &:focus {
+    border: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    border: none;
+    outline: none;
   }
 `;
 
@@ -44,6 +56,7 @@ export const FavoritePlacesButton = styled.button<{ isActive?: boolean }>`
   background: ${(props) => (props.isActive ? '#D4B654' : '#fff5d5')};
   border-radius: 15px;
   border: none;
+  outline: none;
   cursor: pointer;
   font-family: 'Gothic A1';
   font-style: normal;
@@ -56,6 +69,17 @@ export const FavoritePlacesButton = styled.button<{ isActive?: boolean }>`
 
   &:hover {
     opacity: 0.9;
+    border: none;
+    outline: none;
+  }
+  &:focus {
+    border: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    border: none;
+    outline: none;
   }
 `;
 

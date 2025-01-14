@@ -110,10 +110,16 @@ const LeftContainer = () => {
       <BackButton onClick={handleBack} />
       <Search onSearch={handleSearch} />
       <S.ButtonContainer>
-        <S.SavedRoutesButton onClick={() => setActiveView('savedRoutes')}>
+        <S.SavedRoutesButton
+          isActive={activeView === 'savedRoutes'}
+          onClick={() => setActiveView(activeView === 'savedRoutes' ? 'none' : 'savedRoutes')}
+        >
           저장한 루트 보기
         </S.SavedRoutesButton>
-        <S.FavoritePlacesButton onClick={() => setActiveView('favoritePlaces')}>
+        <S.FavoritePlacesButton
+          isActive={activeView === 'favoritePlaces'}
+          onClick={() => setActiveView(activeView === 'favoritePlaces' ? 'none' : 'favoritePlaces')}
+        >
           저장한 장소 보기
         </S.FavoritePlacesButton>
       </S.ButtonContainer>
