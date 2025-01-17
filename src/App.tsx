@@ -1,5 +1,5 @@
 import React from 'react';
-import ReviewPage3 from './pages/ReviewPage4';
+import ReviewPage3 from './pages/EventPage2';
 
 const App: React.FC = () => {
   return (
