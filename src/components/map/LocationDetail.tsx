@@ -14,6 +14,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
   // 현재 장소와 관련 장소들을 하나의 배열로 합침
   const allPlaces = [location, ...(location.relatedPlaces || [])];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
   const currentPlace = allPlaces[currentIndex];
 
   const handleNextLocation = () => {
@@ -25,8 +26,15 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
   };
 
   const handleFavClick = () => {
-    // 좋아요 기능 구현
-    console.log('Favorite clicked');
+    setIsFavorited(!isFavorited);
+    // Log the current location data
+    console.log('Favorited Location Data:', {
+      id: currentPlace.id,
+      name: currentPlace.name,
+      animeName: currentPlace.animeName,
+      address: currentPlace.address,
+      hashtags: currentPlace.hashtags,
+    });
   };
 
   return (
@@ -63,7 +71,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
       </S.TagContainer>
 
       <S.FavButton onClick={handleFavClick}>
-        <img src="/src/assets/fav.png" alt="favorite" />
+        <img src={isFavorited ? '/src/assets/fav2.png' : '/src/assets/fav.png'} alt="favorite" />
       </S.FavButton>
 
       <S.ReviewButton onClick={handleReviewClick}>명소 후기</S.ReviewButton>
