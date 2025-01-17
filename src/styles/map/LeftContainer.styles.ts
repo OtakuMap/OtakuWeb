@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+interface RecommendationItemProps {
+  $isSelected?: boolean;
+}
+
 export const Container = styled.div`
   position: relative;
   width: 400px;
@@ -115,7 +119,7 @@ export const RecentSearchesBox = styled.div`
 export const RecentSearchList = styled.div`
   position: absolute;
   width: 178px;
-  left: 61px;
+  left: 51px;
   bottom: 40px;
   display: flex;
   flex-direction: column;
@@ -172,7 +176,7 @@ export const RecommendationsContainer = styled.div`
   gap: 10px;
 `;
 
-export const RecommendationItem = styled.div`
+export const RecommendationItem = styled.div<RecommendationItemProps>`
   box-sizing: border-box;
   width: 296px;
   height: 31px;

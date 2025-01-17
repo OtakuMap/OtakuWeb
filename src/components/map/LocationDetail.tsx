@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as S from '../../styles/map/LocationDetail.styles';
 import { LocationDetail as LocationDetailType } from '../../types/map/route';
 import { useNavigate } from 'react-router-dom';
@@ -8,10 +8,17 @@ interface LocationDetailProps {
   location: LocationDetailType;
   onClose?: () => void;
 }
-console.log('Lucide X component:', X);
 
 const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) => {
   const navigate = useNavigate();
+  // 현재 장소와 관련 장소들을 하나의 배열로 합침
+  const allPlaces = [location, ...(location.relatedPlaces || [])];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentPlace = allPlaces[currentIndex];
+
+  const handleNextLocation = () => {
+    setCurrentIndex((prev) => (prev === allPlaces.length - 1 ? 0 : prev + 1));
+  };
 
   const handleReviewClick = () => {
     navigate('/review3'); // review3 페이지로 이동
@@ -34,13 +41,23 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
           />
         </S.CloseButton>
       )}
-      <S.LocationImage src={`/src/assets/locations/${location.id}.jpg`} alt={location.name} />
-      <S.Title>{location.name}</S.Title>
-      <S.Subtitle>{location.animeName}</S.Subtitle>
-      <S.Address>{location.address}</S.Address>
+      <S.LocationImage
+        src={`/src/assets/locations/${currentPlace.id}.jpg`}
+        alt={currentPlace.name}
+      />
+      {allPlaces.length > 1 && (
+        <>
+          <S.PaginationButton onClick={handleNextLocation}>
+            <img src="/src/assets/next.png" alt="next" />
+          </S.PaginationButton>
+        </>
+      )}
+      <S.Title>{currentPlace.name}</S.Title>
+      <S.Subtitle>{currentPlace.animeName}</S.Subtitle>
+      <S.Address>{currentPlace.address}</S.Address>
 
       <S.TagContainer>
-        {location.hashtags.map((tag, index) => (
+        {currentPlace.hashtags.map((tag, index) => (
           <S.Tag key={index}>#{tag}</S.Tag>
         ))}
       </S.TagContainer>

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
 import Search from '../common/Search';
 import BackButton from '../common/BackButton';
+import { Place } from '@/types/map/place';
+
+interface LeftContainerProps {
+  onPlaceSelect?: (place: Place) => void;
+}
 
 // 임시 데이터들
 const savedRoutesData = [
@@ -24,21 +29,70 @@ const favoritePlacesData = [
   {
     id: 1,
     title: '아키하바라 애니메이션 센터',
+    name: '아키하바라 애니메이션 센터',
+    isSelected: false,
+    latitude: 35.6995,
+    longitude: 139.7711,
+    animeName: '러브라이브!, 스테인즈 게이트',
+    address: '도쿄도 치요다구 소토칸다 1-7-6 아키바UDX 4F',
+    hashtags: ['아키하바라', '애니메이션', '피규어'],
+    // 같은 위치의 다른 장소들
+    relatedPlaces: [
+      {
+        id: 11,
+        title: '무인양품 아키하바라',
+        name: '무인양품 아키하바라',
+        isSelected: false,
+        latitude: 35.6995,
+        longitude: 139.7711,
+        animeName: '너의 이름은',
+        address: '도쿄도 치요다구 소토칸다 1-7-6 아키바UDX 2F',
+        hashtags: ['아키하바라', '무인양품', '성지순례'],
+      },
+      {
+        id: 12,
+        title: '아키하바라 게이머즈',
+        name: '아키하바라 게이머즈',
+        isSelected: false,
+        latitude: 35.6995,
+        longitude: 139.7711,
+        animeName: '러키스타, 스테인즈 게이트',
+        address: '도쿄도 치요다구 소토칸다 1-7-6 아키바UDX B1',
+        hashtags: ['아키하바라', '게임', '피규어'],
+      },
+    ],
   },
   {
     id: 2,
     title: '나카노 브로드웨이',
+    name: '나카노 브로드웨이',
+    isSelected: false,
+    latitude: 35.708,
+    longitude: 139.665,
+    animeName: '여러 작품',
+    address: '도쿄도 나카노구 나카노 5-52-15',
+    hashtags: ['나카노', '중고피규어', '레트로게임'],
+    relatedPlaces: [], // 관련 장소 없음
   },
   {
     id: 3,
     title: '도에이 애니메이션 뮤지엄',
+    name: '도에이 애니메이션 뮤지엄',
+    isSelected: false,
+    latitude: 35.6784,
+    longitude: 139.6575,
+    animeName: '원피스, 드래곤볼, 세일러문',
+    address: '도쿄도 스기나미구 카미이구사 3-7-6',
+    hashtags: ['도에이', '애니메이션', '뮤지엄'],
+    relatedPlaces: [], // 관련 장소 없음
   },
 ];
 
-const LeftContainer = () => {
+const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   const navigate = useNavigate();
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
   // 뒤로가기 처리
   const handleBack = () => {
@@ -58,6 +112,13 @@ const LeftContainer = () => {
   // 검색어 삭제
   const handleDeleteSearch = (searchText: string) => {
     setRecentSearches((prev) => prev.filter((item) => item !== searchText));
+  };
+
+  const handlePlaceClick = (place: Place) => {
+    setSelectedPlace(place);
+    if (onPlaceSelect) {
+      onPlaceSelect(place);
+    }
   };
 
   // 저장된 루트 클릭 처리 - 추후 사용예정
@@ -94,7 +155,11 @@ const LeftContainer = () => {
         return (
           <S.RecommendationsContainer>
             {favoritePlacesData.map((place) => (
-              <S.RecommendationItem key={place.id} onClick={() => navigate('/route')}>
+              <S.RecommendationItem
+                key={place.id}
+                onClick={() => handlePlaceClick(place)}
+                $isSelected={selectedPlace?.id === place.id}
+              >
                 <S.RecommendationText>{place.title}</S.RecommendationText>
               </S.RecommendationItem>
             ))}

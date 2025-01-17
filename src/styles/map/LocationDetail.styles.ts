@@ -13,6 +13,47 @@ export const Container = styled.div`
   z-index: 1000;
 `;
 
+export const PaginationButton = styled.button`
+  position: absolute;
+  top: 90px;
+  right: 13px;
+  width: 28px;
+  height: 18px;
+  background: transparent; // 배경색 제거
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+export const LocationImageWrapper = styled.div`
+  position: relative;
+  width: 159px;
+  height: 175px;
+  left: 28px;
+  top: 24px;
+  overflow: hidden;
+  border-radius: 8px;
+`;
+
 export const LocationImage = styled.img`
   position: absolute;
   width: 159px;
@@ -21,6 +62,10 @@ export const LocationImage = styled.img`
   top: 24px;
   object-fit: cover;
   border-radius: 8px;
+  // width: 100%;
+  // height: 100%;
+  // object-fit: cover;
+  // transition: transform 0.3s ease;
 `;
 
 export const Title = styled.h1`
