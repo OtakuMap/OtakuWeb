@@ -60,10 +60,10 @@ const LeftContainer = () => {
     setRecentSearches((prev) => prev.filter((item) => item !== searchText));
   };
 
-  // 저장된 루트 클릭 처리
-  const handleSavedRouteClick = (routeId: number) => {
-    navigate(`/route/${routeId}`);
-  };
+  // 저장된 루트 클릭 처리 - 추후 사용예정
+  // const handleSavedRouteClick = (routeId: number) => {
+  //   navigate(`/route/${routeId}`);
+  // };
 
   const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
     const MAX_LENGTH = 15;

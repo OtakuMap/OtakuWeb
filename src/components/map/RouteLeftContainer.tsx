@@ -19,6 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import * as S from '../../styles/map/RouteLeftContainer.styles';
 import BackButton from '../common/BackButton';
 import { RouteLocation, RouteData } from '../../types/map/route';
+import RouteDescriptionEditor from './RouteDescriptionEditor';
 
 interface RouteLeftContainerProps {
   initialLocations: RouteLocation[];
@@ -69,6 +70,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   initialLocations,
   onLocationsChange,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [routeData, setRouteData] = useState<RouteData>({
     title: '다이아몬드 에이스',
     description: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
@@ -146,18 +148,30 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
     window.history.back();
   }, []);
 
+  //설명 수정 - 저장
+  const handleDescriptionSave = (newDescription: string) => {
+    setRouteData((prev) => ({
+      ...prev,
+      description: newDescription,
+    }));
+    setIsEditing(false);
+  };
+
   return (
     <S.Container>
       <BackButton onClick={handleBack} />
       <S.Title>{routeData.title}</S.Title>
-      <S.Description>
-        <p>{routeData.description}</p>
-        <S.EditButton
-          src="/src/assets/edit.png"
-          alt="edit"
-          onClick={() => console.log('편집 모드')}
+      {isEditing ? (
+        <RouteDescriptionEditor
+          description={routeData.description}
+          onSave={handleDescriptionSave}
         />
-      </S.Description>
+      ) : (
+        <S.Description>
+          <p>{routeData.description}</p>
+          <S.EditButton src="/src/assets/edit.png" alt="edit" onClick={() => setIsEditing(true)} />
+        </S.Description>
+      )}
       <S.Divider />
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
