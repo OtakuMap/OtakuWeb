@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const SearchContainer = styled.div`
   position: relative;
   width: 340px;
-  margin: 0 5px;
+  margin: 0 auto;
   padding-top: 20px;
 `;
 
