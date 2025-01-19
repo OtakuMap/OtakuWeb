@@ -14,6 +14,7 @@ const Container = styled.div`
   width: 100vw;
   overflow-y: auto;
   position: relative; /* 추가: 아이콘 위치 지정용 */
+  margin-top: 250px;
 `;
 
 // 공통 Icon 스타일
@@ -69,6 +70,12 @@ const Section = styled.div`
   margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   color: black;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 `;
 
 const SectionTitle = styled.h2`
@@ -76,14 +83,18 @@ const SectionTitle = styled.h2`
   color: black;
   margin-bottom: 10px;
   text-align: center;
+  padding-bottom: 5px; /* 여백 추가 */
+  border-bottom: 1px solid rgb(0, 0, 0);
 `;
 
 const InputField = styled.input`
+  width: 288px;
+  height: 34px;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   border: none;
-  border-radius: 8px;
-  background-color: #f4f4f4;
+  border-radius: 20px;
+  background-color: #e8e8e8;
   font-size: 14px;
 `;
 
@@ -91,10 +102,10 @@ const Button = styled.button`
   width: 173px;
   height: 38px;
   padding: 10px;
-  background-color: #7b66ff;
-  color: white;
+  background-color: #d1c1ff;
+  color: black;
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
@@ -102,7 +113,7 @@ const Button = styled.button`
   margin: 0 auto; /* 버튼을 수평으로 가운데 정렬 */
 
   &:hover {
-    background-color: #5f4bcf;
+    background-color: #d1c1ff;
   }
 `;
 
@@ -196,11 +207,10 @@ const MyPage = () => {
       {/* Profile Edit section */}
       <Section>
         <SectionTitle>내 정보 수정</SectionTitle>
-        <InputField type="email" placeholder="이메일 수정" value="conandaisuki@gmail.com" />
-        <InputField type="password" placeholder="비밀번호 변경" value="xxxxxxxxxxxxxx" />
+        이메일 수정 <InputField type="email" value="conandaisuki@gmail.com" /> <br></br>
+        비밀번호 변경 <InputField type="password" value="xxxxxxxxxxxxxx" />
         <Button>저장하기</Button>
       </Section>
-
       {/* Review Management section */}
       <Section>
         <SectionTitle>내 후기 관리</SectionTitle>

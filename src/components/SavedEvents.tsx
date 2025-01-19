@@ -1,17 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
-import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
-import eventImage1 from '../assets/eventImage1.png'; // 이벤트 이미지 1
-import eventImage2 from '../assets/eventImage2.png'; // 이벤트 이미지 2
-import eventImage3 from '../assets/eventImage3.png'; // 이벤트 이미지 3
+import spaceIcon from '../assets/space-icon.png';
+import starIcon from '../assets/circle-star.png';
+import starFilledIcon from '../assets/circle-filled.png';
+import eventImage1 from '../assets/eventImage1.png';
+import eventImage2 from '../assets/eventImage2.png';
+import eventImage3 from '../assets/eventImage3.png';
 
 interface EventItem {
   id: number;
   title: string;
   date: string;
-  category: string;
+  category: 'popup' | 'exhibition' | 'collab';
   image: string;
-  isStarred?: boolean;
+  isStarred: boolean;
+  isSelected?: boolean;
 }
 
 const Container = styled.div`
@@ -104,6 +107,26 @@ const ListActions = styled.div`
   }
 `;
 
+const CategoryFilter = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const CategoryButton = styled.button<{ active: boolean }>`
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: ${(props) => (props.active ? '#333' : '#999')};
+  font-weight: ${(props) => (props.active ? '600' : '400')};
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #333;
+  }
+`;
+
 const EventGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -116,16 +139,68 @@ const EventCard = styled.div`
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  position: relative;
 
   &:hover {
     transform: translateY(-4px);
   }
 `;
 
-const EventImage = styled.img`
+const EventImageWrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 150px;
+`;
+
+const EventImage = styled.img`
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+`;
+
+const Controls = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
+`;
+
+const CheckboxContainer = styled.div<{ checked: boolean }>`
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  background-color: ${(props) => (props.checked ? '#7B66FF' : 'rgba(255, 255, 255, 0.3)')};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: '✓';
+    color: white;
+    display: ${(props) => (props.checked ? 'block' : 'none')};
+  }
+
+  &:hover {
+    background-color: ${(props) => (props.checked ? '#6B56EF' : 'rgba(255, 255, 255, 0.5)')};
+  }
+`;
+
+const StarIconImage = styled.img`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const EventDetails = styled.div`
@@ -150,26 +225,13 @@ const EventDate = styled.div`
   margin-top: 4px;
 `;
 
-const StarButton = styled.button<{ isStarred?: boolean }>`
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${(props) => (props.isStarred ? '#7B66FF' : '#DBDBFF')};
-  font-size: 24px;
-  padding: 8px;
-  line-height: 1;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-`;
-
 const SavedEvents: React.FC = () => {
-  const [events] = React.useState<EventItem[]>([
+  const [events, setEvents] = React.useState<EventItem[]>([
     {
       id: 1,
       title: '귀멸의 칼날 × 온천 콜라보',
       date: '2023.11.02 ~ 2024.02.12',
-      category: '팝업 스토어 / 전시회 / 콜라보 카페',
+      category: 'collab',
       image: eventImage1,
       isStarred: true,
     },
@@ -177,7 +239,7 @@ const SavedEvents: React.FC = () => {
       id: 2,
       title: '카구야 님은 고백받고 싶어 × 콜라보',
       date: '2023.11.02 ~ 2024.02.12',
-      category: '팝업 스토어 / 전시회 / 콜라보 카페',
+      category: 'popup',
       image: eventImage2,
       isStarred: false,
     },
@@ -185,11 +247,38 @@ const SavedEvents: React.FC = () => {
       id: 3,
       title: '러브라이브! × 콜라보 카페',
       date: '2023.11.02 ~ 2024.02.12',
-      category: '팝업 스토어 / 전시회 / 콜라보 카페',
+      category: 'exhibition',
       image: eventImage3,
       isStarred: true,
     },
   ]);
+
+  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
+  const [showOnlyStarred, setShowOnlyStarred] = React.useState(false);
+  const [selectedEvents, setSelectedEvents] = React.useState<number[]>([]);
+
+  const handleToggleStar = (id: number) => {
+    setEvents(
+      events.map((event) => (event.id === id ? { ...event, isStarred: !event.isStarred } : event)),
+    );
+  };
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedEvents((prev) =>
+      prev.includes(id) ? prev.filter((eventId) => eventId !== id) : [...prev, id],
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    setEvents(events.filter((event) => !selectedEvents.includes(event.id)));
+    setSelectedEvents([]);
+  };
+
+  const filteredEvents = events.filter((event) => {
+    if (showOnlyStarred && !event.isStarred) return false;
+    if (selectedCategory !== 'all' && event.category !== selectedCategory) return false;
+    return true;
+  });
 
   return (
     <Container>
@@ -208,19 +297,60 @@ const SavedEvents: React.FC = () => {
 
         <EventListContainer>
           <ListHeader>
-            <ListTitle>저장한 이벤트 ({events.length})</ListTitle>
+            <ListTitle>저장한 이벤트 ({filteredEvents.length})</ListTitle>
             <ListActions>
-              <button>선택 삭제</button>
+              <button onClick={handleDeleteSelected}>선택 삭제</button>
               <span>/</span>
-              <button>즐겨찾기</button>
+              <button onClick={() => setShowOnlyStarred(!showOnlyStarred)}>
+                {showOnlyStarred ? '전체보기' : '즐겨찾기'}
+              </button>
             </ListActions>
           </ListHeader>
 
+          <CategoryFilter>
+            <CategoryButton
+              active={selectedCategory === 'all'}
+              onClick={() => setSelectedCategory('all')}
+            >
+              전체
+            </CategoryButton>
+            <CategoryButton
+              active={selectedCategory === 'popup'}
+              onClick={() => setSelectedCategory('popup')}
+            >
+              팝업 스토어
+            </CategoryButton>
+            <CategoryButton
+              active={selectedCategory === 'exhibition'}
+              onClick={() => setSelectedCategory('exhibition')}
+            >
+              전시회
+            </CategoryButton>
+            <CategoryButton
+              active={selectedCategory === 'collab'}
+              onClick={() => setSelectedCategory('collab')}
+            >
+              콜라보 카페
+            </CategoryButton>
+          </CategoryFilter>
+
           <EventGrid>
-            {events.map((event) => (
+            {filteredEvents.map((event) => (
               <EventCard key={event.id}>
-                <EventImage src={event.image} alt={event.title} />
-                <StarButton isStarred={event.isStarred}>★</StarButton>
+                <EventImageWrapper>
+                  <EventImage src={event.image} alt={event.title} />
+                  <Controls>
+                    <CheckboxContainer
+                      checked={selectedEvents.includes(event.id)}
+                      onClick={() => handleToggleSelect(event.id)}
+                    />
+                    <StarIconImage
+                      src={event.isStarred ? starFilledIcon : starIcon}
+                      alt={event.isStarred ? 'Starred' : 'Not starred'}
+                      onClick={() => handleToggleStar(event.id)}
+                    />
+                  </Controls>
+                </EventImageWrapper>
                 <EventDetails>
                   <EventTitle>{event.title}</EventTitle>
                   <EventCategory>{event.category}</EventCategory>

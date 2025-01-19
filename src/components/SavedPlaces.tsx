@@ -2,6 +2,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
+import starIcon from '../assets/white-star.png'; // 별표 아이콘
+import starFilledIcon from '../assets/star-filled.png'; // 꽉찬 별표 아이콘
 
 interface RouteItem {
   id: number;
@@ -154,18 +156,14 @@ const RouteAddress = styled.span`
   margin-top: 4px;
 `;
 
-const StarButton = styled.button<{ isStarred?: boolean }>`
-  background: none;
-  border: none;
+const StarIcon = styled.img`
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-  color: ${(props) => (props.isStarred ? '#7B66FF' : '#DBDBFF')};
-  font-size: 24px;
-  padding: 8px;
-  line-height: 1;
 `;
 
 const SavedPlaces: React.FC = () => {
-  const [routes] = React.useState<RouteItem[]>([
+  const [routes, setRoutes] = React.useState<RouteItem[]>([
     {
       id: 1,
       title: '한신 고시엔 구장',
@@ -187,6 +185,25 @@ const SavedPlaces: React.FC = () => {
   ]);
 
   const [selectedRoute, setSelectedRoute] = React.useState<number | null>(null);
+  const [showOnlyStarred, setShowOnlyStarred] = React.useState(false);
+
+  // 선택 삭제 핸들러
+  const handleDelete = () => {
+    if (selectedRoute) {
+      setRoutes(routes.filter((route) => route.id !== selectedRoute));
+      setSelectedRoute(null);
+    }
+  };
+
+  // 즐겨찾기 토글 핸들러
+  const toggleStar = (id: number) => {
+    setRoutes(
+      routes.map((route) => (route.id === id ? { ...route, isStarred: !route.isStarred } : route)),
+    );
+  };
+
+  // 필터링된 루트
+  const filteredRoutes = showOnlyStarred ? routes.filter((route) => route.isStarred) : routes;
 
   return (
     <Container>
@@ -205,15 +222,17 @@ const SavedPlaces: React.FC = () => {
 
         <RouteListContainer>
           <ListHeader>
-            <ListTitle>찜한 장소 (3)</ListTitle>
+            <ListTitle>찜한 장소 ({filteredRoutes.length})</ListTitle>
             <ListActions>
-              <button>선택 삭제</button>
+              <button onClick={handleDelete}>선택 삭제</button>
               <span>/</span>
-              <button>즐겨찾기</button>
+              <button onClick={() => setShowOnlyStarred(!showOnlyStarred)}>
+                {showOnlyStarred ? '전체보기' : '즐겨찾기'}
+              </button>
             </ListActions>
           </ListHeader>
 
-          {routes.map((route) => (
+          {filteredRoutes.map((route) => (
             <RouteItem key={route.id}>
               <RouteDetails>
                 <RadioButton
@@ -221,7 +240,11 @@ const SavedPlaces: React.FC = () => {
                   onClick={() => setSelectedRoute(route.id)}
                 />
                 <RouteTitle>{route.title}</RouteTitle>
-                <StarButton isStarred={route.isStarred}>★</StarButton>
+                <StarIcon
+                  src={route.isStarred ? starFilledIcon : starIcon}
+                  alt={route.isStarred ? 'Starred' : 'Not starred'}
+                  onClick={() => toggleStar(route.id)}
+                />
               </RouteDetails>
               <RouteAddress>{route.address}</RouteAddress>
             </RouteItem>
