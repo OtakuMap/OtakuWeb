@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import spaceIcon from '../assets/space-icon.png';
 import starIcon from '../assets/circle-star.png';
 import starFilledIcon from '../assets/circle-filled.png';
-import eventImage1 from '../assets/eventImage1.png';
-import eventImage2 from '../assets/eventImage2.png';
-import eventImage3 from '../assets/eventImage3.png';
+import eventImage1 from '../assets/one_piece.png';
+import eventImage2 from '../assets/one_piece.png';
+import eventImage3 from '../assets/one_piece.png';
 
 interface EventItem {
   id: number;
@@ -57,35 +57,43 @@ const TabContainer = styled.div`
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
-  padding: 12px 24px;
+  width: 194px;
+  height: 82px;
   border: none;
-  background-color: ${(props) => (props.active ? '#fff' : 'rgba(255, 255, 255, 0.2)')};
-  color: ${(props) => (props.active ? '#0c004b' : '#fff')};
-  border-radius: 8px;
+  background-color: ${(props) => (props.active ? '#fff' : '#CCC')};
+  color: ${(props) => (props.active ? '#000' : '#464654')};
+  border-radius: 20px 20px 0px 0px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 20px;
+  font-weight: 600;
 `;
 
 const EventListContainer = styled.div`
   background: white;
-  border-radius: 16px;
-  margin-top: -3px;
-  padding: 24px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0px 20px 20px 20px;
+  padding: 24px 80px;
 `;
 
 const ListHeader = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   margin-bottom: 16px;
 `;
 
 const ListTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
+  color: #000;
+  font-family: 'Gothic A1';
+  font-size: 30px;
+  font-weight: 700;
+`;
+
+const HeaderDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #464654;
+  margin: 16px 0;
 `;
 
 const ListActions = styled.div`
@@ -93,6 +101,7 @@ const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
+  margin-left: 630px;
 
   button {
     background: none;
@@ -134,7 +143,6 @@ const EventGrid = styled.div`
 `;
 
 const EventCard = styled.div`
-  background-color: #f8f7ff;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -148,15 +156,9 @@ const EventCard = styled.div`
 
 const EventImageWrapper = styled.div`
   position: relative;
-  width: 100%;
-  height: 150px;
 `;
 
-const EventImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
+const EventImage = styled.img``;
 
 const Controls = styled.div`
   position: absolute;
@@ -193,8 +195,6 @@ const CheckboxContainer = styled.div<{ checked: boolean }>`
 `;
 
 const StarIconImage = styled.img`
-  width: 24px;
-  height: 24px;
   cursor: pointer;
   filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
 
@@ -291,13 +291,14 @@ const SavedEvents: React.FC = () => {
 
         <TabContainer>
           <Tab>저장한 루트</Tab>
-          <Tab>찜한 장소</Tab>
+          <Tab>저장한 장소</Tab>
           <Tab active>저장한 이벤트</Tab>
         </TabContainer>
 
         <EventListContainer>
           <ListHeader>
             <ListTitle>저장한 이벤트 ({filteredEvents.length})</ListTitle>
+            <HeaderDivider />
             <ListActions>
               <button onClick={handleDeleteSelected}>선택 삭제</button>
               <span>/</span>

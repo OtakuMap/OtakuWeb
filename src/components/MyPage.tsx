@@ -14,7 +14,6 @@ const Container = styled.div`
   width: 100vw;
   overflow-y: auto;
   position: relative; /* 추가: 아이콘 위치 지정용 */
-  margin-top: 250px;
 `;
 
 // 공통 Icon 스타일

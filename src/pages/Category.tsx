@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Search from '../components/common/Search';
 
 const Container = styled.div`
-  margin-top: 110px;
+  margin-top: 60px;
   display: flex;
   height: 100vh;
   width: 100vw;

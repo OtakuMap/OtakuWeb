@@ -40,9 +40,11 @@ const ContentWrapper = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 24px;
   color: #fff;
-  margin: 50px 0 30px 0;
+  font-family: 'Gothic A1';
+  font-size: 38px;
+  font-weight: 600;
+  margin: 48px 0;
 `;
 
 const TabContainer = styled.div`
@@ -52,35 +54,43 @@ const TabContainer = styled.div`
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
-  padding: 12px 24px;
+  width: 194px;
+  height: 82px;
   border: none;
-  background-color: ${(props) => (props.active ? '#fff' : 'rgba(255, 255, 255, 0.2)')};
-  color: ${(props) => (props.active ? '#0c004b' : '#fff')};
-  border-radius: 8px;
+  background-color: ${(props) => (props.active ? '#fff' : '#CCC')};
+  color: ${(props) => (props.active ? '#000' : '#464654')};
+  border-radius: 20px 20px 0px 0px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 20px;
+  font-weight: 600;
 `;
 
 const RouteListContainer = styled.div`
   background: white;
-  border-radius: 16px;
-  margin-top: -3px;
-  padding: 24px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0px 20px 20px 20px;
+  padding: 24px 80px;
 `;
 
 const ListHeader = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   margin-bottom: 16px;
 `;
 
 const ListTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
+  color: #000;
+  font-family: 'Gothic A1';
+  font-size: 30px;
+  font-weight: 700;
+`;
+
+const HeaderDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #464654;
+  margin: 16px 0;
 `;
 
 const ListActions = styled.div`
@@ -88,6 +98,7 @@ const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
+  margin-left: 630px;
 
   button {
     background: none;
@@ -106,9 +117,9 @@ const RouteItem = styled.div`
   display: flex;
   flex-direction: column;
   padding: 16px;
-  background-color: #f8f7ff;
+  background-color: #e9e2ff;
   margin-bottom: 8px;
-  border-radius: 12px;
+  border-radius: 15px;
   transition: background-color 0.2s;
 
   &:hover {
@@ -145,22 +156,21 @@ const RadioButton = styled.div<{ checked: boolean }>`
 
 const RouteTitle = styled.span`
   flex: 1;
-  color: #333;
-  font-size: 15px;
-  font-weight: 500;
+  color: #000;
+  font-family: 'Gothic A1';
+  font-size: 24px;
+  font-weight: 600;
 `;
 
 const RouteAddress = styled.span`
-  font-size: 14px;
-  color: #666;
+  font-family: 'Gothic A1';
+  font-size: 20px;
+  font-weight: 500;
+  color: #000;
   margin-top: 4px;
 `;
 
-const StarIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-`;
+const StarIcon = styled.img``;
 
 const SavedPlaces: React.FC = () => {
   const [routes, setRoutes] = React.useState<RouteItem[]>([
@@ -216,13 +226,14 @@ const SavedPlaces: React.FC = () => {
 
         <TabContainer>
           <Tab>저장한 루트</Tab>
-          <Tab active>찜한 장소</Tab>
+          <Tab active>저장한 장소</Tab>
           <Tab>저장한 이벤트</Tab>
         </TabContainer>
 
         <RouteListContainer>
           <ListHeader>
-            <ListTitle>찜한 장소 ({filteredRoutes.length})</ListTitle>
+            <ListTitle>저장한 장소 ({filteredRoutes.length})</ListTitle>
+            <HeaderDivider />
             <ListActions>
               <button onClick={handleDelete}>선택 삭제</button>
               <span>/</span>
