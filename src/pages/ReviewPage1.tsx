@@ -126,6 +126,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: flex-start; /* 상단 정렬로 변경 */
   overflow-y: auto; /* 세로 스크롤 추가 */
+  margin-top: 60px;
 `;
 
 const SearchWrapper = styled.div`

@@ -10,6 +10,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 60px;
 `;
 
 const BreadcrumbNav = styled.div`
@@ -70,6 +71,7 @@ const UserInfo = styled.div`
 const Username = styled.span`
   font-weight: bold;
   margin-bottom: 5px;
+  color: black;
 `;
 
 const Date = styled.span`
@@ -173,6 +175,7 @@ const RouteName = styled.div`
   border-radius: 15px;
   font-size: 14px;
   flex: 1;
+  color: black;
 `;
 
 const RouteButtonContainer = styled.div`

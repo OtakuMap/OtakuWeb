@@ -13,6 +13,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 60px;
 `;
 
 const WhiteContainer = styled.div`
@@ -103,6 +104,7 @@ const SectionTitle = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: black;
 `;
 
 const SortOptions = styled.div`
@@ -124,6 +126,7 @@ const ReviewContent = styled.div`
 const ReviewTitle = styled.h3`
   font-size: 18px;
   margin-bottom: 10px;
+  color: black;
 `;
 
 const ReviewText = styled.p`

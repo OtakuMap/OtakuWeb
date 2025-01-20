@@ -3,6 +3,18 @@ import { MapPin } from 'lucide-react';
 import profile from '../assets/profile.png';
 import profile2 from '../assets/profile2.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useState } from 'react';
+
+interface Review {
+  id: number;
+  profileImage: string;
+  username: string;
+  rating: number;
+  maxRating: number;
+  likes: number;
+  dislikes: number;
+  content: string;
+}
 
 const profileData = {
   profileImage: profile,
@@ -81,6 +93,7 @@ const Container = styled.div`
   padding: 20px;
   display: flex;
   flex-direction: column;
+  margin-top: 60px;
 `;
 
 const ContentWrapper = styled.div`
@@ -280,26 +293,6 @@ const Header = styled.h1`
     background-color: white;
   }
 `;
-const ReviewItem = styled.div`
-  background-color: white;
-  color: #000;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  font-size: 14px;
-  width: 250px;
-  height: 250px;
-  position: relative;
-`;
-
-const FeedbackButton = styled.div`
-  position: relative;
-  bottom: 10px;
-  right: 10px;
-  display: flex;
-  gap: 10px;
-  cursor: pointer;
-`;
 
 const IconContainer = styled.div`
   display: flex;
@@ -327,8 +320,148 @@ const ReviewContent = styled.p`
   white-space: pre-line;
   margin-top: 20px;
 `;
+const SubmitButton = styled.button`
+  background-color: white;
+  color: #0c004b;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+const EditDeleteButtons = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+`;
+
+const ActionButton = styled.button`
+  background: white;
+  color: black;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+const ReviewItem = styled.div`
+  background-color: white;
+  color: #000;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  font-size: 14px;
+  width: 250px;
+  min-height: 250px;
+  position: relative;
+`;
+
+// FeedbackButton 하나로 통합
+const FeedbackButton = styled.div`
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  gap: 10px;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+// InlineEditTextArea 추가
+const InlineEditTextArea = styled.textarea`
+  width: 85%;
+  height: 60px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: black;
+  resize: none;
+  margin-left: 20px;
+  font-family: inherit;
+  overflow-y: auto;
+`;
 
 const ReviewPage4 = () => {
+  const [reviews, setReviews] = useState<Review[]>(reviewData);
+  const [reviewText, setReviewText] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editText, setEditText] = useState('');
+
+  // 리뷰 추가 핸들러
+  const handleReviewSubmit = () => {
+    if (reviewText.trim() === '') return;
+
+    const newReview: Review = {
+      id: reviews.length + 1,
+      profileImage: profileData.profileImage,
+      username: profileData.name,
+      rating: profileData.rating,
+      maxRating: profileData.maxRating,
+      likes: 0,
+      dislikes: 0,
+      content: reviewText,
+    };
+
+    setReviews([newReview, ...reviews]);
+    setReviewText('');
+  };
+  const handleEditStart = (review: Review) => {
+    setEditingId(review.id);
+    setEditText(review.content);
+  };
+
+  // 수정 취소
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditText('');
+  };
+
+  // 수정 완료
+  const handleEditComplete = (reviewId: number) => {
+    setReviews(
+      reviews.map((review) => (review.id === reviewId ? { ...review, content: editText } : review)),
+    );
+    setEditingId(null);
+    setEditText('');
+  };
+
+  const handleDelete = (reviewId: number) => {
+    if (window.confirm('리뷰를 삭제하시겠습니까?')) {
+      setReviews(reviews.filter((review) => review.id !== reviewId));
+    }
+  };
+
+  const handleLike = (reviewId: number) => {
+    setReviews(
+      reviews.map((review) =>
+        review.id === reviewId ? { ...review, likes: review.likes + 1 } : review,
+      ),
+    );
+  };
+
+  const handleDislike = (reviewId: number) => {
+    setReviews(
+      reviews.map((review) =>
+        review.id === reviewId ? { ...review, dislikes: review.dislikes + 1 } : review,
+      ),
+    );
+  };
   return (
     <Container>
       <ContentWrapper>
@@ -360,41 +493,78 @@ const ReviewPage4 = () => {
                 </StarRating>
               </ProfileInfo>
             </ProfileContainer>
-            <FeedbackInput placeholder="한 줄 후기를 남겨주세요 !" />
+            <div style={{ position: 'relative', width: '800px' }}>
+              <FeedbackInput
+                placeholder="한 줄 후기를 남겨주세요 !"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+              />
+              <SubmitButton onClick={handleReviewSubmit}>등록하기</SubmitButton>
+            </div>
           </FeedbackSection>
 
           <ReviewGrid>
-            {reviewData.map((review) => (
-              <ReviewItem key={review.id}>
-                <ReviewProfileContainer>
-                  <ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
-                  <ReviewProfileInfo>
-                    <ReviewProfileName>{review.username}</ReviewProfileName>
-                    <ReviewStarRating>
-                      {'⭐'.repeat(review.rating)}
-                      {'☆'.repeat(review.maxRating - review.rating)}
-                    </ReviewStarRating>
-                  </ReviewProfileInfo>
-                </ReviewProfileContainer>
+            {reviews.map(
+              (
+                review, // reviewData를 reviews로 변경
+              ) => (
+                <ReviewItem key={review.id}>
+                  <ReviewProfileContainer>
+                    <ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
+                    <ReviewProfileInfo>
+                      <ReviewProfileName>{review.username}</ReviewProfileName>
+                      <ReviewStarRating>
+                        {'⭐'.repeat(review.rating)}
+                        {'☆'.repeat(review.maxRating - review.rating)}
+                      </ReviewStarRating>
+                    </ReviewProfileInfo>
+                  </ReviewProfileContainer>
 
-                <ReviewContent>{review.content}</ReviewContent>
+                  {editingId === review.id ? (
+                    <InlineEditTextArea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      autoFocus
+                    />
+                  ) : (
+                    <ReviewContent>{review.content}</ReviewContent>
+                  )}
 
-                <FeedbackButtonsWrapper>
-                  <FeedbackButton>
-                    <IconContainer>
-                      <ThumbsUp size={20} />
-                      <span>{review.likes}</span>
-                    </IconContainer>
-                  </FeedbackButton>
-                  <FeedbackButton>
-                    <IconContainer>
-                      <ThumbsDown size={20} />
-                      <span>{review.dislikes}</span>
-                    </IconContainer>
-                  </FeedbackButton>
-                </FeedbackButtonsWrapper>
-              </ReviewItem>
-            ))}
+                  {review.username === profileData.name && (
+                    <EditDeleteButtons>
+                      {editingId === review.id ? (
+                        <>
+                          <ActionButton onClick={() => handleEditComplete(review.id)}>
+                            완료
+                          </ActionButton>
+                          <ActionButton onClick={handleEditCancel}>취소</ActionButton>
+                        </>
+                      ) : (
+                        <>
+                          <ActionButton onClick={() => handleEditStart(review)}>수정</ActionButton>
+                          <ActionButton onClick={() => handleDelete(review.id)}>삭제</ActionButton>
+                        </>
+                      )}
+                    </EditDeleteButtons>
+                  )}
+
+                  <FeedbackButtonsWrapper>
+                    <FeedbackButton onClick={() => handleLike(review.id)}>
+                      <IconContainer>
+                        <ThumbsUp size={20} />
+                        <span>{review.likes}</span>
+                      </IconContainer>
+                    </FeedbackButton>
+                    <FeedbackButton onClick={() => handleDislike(review.id)}>
+                      <IconContainer>
+                        <ThumbsDown size={20} />
+                        <span>{review.dislikes}</span>
+                      </IconContainer>
+                    </FeedbackButton>
+                  </FeedbackButtonsWrapper>
+                </ReviewItem>
+              ),
+            )}
           </ReviewGrid>
         </WhiteContainer>
       </ContentWrapper>
