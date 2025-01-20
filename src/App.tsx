@@ -8,6 +8,19 @@ import SearchIdPWPage from './pages/search_idpw';
 import NewSetPWPage from './pages/newsetpw';
 import RouteManagement from './components/RouteManagement';
 import Navbar from './components/common/Navbar';
+<<<<<<< Updated upstream
+=======
+import MyPage from './components/MyPage';
+import Cover from './components/Cover';
+import Category from './components/category';
+import MapPage from './pages/map/MapPage';
+import RoutePage from './pages/map/RoutePage';
+import ReviewPage1 from './pages/ReviewPage1';
+import ReviewPage2 from './pages/ReviewPage2';
+import ReviewPage3 from './pages/ReviewPage3';
+import ReviewPage4 from './pages/ReviewPage4';
+import ReviewPage5 from './pages/ReviewPage5';
+>>>>>>> Stashed changes
 
 const AppContainer = styled.div`
   position: relative;
@@ -15,6 +28,17 @@ const AppContainer = styled.div`
   background-color: #0c004b;
 `;
 
+<<<<<<< Updated upstream
+=======
+// Navbar를 조건부로 렌더링하는 컴포넌트
+const NavigationWrapper = () => {
+  const location = useLocation();
+  const hideNavbarPaths = ['/map', '/route'];
+
+  return hideNavbarPaths.includes(location.pathname) ? null : <Navbar />;
+};
+
+>>>>>>> Stashed changes
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -32,8 +56,22 @@ const App: React.FC = () => {
         </Routes>
       ) : (
         <AppContainer>
+<<<<<<< Updated upstream
           <Navbar />
           <RouteManagement />
+=======
+          <NavigationWrapper />
+          <Routes>
+            <Route path="/" element={<RouteManagement />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/route" element={<RoutePage />} />
+            <Route path="/review1" element={<ReviewPage1 />} />
+            <Route path="/review2" element={<ReviewPage2 />} />
+            <Route path="/review3" element={<ReviewPage3 />} />
+            <Route path="/review4" element={<ReviewPage4 />} />
+            <Route path="/review5" element={<ReviewPage5 />} />
+          </Routes>
+>>>>>>> Stashed changes
         </AppContainer>
       )}
     </BrowserRouter>
