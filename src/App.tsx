@@ -40,13 +40,17 @@ const App: React.FC = () => {
     <BrowserRouter>
       {!isLoggedIn ? (
         <Routes>
-          <Route
-            path="/"
-            element={<LoginPage onLogin={() => setIsLoggedIn(true)} />}
-          />
+          <Route path="/" element={<LoginPage/>}/>
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/search-id-pw" element={<SearchIdPWPage />} />
           <Route path="/newsetpw" element={<NewSetPWPage />} />
+          <Route path="/" element={<RouteManagement />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/review1" element={<ReviewPage1 />} />
+            <Route path="/review2" element={<ReviewPage2 />} />
+            <Route path="/review3" element={<ReviewPage3 />} />
+            <Route path="/review4" element={<ReviewPage4 />} />
+            <Route path="/review5" element={<ReviewPage5 />} />
         </Routes>
       ) : (
         <AppContainer>

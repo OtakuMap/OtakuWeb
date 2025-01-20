@@ -1,57 +1,31 @@
 // newsetpw
 import styled from "styled-components";
-import { useNavigate } from 'react-router-dom';
-import "../styles/font.css";
-import kakaoIcon from '../assets/img/kakao-icon.png';
-import naverIcon from '../assets/img/naver-icon.png';
-import googleIcon from '../assets/img/google-icon.png';
-import logoIcon from '../assets/logo.png';
+import Backgroundimg from '../assets/logorepeat.png';
 
 const NewSetPWPage: React.FC = () => {
-  const navigate = useNavigate(); 
   return (
     <Container>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <Row key={rowIndex} rowIndex={rowIndex}>
-          {Array.from({ length: 10 }).map((_, colIndex) => (
-            <LogoTile
-              key={`${rowIndex}-${colIndex}`}
-              src={logoIcon}
-              rowIndex={rowIndex}
-              colIndex={colIndex}
-            />
-          ))}
-        </Row>
-      ))}
-      <LoginBox>
-        <Title>
-          <WelcomeText>WELCOME!</WelcomeText>
-          <Logo src={logoIcon} />
-        </Title>
-        <InputBox>
+      <NewsetpwBox>
+          <Text>새로운 비밀번호 설정</Text>
           <Form>
             <FormGroup>
-              <Label>ID</Label>
+              <Label>새로운 비밀번호 입력</Label>
               <Input type="text" />
             </FormGroup>
-            <Divider />
             <FormGroup>
-              <Label>PW</Label>
+              <Label>비밀번호 확인</Label>
               <Input type="password" />
             </FormGroup>
           </Form>
-        </InputBox>
+        <DetailText>
+          영문, 숫자, 특수문자 중 2종류 이상으로
+          최소 10자리 이상 또는 3종류 이상을 조합하하여 최소 8자리 이상의 길이로 구현하여야 합니다.
+        </DetailText>
+        <Divider />
         <Actions>
-          <ActionLink>아이디/비밀번호 찾기</ActionLink>
-          <ActionLink onClick={() => navigate('/signup')}>회원가입</ActionLink>
+          <ActionLink>설정하기</ActionLink>
         </Actions>
-        <ActionLink2>간편 회원가입/로그인</ActionLink2>
-        <SocialLogin>
-          <SocialIcon src={kakaoIcon} alt="Kakao Login" />
-          <SocialIcon src={naverIcon} alt="Naver Login" />
-          <SocialIcon src={googleIcon} alt="Google Login" />
-        </SocialLogin>
-      </LoginBox>
+      </NewsetpwBox>
     </Container>
   );
 };
@@ -60,102 +34,90 @@ export default NewSetPWPage;
 
 const Container = styled.div`
   display: flex;
-  background: #101148;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
+  background-image: url(${Backgroundimg});
+  background-size: cover; // 화면 크기에 맞게 이미지 크기 조정
+  background-position: center;  // 이미지 중앙 정렬
 `;
 
-const Row = styled.div<{ rowIndex: number }>`
-  position: absolute;
-  top: ${({ rowIndex }) => `${10 + rowIndex * 147}px`};
-  width: 100%;
-  display: flex;
-  justify-content: ${({ rowIndex }) =>
-    rowIndex % 2 === 0 ? "flex-start" : "flex-end"};
-`;
-
-const LogoTile = styled.img<{ rowIndex: number; colIndex: number }>`
-  width: 948px;
-  height: 147px;
-  margin: 10px;
-  opacity: ${({ rowIndex, colIndex }) =>
-    0.8 - rowIndex * 0.1 - colIndex * 0.01};
-`;
-
-const LoginBox = styled.div`
+const NewsetpwBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  width: 724px;
+  width: 661px;
+  height: 454px;
   background: #101148;
   border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
 `;
 
-const Title = styled.div`
-  text-align: center;
-  color: #ffffff;
-  margin-bottom: 20px;
-`;
-
-const WelcomeText = styled.h1`
-  font-family: 'Pixelify Sans', sans-serif;
+const Text = styled.label`
+  font-family: 'Gothic A1';
   font-weight: 600;
-  font-size: 40px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  line-height: 30px;
+  color: #ffffff;
 `;
 
-const Logo = styled.img`
-  width: 286px;
-  height: 44px;
-`;
-
-const InputBox = styled.div`
-  width: 100%;
-  background-color: #101148;
-  border-radius: 20px;
-  border: 2px solid #d1c1ff;
-  padding: 20px;
-  margin-bottom: 20px;
+const DetailText = styled.label`
+  font-family: 'Gothic A1';
+  font-weight: 500;
+  font-size: 16px;
+  line-height:20px;
+  color: #999797;
+  width:577px;
+  margin-bottom:20px;
 `;
 
 const Form = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top:35px;
+  margin-bottom:40px;
 `;
+
 
 const FormGroup = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
-  gap: 10px;
   margin-bottom: 10px;
+  width: 448px;
+  hight :60px;
+  background-color: #101148;
+  border-radius: 20px;
+  border: 2px solid #d1c1ff;
+  box-sizing: border-box;
 `;
 
 const Label = styled.label`
-  font-family: 'Pixelify Sans', sans-serif;
-  font-size: 24px;
+  position:relative;
+  font-family: 'Gothic A1';
+  font-size: 20px;
   font-weight: 600;
-  text-align:left;
-  color: #ffffff;
+  line-height:25px;
+  color: #999797;
+  margin-left: 20px;
+  flex-shrink: 0;
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  font-size: 16px;
+  font-size: 20px;
   background-color: #101148;
   color: #ffffff;
   border: none;
   outline: none;
-  width: 80%;
-
+  height: 56px;
+  flex-shrink: 0;
+  width:45%;
+  margin-left:10px;
   &:focus {
     background-color: #101148;
     color: #ffffff;
@@ -170,56 +132,19 @@ const Input = styled.input`
 `;
 
 const Divider = styled.hr`
-  border: 0;
-  height: 1px;
-  background-color: #999797;
-  width: 100%;
+  border: 1px solid #ffffff;
+  width: 600px;
+  margin-bottom:20px;
 `;
 
 const Actions = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 60%;
   margin-bottom: 20px;
 `;
 
-const ActionLink = styled.a`
+const ActionLink = styled.label`
   font-family: 'Gothic A1';
-  font-size: 12px;
-  color: #cccccc;
+  font-size: 24px;
+  color: #ffffff;
   cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const ActionLink2 = styled.a`
-  font-family: 'Gothic A1';
-  font-weight: 600;
-  font-size: 15px;
-  color: #cccccc;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const SocialLogin = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-`;
-
-const SocialIcon = styled.img`
-  width: 68px;
-  height: 68px;
-  cursor: pointer;
-  border-radius: 50%;
-
-  &:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s;
-  }
 `;

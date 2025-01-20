@@ -1,32 +1,20 @@
 import styled from "styled-components";
-import logoIcon from '../assets/logo.png';
+import Backgroundimg from '../assets/logorepeat.png';
 
 const SearchIdPWPage: React.FC = () => {
   return (
     <Container>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <Row key={rowIndex} rowIndex={rowIndex}>
-          {Array.from({ length: 10 }).map((_, colIndex) => (
-            <LogoTile
-              key={`${rowIndex}-${colIndex}`}
-              src={logoIcon}
-              rowIndex={rowIndex}
-              colIndex={colIndex}
-            />
-          ))}
-        </Row>
-      ))}
       <SearchIdPwBox>
         <Section>
           <Title>아이디 찾기</Title>
           <Form>
             <FormGroup>
               <Label>이름(실명)</Label>
-              <Input type="text"  />
+              <Input type="text" />
             </FormGroup>
             <FormGroup>
               <Label>가입한 E - mail</Label>
-              <Input type="text"  />
+              <Input type="text" />
             </FormGroup>
             <ActionButton>조회하기</ActionButton>
           </Form>
@@ -44,11 +32,10 @@ const SearchIdPWPage: React.FC = () => {
               <Input type="text" />
             </FormGroup>
             <FormGroup>
-                <Label>인증번호</Label>
-                <Input type="text" />
-            <VerifyButton>인증 하기</VerifyButton>
+              <Label>인증번호</Label>
+              <Input type="text" />
             </FormGroup>
-            <ActionButton>조회하기</ActionButton>
+            <ActionButton>인증번호 받기</ActionButton>
           </Form>
         </Section>
       </SearchIdPwBox>
@@ -60,44 +47,32 @@ export default SearchIdPWPage;
 
 const Container = styled.div`
   display: flex;
-  background: #101148;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
-`;
-
-const Row = styled.div<{ rowIndex: number }>`
-  position: absolute;
-  top: ${({ rowIndex }) => `${10 + rowIndex * 147}px`};
-  width: 100%;
-  display: flex;
-  justify-content: ${({ rowIndex }) =>
-    rowIndex % 2 === 0 ? "flex-start" : "flex-end"};
-`;
-
-const LogoTile = styled.img<{ rowIndex: number; colIndex: number }>`
-  width: 948px;
-  height: 147px;
-  margin: 10px;
-  opacity: ${({ rowIndex, colIndex }) =>
-    0.8 - rowIndex * 0.1 - colIndex * 0.01};
+  background-image: url(${Backgroundimg});
+  background-size: cover;
+  background-position: center;
 `;
 
 const SearchIdPwBox = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content:flex-start;
   align-items: center;
   position: relative;
-  width:528px;
-  height: 570px;
-  background: #1a1b4b;
+  width: 661px;
+  height: auto;
+  max-height:90%;
+  background: #101148;
   border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  overflow-y: auto; 
+  scrollbar-width: none; 
 `;
 
 const Section = styled.div`
@@ -109,61 +84,67 @@ const Title = styled.div`
   font-family: 'Gothic A1', serif;
   text-align: center;
   color: #ffffff;
-  margin-bottom: 5px;
-  margin-top:5px;
+  margin-bottom: 35px;
+  margin-top: 30px;
   font-size: 24px;
   font-weight: 600;
+  line-height:30px;
 `;
 
 const Form = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  justify-content:center;
+  align-items: center;
+  margin-bottom: 35px;
 `;
 
 const FormGroup = styled.div`
   display: flex;
+  justify-content: flex-start; 
   align-items: center;
-  gap: 10px;
+  margin-bottom: 10px;
+  width: 448px;
+  height: 60px;
   background-color: #101148;
   border-radius: 20px;
   border: 2px solid #d1c1ff;
-  padding: 10px;
-  position: relative;
+  box-sizing: border-box;
 `;
 
 const Label = styled.label`
+  position: relative;
   font-family: 'Gothic A1';
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
+  line-height: 25px;
   color: #999797;
-  text-align: left;
+  margin-left: 15px;
+  flex-shrink: 0;
 `;
 
 const Input = styled.input`
-  flex: 1;
-  padding: 8px;
-  font-size: 16px;
+  font-size: 20px;
   background-color: #101148;
   color: #ffffff;
   border: none;
   outline: none;
-  &::placeholder {
-    color: #999797;
-  }
-`;
-
-const VerifyButton = styled.button`
-  background-color: #Bdaee5;
-  color: #101148;
-  border: 2px solid #fff5d5;
-  border-radius: 30px;
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  align-self:flex-end;
+  height: 56px;
   flex-shrink: 0;
+  width: 58%;
+  margin-left: 10px;
+
+  &:focus {
+    background-color: #101148;
+    color: #ffffff;
+  }
+
+  &:-webkit-autofill {
+    background-color: #101148 !important;
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
+    color: #ffffff !important;
+  }
 `;
 
 const ActionButton = styled.button`
@@ -177,14 +158,14 @@ const ActionButton = styled.button`
   cursor: pointer;
   text-align: center;
   margin: 0 auto;
-    width:174px;
-  height:60px;
+  width: 174px;
+  height: 60px;
+  margin-top: 35px;
 `;
 
 const Divider = styled.hr`
-  border: 0;
-  height: 1px;
-  background-color: #999797;
-  width: 100%;
-  margin: 20px 0;
+  border: 1px solid #ffffff;
+  width: 600px;
+  position: relative;
+  z-index: 1; 
 `;
