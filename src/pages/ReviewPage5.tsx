@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import profileImage from '../assets/profile.png';
-import mapImage from '../assets/map.png';
+import mapImage from '../assets/mapData.png';
 
 const Container = styled.div`
   background-color: #0c004b;

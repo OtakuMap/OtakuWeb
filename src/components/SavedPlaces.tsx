@@ -1,3 +1,4 @@
+// SavedPlaces.tsx
 import React from 'react';
 import styled from 'styled-components';
 import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
@@ -5,7 +6,7 @@ import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
 interface RouteItem {
   id: number;
   title: string;
-  author?: string;
+  address: string;
   isStarred?: boolean;
 }
 
@@ -16,23 +17,23 @@ const Container = styled.div`
   min-height: 100vh;
   padding: 40px;
   width: 100vw;
-  position: relative; /* 아이콘 위치를 위한 기준 */
+  position: relative;
 `;
 
-// 아이콘 컨테이너
 const IconContainer = styled.div`
   position: absolute;
-  top: 80px; /* 상단 여백 */
-  right: 50px; /* 우측 여백 */
+  top: 75px;
+  right: 430px;
   display: flex;
   align-items: center;
+  gap: 12px;
 `;
 
-// 아이콘 이미지 스타일
 const IconImage = styled.img``;
 
 const ContentWrapper = styled.div`
   width: 100%;
+  max-width: 960px;
   margin: 0 auto;
 `;
 
@@ -43,9 +44,9 @@ const Title = styled.h1`
 `;
 
 const TabContainer = styled.div`
-  position: relative;
   display: flex;
   gap: 8px;
+  margin-bottom: 0px;
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
@@ -62,7 +63,9 @@ const Tab = styled.button<{ active?: boolean }>`
 const RouteListContainer = styled.div`
   background: white;
   border-radius: 16px;
-  padding: 24px 80px;
+  margin-top: -3px;
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const ListHeader = styled.div`
@@ -99,7 +102,7 @@ const ListActions = styled.div`
 
 const RouteItem = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 16px;
   background-color: #f8f7ff;
   margin-bottom: 8px;
@@ -109,6 +112,11 @@ const RouteItem = styled.div`
   &:hover {
     background-color: #f0f0ff;
   }
+`;
+
+const RouteDetails = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const RadioButton = styled.div<{ checked: boolean }>`
@@ -137,6 +145,13 @@ const RouteTitle = styled.span`
   flex: 1;
   color: #333;
   font-size: 15px;
+  font-weight: 500;
+`;
+
+const RouteAddress = styled.span`
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
 `;
 
 const StarButton = styled.button<{ isStarred?: boolean }>`
@@ -149,40 +164,48 @@ const StarButton = styled.button<{ isStarred?: boolean }>`
   line-height: 1;
 `;
 
-const RouteManagement: React.FC = () => {
+const SavedPlaces: React.FC = () => {
   const [routes] = React.useState<RouteItem[]>([
-    { id: 1, title: '오사카 굿즈샵 뿌시기', isStarred: false },
-    { id: 2, title: '오사카 굿즈샵 뿌시기 오사카 굿즈샵 뿌시기', isStarred: false },
     {
-      id: 3,
-      title: '오사카 굿즈샵 뿌시기 오사카 굿즈샵 뿌시기 오사카 굿즈샵 뿌시기',
+      id: 1,
+      title: '한신 고시엔 구장',
+      address: '1-82 Koshiencho, Nishinomiya, Hyogo 663-8152 일본',
       isStarred: false,
     },
-    { id: 4, title: '제목제목제목제목제목제목제목제목제목제목제목제목제목', isStarred: false },
-    { id: 5, title: '제목제목제목제목제목제목제목제목제목제목제목제목제목', isStarred: false },
+    {
+      id: 2,
+      title: '한신 고시엔 구장',
+      address: '1-82 Koshiencho, Nishinomiya, Hyogo 663-8152 일본',
+      isStarred: false,
+    },
+    {
+      id: 3,
+      title: '한신 고시엔 구장',
+      address: '1-82 Koshiencho, Nishinomiya, Hyogo 663-8152 일본',
+      isStarred: false,
+    },
   ]);
 
   const [selectedRoute, setSelectedRoute] = React.useState<number | null>(null);
 
   return (
     <Container>
-      <ContentWrapper>
-        {/* 아이콘 컨테이너 */}
-        <IconContainer>
-          <IconImage src={spaceIcon} alt="Space Icon" />
-        </IconContainer>
+      <IconContainer>
+        <IconImage src={spaceIcon} alt="Space Icon" />
+      </IconContainer>
 
+      <ContentWrapper>
         <Title>나의 좋아요</Title>
 
         <TabContainer>
-          <Tab active>저장한 루트</Tab>
-          <Tab>편한 장소</Tab>
+          <Tab>저장한 루트</Tab>
+          <Tab active>찜한 장소</Tab>
           <Tab>저장한 이벤트</Tab>
         </TabContainer>
 
         <RouteListContainer>
           <ListHeader>
-            <ListTitle>저장한 루트 (5)</ListTitle>
+            <ListTitle>찜한 장소 (3)</ListTitle>
             <ListActions>
               <button>선택 삭제</button>
               <span>/</span>
@@ -192,12 +215,15 @@ const RouteManagement: React.FC = () => {
 
           {routes.map((route) => (
             <RouteItem key={route.id}>
-              <RadioButton
-                checked={selectedRoute === route.id}
-                onClick={() => setSelectedRoute(route.id)}
-              />
-              <RouteTitle>{route.title}</RouteTitle>
-              <StarButton isStarred={route.isStarred}>★</StarButton>
+              <RouteDetails>
+                <RadioButton
+                  checked={selectedRoute === route.id}
+                  onClick={() => setSelectedRoute(route.id)}
+                />
+                <RouteTitle>{route.title}</RouteTitle>
+                <StarButton isStarred={route.isStarred}>★</StarButton>
+              </RouteDetails>
+              <RouteAddress>{route.address}</RouteAddress>
             </RouteItem>
           ))}
         </RouteListContainer>
@@ -206,4 +232,4 @@ const RouteManagement: React.FC = () => {
   );
 };
 
-export default RouteManagement;
+export default SavedPlaces;

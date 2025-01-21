@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import profile from '../assets/profile.png';
 import profile3 from '../assets/profile3.png';
-import eventImage from '../assets/event.png';
-import review from '../assets/review.png';
+import eventImage from '../assets/eventImg.png';
+import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
-import mapImage from '../assets/map.png';
+import mapImage from '../assets/mapData.png';
 import product from '../assets/product.png';
 
 interface Review {
