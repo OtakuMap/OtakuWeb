@@ -37,6 +37,7 @@ const Container = styled.div`
   padding: 20px;
   display: flex;
   flex-direction: column;
+  margin-top: 60px;
 `;
 
 const ContentWrapper = styled.div`
@@ -129,6 +130,7 @@ const Header = styled.div`
   margin-bottom: 20px;
   padding: 0 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  color: black;
 `;
 
 const ReviewList = styled.div`

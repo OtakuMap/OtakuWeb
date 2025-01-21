@@ -39,6 +39,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 60px;
 `;
 
 const SearchBar = styled.div`
@@ -106,6 +107,7 @@ const Title = styled.h1`
   font-size: 24px;
   font-weight: bold;
   color: #000;
+  margin-bottom: 5px;
 `;
 
 const SortOptionsWrapper = styled.div`
