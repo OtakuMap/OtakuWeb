@@ -28,12 +28,22 @@ const GOOGLE_MAPS_LOADING_STATE = {
 };
 
 const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
+  // 이미 로드된 경우
   if (GOOGLE_MAPS_LOADING_STATE.loaded) {
     return Promise.resolve();
   }
 
+  // 로딩 중인 경우
   if (GOOGLE_MAPS_LOADING_STATE.loading && GOOGLE_MAPS_LOADING_STATE.promise) {
     return GOOGLE_MAPS_LOADING_STATE.promise;
+  }
+
+  // 이미 스크립트가 존재하는지 확인
+  const existingScript = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+
+  if (existingScript) {
+    GOOGLE_MAPS_LOADING_STATE.loaded = true;
+    return Promise.resolve();
   }
 
   GOOGLE_MAPS_LOADING_STATE.loading = true;
@@ -113,15 +123,30 @@ const MapContainer: React.FC<MapContainerProps> = ({
         },
       });
 
-      marker.addListener('click', () => {
+      // 클릭 핸들러를 별도 함수로 분리
+      const handleMarkerClick = () => {
         if (onMarkerClick) {
           onMarkerClick(location);
         }
-      });
+
+        // requestAnimationFrame을 사용하여 다음 프레임에서 지도 업데이트
+        requestAnimationFrame(() => {
+          const map = mapInstance.current;
+          if (!map) return;
+
+          map.setCenter({
+            lat: location.latitude,
+            lng: location.longitude,
+          });
+          map.setZoom(17);
+        });
+      };
+
+      marker.addListener('click', handleMarkerClick);
 
       return marker;
     },
-    [onMarkerClick],
+    [onMarkerClick], // mapInstance 제거
   );
 
   // 마커 업데이트

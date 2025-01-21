@@ -24,4 +24,5 @@ export interface LocationDetail {
   animeName: string;
   address: string;
   hashtags: string[];
+  relatedPlaces?: LocationDetail[];
 }
