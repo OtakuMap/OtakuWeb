@@ -1,7 +1,10 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import LeftContainer from '../../components/map/LeftContainter';
 import MapContainer from '../../components/map/MapContainer';
 import FilterButton from '@/components/map/FilterButton';
+import LocationDetail from '@/components/map/LocationDetail';
+import { Place } from '@/types/map/place';
 
 const PageContainer = styled.div`
   display: flex;
@@ -21,24 +24,48 @@ const MapWrapper = styled.div`
 `;
 
 const MapPage = () => {
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [showLocationDetail, setShowLocationDetail] = useState(false);
+
   const handleFilterChange = (isActive: boolean) => {
     // 필터 상태 변경 시 처리할 로직
     console.log('Filter state:', isActive);
   };
 
+  const handlePlaceSelect = (place: Place) => {
+    setSelectedPlace(place);
+    setShowLocationDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setShowLocationDetail(false);
+  };
+
   return (
     <PageContainer>
-      <LeftContainer />
+      <LeftContainer onPlaceSelect={handlePlaceSelect} />
       <MapWrapper>
         <MapContainer
           apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-          center={{
-            lat: 34.72145462036133,
-            lng: 135.3616485595703,
-          }}
-          zoom={16}
+          center={
+            selectedPlace
+              ? {
+                  lat: selectedPlace.latitude,
+                  lng: selectedPlace.longitude,
+                }
+              : {
+                  lat: 34.72145462036133,
+                  lng: 135.3616485595703,
+                }
+          }
+          zoom={selectedPlace ? 17 : 16}
+          locations={selectedPlace ? [selectedPlace] : []}
+          onMarkerClick={() => setShowLocationDetail(true)}
         />
         <FilterButton onFilterChange={handleFilterChange} />
+        {showLocationDetail && selectedPlace && (
+          <LocationDetail location={selectedPlace} onClose={handleCloseDetail} />
+        )}
       </MapWrapper>
     </PageContainer>
   );

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
 import MapContainer from '../../components/map/MapContainer';
+import LocationDetail from '@/components/map/LocationDetail';
 import { RouteLocation } from '@/types/map/route';
 
 const PageContainer = styled.div`
@@ -31,7 +32,7 @@ const sampleLocations: RouteLocation[] = [
     longitude: 139.7755,
     animeName: '기동전사 건담',
     address: '도쿄도 미나토구 오다이바 1-7-1 다이버시티 도쿄 플라자 7F',
-    hashtags: ['#건담', '#오다이바', '#다이버시티도쿄'],
+    hashtags: ['건담', '오다이바', '다이버시티도쿄'],
   },
   {
     id: 2,
@@ -41,7 +42,7 @@ const sampleLocations: RouteLocation[] = [
     longitude: 139.7715,
     animeName: '스테인즈 게이트',
     address: '도쿄도 치요다구 소토칸다 1-15-16',
-    hashtags: ['#아키하바라', '#오타쿠', '#전자상가'],
+    hashtags: ['아키하바라', '오타쿠', '전자상가'],
   },
   {
     id: 3,
@@ -51,7 +52,7 @@ const sampleLocations: RouteLocation[] = [
     longitude: 139.5704,
     animeName: '지브리 작품들',
     address: '도쿄도 미타카시 시모렌자쿠 1-1-83',
-    hashtags: ['#지브리', '#미야자키하야오', '#토토로'],
+    hashtags: ['지브리', '미야자키하야오', '토토로'],
   },
   {
     id: 4,
@@ -61,7 +62,7 @@ const sampleLocations: RouteLocation[] = [
     longitude: 139.665,
     animeName: '여러 작품',
     address: '도쿄도 나카노구 나카노 5-52-15',
-    hashtags: ['#중고피규어', '#레트로게임', '#만화'],
+    hashtags: ['중고피규어', '레트로게임', '만화'],
   },
   {
     id: 5,
@@ -71,12 +72,13 @@ const sampleLocations: RouteLocation[] = [
     longitude: 139.7177,
     animeName: '포케몬',
     address: '도쿄도 도시마구 히가시이케부쿠로 3-1-2 선샤인시티 알파도메 3F',
-    hashtags: ['#포케몬', '#이케부쿠로', '#선샤인시티'],
+    hashtags: ['포케몬', '이케부쿠로', '선샤인시티'],
   },
 ];
 
 const RoutePage = () => {
   const [locations, setLocations] = useState<RouteLocation[]>(sampleLocations);
+  const [selectedLocation, setSelectedLocation] = useState<RouteLocation | null>(null);
 
   // 중심점과 줌 레벨 계산
   const mapSettings = useMemo(() => {
@@ -130,12 +132,11 @@ const RoutePage = () => {
   }, [locations]);
 
   const handleMarkerClick = (location: RouteLocation) => {
-    console.log('Location details:', {
-      name: location.name,
-      animeName: location.animeName,
-      address: location.address,
-      hashtags: location.hashtags,
-    });
+    setSelectedLocation(location);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedLocation(null);
   };
 
   const handleLocationsChange = (newLocations: RouteLocation[]) => {
@@ -153,6 +154,9 @@ const RoutePage = () => {
           locations={locations}
           onMarkerClick={handleMarkerClick}
         />
+        {selectedLocation && (
+          <LocationDetail location={selectedLocation} onClose={handleCloseDetail} />
+        )}
       </MapWrapper>
     </PageContainer>
   );

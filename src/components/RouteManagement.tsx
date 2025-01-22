@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
 
 interface RouteItem {
   id: number;
@@ -15,7 +16,20 @@ const Container = styled.div`
   min-height: 100vh;
   padding: 40px;
   width: 100vw;
+  position: relative; /* 아이콘 위치를 위한 기준 */
 `;
+
+// 아이콘 컨테이너
+const IconContainer = styled.div`
+  position: absolute;
+  top: 80px; /* 상단 여백 */
+  right: 50px; /* 우측 여백 */
+  display: flex;
+  align-items: center;
+`;
+
+// 아이콘 이미지 스타일
+const IconImage = styled.img``;
 
 const ContentWrapper = styled.div`
   width: 100%;
@@ -153,6 +167,11 @@ const RouteManagement: React.FC = () => {
   return (
     <Container>
       <ContentWrapper>
+        {/* 아이콘 컨테이너 */}
+        <IconContainer>
+          <IconImage src={spaceIcon} alt="Space Icon" />
+        </IconContainer>
+
         <Title>나의 좋아요</Title>
 
         <TabContainer>
