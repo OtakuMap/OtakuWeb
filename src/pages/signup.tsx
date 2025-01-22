@@ -1,21 +1,9 @@
 import styled from "styled-components";
-import logoIcon from '../assets/logo.png';
+import Backgroundimg from '../assets/logorepeat.png';
 
 const SignupPage: React.FC = () => {
   return (
     <Container>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <Row key={rowIndex} rowIndex={rowIndex}>
-          {Array.from({ length: 10 }).map((_, colIndex) => (
-            <LogoTile
-              key={`${rowIndex}-${colIndex}`}
-              src={logoIcon}
-              rowIndex={rowIndex}
-              colIndex={colIndex}
-            />
-          ))}
-        </Row>
-      ))}
       <SignupBox>
         <Title>
           <SignupText>회원가입</SignupText>
@@ -26,25 +14,37 @@ const SignupPage: React.FC = () => {
               <Label>이름(실명)</Label>
               <Input type="text" />
             </FormGroup>
-            <FormGroup>
+          </Form>
+          <Form>
+          <Form2>
+            <FormGroupShort>
               <Label>닉네임</Label>
               <Input type="text" />
-              <VerifyButton>인증하기</VerifyButton>
-            </FormGroup>
-            <FormGroup>
+            </FormGroupShort>
+              <VerifyButton>중복 확인</VerifyButton>
+          </Form2>
+          <Form2>
+            <FormGroupShort>
               <Label>ID</Label>
               <Input type="text" />
-              <VerifyButton>인증하기</VerifyButton>
-            </FormGroup>
+            </FormGroupShort>
+              <VerifyButton>중복 확인</VerifyButton>
+          </Form2>
+        </Form>
+        <Form>
             <FormGroup>
               <Label>E - mail</Label>
               <Input type="text" />
             </FormGroup>
-            <FormGroup>
+          <Form2>
+            <FormGroupShort>
               <Label>인증 번호</Label>
               <Input type="text" />
-              <VerifyButton>인증하기</VerifyButton>
-            </FormGroup>
+            </FormGroupShort>
+              <VerifyButton>인증 하기</VerifyButton>
+          </Form2>
+        </Form>
+        <Form3>
             <FormGroup>
               <Label>비밀번호</Label>
               <Input type="password" />
@@ -53,6 +53,7 @@ const SignupPage: React.FC = () => {
                 <Label>비밀번호 확인</Label>
                 <Input type="password" />
             </FormGroup>
+        </Form3>
             <CheckboxGroup>
                 <CheckboxItem>
                     <Checkbox id="check1" />
@@ -69,7 +70,6 @@ const SignupPage: React.FC = () => {
                     <CheckboxLabel>만 14세 이상입니다</CheckboxLabel>
                 </CheckboxItem>
             </CheckboxGroup>
-          </Form>
         </InputBox>
         <Divider/>
         <Actions>
@@ -84,31 +84,18 @@ export default SignupPage;
 
 const Container = styled.div`
   display: flex;
-  background: #101148;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
+  background-image: url(${Backgroundimg});
+  background-size: cover; // 화면 크기에 맞게 이미지 크기 조정
+  background-position: center;  // 이미지 중앙 정렬
 `;
 
-const Row = styled.div<{ rowIndex: number }>`
-  position: absolute;
-  top: ${({ rowIndex }) => `${10 + rowIndex * 147}px`};
-  width: 100%;
-  display: flex;
-  justify-content: ${({ rowIndex }) =>
-    rowIndex % 2 === 0 ? "flex-start" : "flex-end"};
-`;
-
-const LogoTile = styled.img<{ rowIndex: number; colIndex: number }>`
-  width: 948px;
-  height: 147px;
-  margin: 10px;
-  opacity: ${({ rowIndex, colIndex }) =>
-    0.8 - rowIndex * 0.1 - colIndex * 0.01};
-`;
 
 const SignupBox = styled.div`
   display: flex;
@@ -116,18 +103,20 @@ const SignupBox = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  width:528px;
-  height: 570px;
+  width: 661px;
+  height: auto;
+  max-height: 90%;
   background: #101148;
   border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
-`;
 
+`;
 const Title = styled.div`
+  display: flex;
+  justify-content:center;
   text-align: center;
-  color: #ffffff;
-  margin-bottom: 5px;
+  color: #ffffff;  
+  margin-top: 30px; 
+  margin-bottom:30px;
 `;
 
 const SignupText = styled.h1`
@@ -135,56 +124,84 @@ const SignupText = styled.h1`
   font-weight: 600;
   font-size: 24px;
   line-height:30px;
-  margin-bottom: 10px;
-
 `;
 
 const InputBox = styled.div`
-  width: 100%;
+  width: 460px;
   background-color: #101148;
   border-radius: 20px;
-  margin-bottom: 5px;
-  display: flex; /* flexbox를 사용 */
-  flex-direction: column; /* 자식 요소들이 수직으로 쌓이도록 */
-  align-items: center; /* 자식 요소들이 수평으로 중앙 정렬되도록 */
-  `;
+  display: flex;
+  flex-direction: column;
+  
+  overflow-y: auto; 
+  overflow-x: hidden;
+  scrollbar-width: none; 
+`;
 
 const Form = styled.div`
   display: flex;
   flex-direction: column;
+  margin-bottom:35px;
+`;
+
+const Form2 = styled.div`
+  display: flex;
+  flex-direction: space-between;
+`;
+
+const Form3 = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom:30px;
 `;
 
 const FormGroup = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 10px;
   margin-bottom: 10px;
   width: 448px;
   hight :60px;
   background-color: #101148;
   border-radius: 20px;
   border: 2px solid #d1c1ff;
+  box-sizing: border-box;
+`;
+
+const FormGroupShort = styled.div`
+  display: flex;
+  justify-content: flex-start;;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 336px;
+  hight :60px;
+  background-color: #101148;
+  border-radius: 20px;
+  border: 2px solid #d1c1ff;
+  box-sizing: border-box;
 `;
 
 const Label = styled.label`
+  position:relative;
   font-family: 'Gothic A1';
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
+  line-height:25px;
   color: #999797;
-  margin-left: 10px;
+  margin-left: 20px;
+  flex-shrink: 0;
 `;
 
 const Input = styled.input`
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
+  font-size: 20px;
   background-color: #101148;
   color: #ffffff;
   border: none;
   outline: none;
-  width: 130px;
-
+  height: 56px;
+  flex-shrink: 0;
+  width:58%;
+  margin-left:10px;
   &:focus {
     background-color: #101148;
     color: #ffffff;
@@ -201,12 +218,14 @@ const Input = styled.input`
 const VerifyButton = styled.button`
   width: 93px;
   height: 60px;
+  padding:0px;
   background-color: #bdaee5;
+  margin-left:20px;
   color: #101148;
-  border: none;
-  border-radius: 10px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
+  line-height:17.5px;
   cursor: pointer;
   flex-shrink: 0; /* 버튼 크기 고정 */
   border : 2px solid #fff5d5;
@@ -215,7 +234,7 @@ const VerifyButton = styled.button`
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  width:448px;
 `;
 
 const CheckboxItem = styled.div`
@@ -226,9 +245,11 @@ const CheckboxItem = styled.div`
 const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   width: 30px;
   height: 30px;
+
   accent-color: #bdaee5; /* 체크박스 색상 */
   cursor: pointer;
   border : 2px solid #fff5d5;
+  margin-bottom:10px;
 `;
 
 const CheckboxLabel = styled.label`
@@ -241,9 +262,11 @@ const CheckboxLabel = styled.label`
 `;
 
 const Divider = styled.hr`
+  margin-top:27px; 
+  margin-bottom:22px;
   height: 1px;
   background-color: #ffffff;
-  width: 100%;
+  width: 516px;
 `;
 
 const Actions = styled.div`
@@ -258,7 +281,6 @@ const ActionLink = styled.a`
   font-size: 24px;
   color: #cccccc;
   cursor: pointer;
-
 `;
 
 const ActionLink2 = styled.a`
@@ -266,7 +288,7 @@ const ActionLink2 = styled.a`
   font-size: 18px;
   color: #999797;
   cursor: pointer;
-
+  line-height:22.5px;
 `;
 
 
