@@ -139,10 +139,10 @@ const RoutePage = () => {
     const maxDiff = Math.max(latDiff, lngDiff);
 
     // 거리에 따른 줌 레벨 조정
-    let zoom = 12; // 기본값
-    if (maxDiff > 0.2) zoom = 11;
-    if (maxDiff > 0.5) zoom = 10;
-    if (maxDiff > 1) zoom = 9;
+    let zoom = 13; // 기본값
+    if (maxDiff > 0.2) zoom = 12;
+    if (maxDiff > 0.5) zoom = 11;
+    if (maxDiff > 1) zoom = 10;
 
     // 마진을 조금 주기 위해 약간의 패딩 효과
     const padding = 0.02; // 약간의 여백

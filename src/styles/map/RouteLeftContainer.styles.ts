@@ -61,7 +61,7 @@ export const RouteList = styled.div`
   left: 25px;
   top: 216px;
   width: 285px;
-  height: 254px; 
+  height: 254px;
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 10px;
@@ -106,7 +106,6 @@ export const RouteItem = styled.div`
     margin-bottom: 16px;
   }
 `;
-
 
 export const NumberBox = styled.div`
   position: absolute;
