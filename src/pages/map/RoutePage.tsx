@@ -74,6 +74,26 @@ const sampleLocations: RouteLocation[] = [
     address: '도쿄도 도시마구 히가시이케부쿠로 3-1-2 선샤인시티 알파도메 3F',
     hashtags: ['포케몬', '이케부쿠로', '선샤인시티'],
   },
+  {
+    id: 6,
+    name: '애니메이트 이케부쿠로 본점',
+    isSelected: false,
+    latitude: 35.7294,
+    longitude: 139.7137,
+    animeName: '여러 작품',
+    address: '도쿄도 도시마구 히가시이케부쿠로 1-20-7',
+    hashtags: ['애니메이트', '이케부쿠로', '굿즈'],
+  },
+  {
+    id: 7,
+    name: '니코니코 본사',
+    isSelected: false,
+    latitude: 35.7016,
+    longitude: 139.7741,
+    animeName: '여러 작품',
+    address: '도쿄도 치요다구 소토칸다 6-27-9',
+    hashtags: ['니코니코', '아키하바라', '동영상'],
+  },
 ];
 
 const RoutePage = () => {
@@ -119,10 +139,10 @@ const RoutePage = () => {
     const maxDiff = Math.max(latDiff, lngDiff);
 
     // 거리에 따른 줌 레벨 조정
-    let zoom = 12; // 기본값
-    if (maxDiff > 0.2) zoom = 11;
-    if (maxDiff > 0.5) zoom = 10;
-    if (maxDiff > 1) zoom = 9;
+    let zoom = 13; // 기본값
+    if (maxDiff > 0.2) zoom = 12;
+    if (maxDiff > 0.5) zoom = 11;
+    if (maxDiff > 1) zoom = 10;
 
     // 마진을 조금 주기 위해 약간의 패딩 효과
     const padding = 0.02; // 약간의 여백
