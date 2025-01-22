@@ -214,21 +214,26 @@ const EventPage = () => {
     <S.Container>
       <S.Content>
         <S.EventHeader imageUrl={eventData.backimage}>
-          <S.EventImage src={eventImage} alt={eventData.title} />
-          <S.EventInfo>
-            <S.EventTitle>{eventData.title}</S.EventTitle>
-            <S.EventSubtitle>{eventData.subtitle}</S.EventSubtitle>
-            <S.SaveButton>이벤트 저장하기</S.SaveButton>
-          </S.EventInfo>
+          <S.EventHeaderInner>
+            <S.EventImage src={eventImage} alt={eventData.title} />
+            <S.EventInfo>
+              <S.EventTitle>{eventData.title}</S.EventTitle>
+              <S.EventSubtitle>{eventData.subtitle}</S.EventSubtitle>
+              <S.SaveButton>이벤트 저장하기</S.SaveButton>
+            </S.EventInfo>
+          </S.EventHeaderInner>
         </S.EventHeader>
 
-        <S.TabNav>
-          {['기본정보', '후기', '공식 사이트'].map((tab) => (
-            <S.Tab key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
-              {tab}
-            </S.Tab>
-          ))}
-        </S.TabNav>
+        {/* 탭 네비게이션 부분 수정 */}
+        <S.TabWrapper>
+          <S.TabInner>
+            {['기본정보', '후기', '공식 사이트'].map((tab) => (
+              <S.Tab key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+                {tab}
+              </S.Tab>
+            ))}
+          </S.TabInner>
+        </S.TabWrapper>
 
         {activeTab === '기본정보' && (
           <S.EventInfoSection>
@@ -243,6 +248,8 @@ const EventPage = () => {
                 {eventData.date.start} - {eventData.date.end}
               </S.SectionText>
             </S.Section>
+
+            <S.divider />
 
             <S.Section>
               <S.SectionTitle>위치</S.SectionTitle>
@@ -267,6 +274,8 @@ const EventPage = () => {
                 />
               </S.MapWrapper>
             </S.Section>
+
+            <S.divider />
 
             <S.Section>
               <S.SectionTitle>판매제품</S.SectionTitle>

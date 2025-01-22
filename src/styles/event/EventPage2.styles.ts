@@ -8,15 +8,13 @@ export const Container = styled.div`
   background-color: #0c004b;
   color: white;
   font-family: 'Arial', sans-serif;
-  padding: 20px;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  overflow-y: auto;
   margin-top: 60px;
+  overflow-x: hidden;
 `;
 
 export const Content = styled.div`
@@ -27,11 +25,13 @@ export const Content = styled.div`
 `;
 
 export const EventHeader = styled.div<EventHeaderProps>`
-  display: flex;
-  gap: 20px;
+  position: relative;
+  width: 100vw;
+  height: 545px;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
   margin-bottom: 30px;
   padding: 40px;
-  position: relative;
   overflow: hidden;
   background-image: linear-gradient(to bottom, #0c004b, transparent),
     url(${(props) => props.imageUrl});
@@ -39,32 +39,84 @@ export const EventHeader = styled.div<EventHeaderProps>`
   background-position: center;
 `;
 
-// Navigation styles
-export const TabNav = styled.nav`
-  display: flex;
-  margin: 20px 0;
-  border-bottom: 1px solid #252660;
-  gap: 40px;
+export const EventHeaderInner = styled.div`
+  position: relative;
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 auto;
   padding: 0 20px;
+  display: flex;
+  gap: 40px;
+`;
+
+export const EventImage = styled.img`
+  width: 336px;
+  height: 476px;
+  object-fit: cover;
+  margin-top: auto;
+`;
+
+export const EventInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 40px;
+  margin-left: 10px;
+  position: relative;
+`;
+
+// Navigation styles
+export const TabWrapper = styled.div`
+  width: 100vw;
+  position: relative;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  border-bottom: 1px solid #ffffff;
+  background-color: #0c004b;
+`;
+
+export const TabInner = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 120px;
+  position: relative;
 `;
 
 export const Tab = styled.button<{ isActive: boolean }>`
-  color: ${(props) => (props.isActive ? '#fff' : '#666')};
+  color: #ffffff;
   background: none;
   border: none;
-  padding: 10px 0;
-  font-size: 16px;
+  padding: 0 0 10px 0;
+  margin-bottom: 8px;
   cursor: pointer;
   position: relative;
+
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+
+  &:focus {
+    outline: none;
+  }
 
   &::after {
     content: '';
     position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
+    bottom: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: ${(props) => (props.isActive ? '130px' : '0')};
+    height: ${(props) => (props.isActive ? '8px' : '2px')};
     background-color: ${(props) => (props.isActive ? '#B8EFFD' : 'transparent')};
+    border: ${(props) => (props.isActive ? '1px solid #FFFFFF' : 'none')};
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+    z-index: 2;
   }
 `;
 
@@ -274,45 +326,55 @@ export const PostTitle = styled.h3`
   font-weight: normal;
 `;
 
-export const EventImage = styled.img`
-  width: 250px;
-  height: 350px;
-  object-fit: cover;
-  border-radius: 10px;
-`;
-
-export const EventInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
 export const EventTitle = styled.h1`
-  font-size: 32px;
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 60px;
+
+  color: #ffffff;
   margin-bottom: 5px;
 `;
 
 export const EventSubtitle = styled.h2`
-  font-size: 24px;
-  color: #cccccc;
-  margin-bottom: 20px;
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
+
+  color: #ffffff;
+
+  margin-bottom: 100px;
 `;
 
 export const SaveButton = styled.button`
-  background-color: #fef3c7;
-  position: absolute;
-  bottom: 50px;
-  right: 90px;
-  color: #0a0a2e;
   padding: 12px 24px;
-  border-radius: 20px;
-  border: none;
-  font-weight: bold;
   width: 268px;
+  height: 51px;
+  background: #fff5d5;
+  border-radius: 25px;
+  border: none;
   cursor: pointer;
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 28px;
+  color: #101148;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
 
   &:hover {
-    background-color: #fde68a;
+    background: #fff0c0;
+  }
+
+  &:focus {
+    outline: none;
   }
 `;
 
@@ -329,18 +391,32 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.div`
-  font-size: 18px;
+  //   position: absolute;
+  margin-bottom: 10px;
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 35px;
+  color: #ffffff;
 `;
 
 export const SectionText = styled.div`
-  font-size: 18px;
+  //   position: absolute;
+
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 30px;
+  color: #ffffff;
 `;
 
 export const MapWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px auto 30px auto;
+  margin: 35px auto 30px auto;
   width: 1057px;
   height: 434px;
   border-radius: 10px;
@@ -396,4 +472,11 @@ export const InlineEditTextArea = styled.textarea`
   margin-left: 20px;
   font-family: inherit;
   overflow-y: auto;
+`;
+
+export const divider = styled.div`
+  width: 700px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  border: 1px solid #605f5f;
 `;
