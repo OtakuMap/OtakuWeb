@@ -92,7 +92,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
 
   //루트명 일정 글자 수 넘어가면 ...처리
   const TruncatedDescription = ({ text }: { text: string }) => {
-    const MAX_LENGTH = 37;
+    const MAX_LENGTH = 33;
     const truncatedText = text.length > MAX_LENGTH ? `${text.slice(0, MAX_LENGTH)}...` : text;
 
     return <p>{truncatedText}</p>;

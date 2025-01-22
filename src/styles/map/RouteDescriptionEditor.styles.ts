@@ -2,28 +2,26 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
-  width: 340px;
-  height: 129px;
+  width: 272px; // 340 * 0.8
+  height: 103px; // 129 * 0.8
   padding: 0px;
 `;
 
 export const InputArea = styled.div`
   position: relative;
-  margin-top: 10px;
-  width: 340px;
-  z-index: 1; // z-index 추가
+  margin-top: 8px; // 10 * 0.8
+  width: 272px; // 340 * 0.8
+  z-index: 1;
 `;
 
 export const TextArea = styled.textarea`
-  width: 340px;
-  height: 126px;
-  //   min-height: 84px; // 두 줄 높이
-  //   max-height: 126px; // 세 줄 높이
+  width: 272px; // 340 * 0.8
+  height: 101px; // 126 * 0.8
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
-  font-size: 30px;
-  line-height: 45px; // 줄 높이를 점선 간격과 맞춤
+  font-size: 24px; // 30 * 0.8
+  line-height: 36px; // 45 * 0.8
   color: #999797;
   background: transparent;
   border: none;
@@ -50,11 +48,11 @@ export const TextArea = styled.textarea`
 
 export const DashedLine = styled.div<{ top: number }>`
   position: absolute;
-  width: 340px;
+  width: 272px; // 340 * 0.8
   left: 0px;
-  top: ${(props) => props.top}px;
+  top: ${(props) => props.top * 0.8}px; // top 값도 80%로 축소
   z-index: 2;
-  height: 2px; // 선의 두께
+  height: 2px;
   background-image: linear-gradient(
     to right,
     #d1c1ff 0%,
@@ -62,21 +60,21 @@ export const DashedLine = styled.div<{ top: number }>`
     transparent 50%,
     transparent 100%
   );
-  background-size: 15px 2px; // 점선의 간격 조절 (전체 길이, 두께)
+  background-size: 12px 2px; // 15 * 0.8, 점선의 간격도 축소
 `;
 
 export const EditButton = styled.button`
   position: absolute;
-  right: -15px;
-  top: 100px;
+  right: -12px; // -15 * 0.8
+  top: 80px; // 100 * 0.8
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
-  font-size: 15px;
-  line-height: 19px;
+  font-size: 12px; // 15 * 0.8
+  line-height: 15px; // 19 * 0.8
   color: #ffffff;
   background: transparent;
   border: none;
   cursor: pointer;
-  z-index: 3; // 가장 위에 위치
+  z-index: 3;
 `;

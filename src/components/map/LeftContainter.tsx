@@ -173,7 +173,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   return (
     <S.Container>
       <BackButton onClick={handleBack} />
-      <Search onSearch={handleSearch} />
+      <Search onSearch={handleSearch} onSuggestionSelect={(place) => handlePlaceClick(place)} />
       <S.ButtonContainer>
         <S.SavedRoutesButton
           isActive={activeView === 'savedRoutes'}
