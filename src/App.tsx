@@ -24,6 +24,7 @@ import ReviewPage5 from './pages/ReviewPage5';
 import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
 import EventPage from './pages/EventPage2';
+/*import OAuthRedirectHandler from './pages/OAuthRedirect';*/
 
 const AppContainer = styled.div`
   position: relative;
@@ -40,19 +41,20 @@ const NavigationWrapper = () => {
 };
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <BrowserRouter>
       {!isLoggedIn ? (
         <Routes>
-          <Route path="/" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
+          <Route
+            path="/"
+            element={<LoginPage onLogin={() => setIsLoggedIn(true)} />}
+          />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/search-id-pw" element={<SearchIdPWPage />} />
           <Route path="/newsetpw" element={<NewSetPWPage />} />
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/route" element={<RoutePage />} />
-          <Route path="/review3" element={<ReviewPage3 />} />
+
         </Routes>
       ) : (
         <AppContainer>
@@ -68,14 +70,6 @@ const App: React.FC = () => {
             <Route path="/review5" element={<ReviewPage5 />} />
             <Route path="/review6" element={<ReviewPage6 />} />
             <Route path="/review7" element={<ReviewPage7 />} />
-            <Route path="/event" element={<EventPage />} />
-            <Route path="/route-management" element={<RouteManagement />} />
-            <Route path="/saved-places" element={<SavedPlaces />} />
-            <Route path="/saved-events" element={<SavedEvents />} />
-            <Route path="/my-page" element={<MyPage />} />
-
-            <Route path="/category" element={<Category />} />
-            <Route path="/" element={<Cover />} />
           </Routes>
         </AppContainer>
       )}
