@@ -224,6 +224,10 @@ export const ReviewButton = styled.button`
   padding: 8px 16px;
   cursor: pointer;
   z-index: 2;
+  &:focus {
+    outline: none;
+    border: none;
+  }
 `;
 
 export const ReviewList = styled.div`
@@ -284,6 +288,10 @@ export const FeedbackButtons = styled.div`
   bottom: 15px;
   right: 15px;
   cursor: pointer;
+  &:focus {
+    outline: none;
+    border: none;
+  }
 `;
 
 export const IconButton = styled.button`
@@ -294,6 +302,10 @@ export const IconButton = styled.button`
   border: none;
   color: #666;
   cursor: pointer;
+  &:focus {
+    outline: none;
+    border: none;
+  }
 `;
 
 export const PostGrid = styled.div`
@@ -443,16 +455,27 @@ export const EditDeleteButtons = styled.div`
   right: 15px;
   display: flex;
   gap: 10px;
+  outline: none;
 `;
 
 export const ActionButton = styled.button`
   background: white;
   color: black;
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 14px;
+  padding: 1px 1px;
+  font-size: 18px;
   cursor: pointer;
+  outline: none;
+  color: '#464654';
+
+  font-family: 'Gothic A1';
+  font-weight: '500';
+  word-wrap: 'break-word';
+  &:focus {
+    outline: none;
+    border: none;
+  }
 
   &:hover {
     background: #f5f5f5;
@@ -479,4 +502,27 @@ export const divider = styled.div`
   margin-top: 10px;
   margin-bottom: 30px;
   border: 1px solid #605f5f;
+`;
+
+export const StarRatingInput = styled.div`
+  display: flex;
+  gap: 4px;
+  height: 32px;
+
+  span {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+`;
+
+export const ReviewStarRating = styled.div`
+  display: flex;
+  gap: 4px;
+  height: 32px;
+
+  span {
+    display: flex;
+    align-items: center;
+  }
 `;

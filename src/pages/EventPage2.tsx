@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import MapContainer from '@/components/map/MapContainer';
 import { RouteLocation } from '@/types/map/route';
+import dividerLine from '../assets/dividerLine.png';
+import StarFull from '../assets/StarFull.png';
+import StarEm from '../assets/StarEm.png';
 import * as S from '../styles/event/EventPage2.styles';
 import profile from '../assets/profile.png';
 import profile3 from '../assets/profile3.png';
@@ -20,6 +22,7 @@ interface Review {
   likes: number;
   dislikes: number;
   content: string;
+  userVote: 'like' | 'dislike' | null;
 }
 
 // 기존의 eventData, profileData, postData는 그대로 유지
@@ -127,12 +130,17 @@ const postData = [
 
 const EventPage = () => {
   const [reviewText, setReviewText] = useState('');
-
-  const [editingReview, setEditingReview] = useState<Review | null>(null);
-  const [activeTab, setActiveTab] = useState('후기');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
-  const [reviews, setReviews] = useState<Review[]>(reviewData);
+  const [inputRating, setInputRating] = useState(0);
+  const [editRating, setEditRating] = useState(0);
+  const [activeTab, setActiveTab] = useState('후기');
+  const [reviews, setReviews] = useState<Review[]>(
+    reviewData.map((review) => ({
+      ...review,
+      userVote: null,
+    })),
+  );
 
   const calculateAverageRating = (reviews: Review[]) => {
     if (reviews.length === 0) return 0;
@@ -142,50 +150,53 @@ const EventPage = () => {
   };
 
   const handleReviewSubmit = () => {
-    if (reviewText.trim() === '') return;
-
-    if (editingReview) {
-      // null 체크만으로 충분합니다
-      setReviews(
-        reviews.map((review) =>
-          review.id === editingReview.id ? { ...review, content: reviewText } : review,
-        ),
-      );
-      setEditingReview(null);
-    } else {
-      const newReview: Review = {
-        id: reviews.length + 1,
-        profileImage: profileData.profileImage,
-        username: profileData.name,
-        rating: profileData.rating,
-        maxRating: profileData.maxRating,
-        likes: 0,
-        dislikes: 0,
-        content: reviewText,
-      };
-      setReviews([newReview, ...reviews]);
+    if (reviewText.trim() === '') {
+      window.confirm('후기를 등록해주세요!');
+      return;
     }
+    if (inputRating === 0) {
+      window.confirm('별점을 등록해주세요!');
+      return;
+    }
+
+    const newReview: Review = {
+      id: reviews.length + 1,
+      profileImage: profileData.profileImage,
+      username: profileData.name,
+      rating: inputRating,
+      maxRating: 4,
+      likes: 0,
+      dislikes: 0,
+      content: reviewText,
+      userVote: null,
+    };
+
+    setReviews([newReview, ...reviews]);
     setReviewText('');
+    setInputRating(0);
   };
 
   const handleEditStart = (review: Review) => {
     setEditingId(review.id);
     setEditText(review.content);
+    setEditRating(review.rating);
   };
 
-  // 수정 취소
   const handleEditCancel = () => {
     setEditingId(null);
     setEditText('');
+    setEditRating(0);
   };
 
-  // 수정 완료
   const handleEditComplete = (reviewId: number) => {
     setReviews(
-      reviews.map((review) => (review.id === reviewId ? { ...review, content: editText } : review)),
+      reviews.map((review) =>
+        review.id === reviewId ? { ...review, content: editText, rating: editRating } : review,
+      ),
     );
     setEditingId(null);
     setEditText('');
+    setEditRating(0);
   };
 
   const handleDelete = (reviewId: number) => {
@@ -196,17 +207,36 @@ const EventPage = () => {
 
   const handleLike = (reviewId: number) => {
     setReviews(
-      reviews.map((review) =>
-        review.id === reviewId ? { ...review, likes: review.likes + 1 } : review,
-      ),
+      reviews.map((review) => {
+        if (review.id === reviewId) {
+          if (review.userVote === 'like') {
+            return { ...review, likes: review.likes - 1, userVote: null };
+          } else {
+            const newLikes = review.likes + 1;
+            const newDislikes =
+              review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
+            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
+          }
+        }
+        return review;
+      }),
     );
   };
 
   const handleDislike = (reviewId: number) => {
     setReviews(
-      reviews.map((review) =>
-        review.id === reviewId ? { ...review, dislikes: review.dislikes + 1 } : review,
-      ),
+      reviews.map((review) => {
+        if (review.id === reviewId) {
+          if (review.userVote === 'dislike') {
+            return { ...review, dislikes: review.dislikes - 1, userVote: null };
+          } else {
+            const newDislikes = review.dislikes + 1;
+            const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
+            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
+          }
+        }
+        return review;
+      }),
     );
   };
 
@@ -224,7 +254,6 @@ const EventPage = () => {
           </S.EventHeaderInner>
         </S.EventHeader>
 
-        {/* 탭 네비게이션 부분 수정 */}
         <S.TabWrapper>
           <S.TabInner>
             {['기본정보', '후기', '공식 사이트'].map((tab) => (
@@ -235,68 +264,25 @@ const EventPage = () => {
           </S.TabInner>
         </S.TabWrapper>
 
-        {activeTab === '기본정보' && (
-          <S.EventInfoSection>
-            <S.Section>
-              <S.SectionTitle>이벤트 이름</S.SectionTitle>
-              <S.SectionText>{eventData.titleJp}</S.SectionText>
-            </S.Section>
-
-            <S.Section>
-              <S.SectionTitle>일자</S.SectionTitle>
-              <S.SectionText>
-                {eventData.date.start} - {eventData.date.end}
-              </S.SectionText>
-            </S.Section>
-
-            <S.divider />
-
-            <S.Section>
-              <S.SectionTitle>위치</S.SectionTitle>
-              <S.SectionText>{eventData.location.name}</S.SectionText>
-              <S.MapWrapper>
-                <MapContainer
-                  apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                  center={eventData.location.coordinates}
-                  zoom={17}
-                  locations={[
-                    {
-                      id: 1,
-                      latitude: eventData.location.coordinates.lat,
-                      longitude: eventData.location.coordinates.lng,
-                      name: eventData.location.name,
-                      isSelected: false,
-                      animeName: '다이아몬드 에이스 ACT2',
-                      address: 'Tokyo AMNIBUS STORE(MAGNET by SHIBUYA109 5F)',
-                      hashtags: ['팝업스토어', '다이아몬드에이스'],
-                    },
-                  ]}
-                />
-              </S.MapWrapper>
-            </S.Section>
-
-            <S.divider />
-
-            <S.Section>
-              <S.SectionTitle>판매제품</S.SectionTitle>
-              <S.ProductContainer>
-                <S.ProductImage src={eventData.productImage} alt="판매제품 목록" />
-              </S.ProductContainer>
-            </S.Section>
-          </S.EventInfoSection>
-        )}
-
         {activeTab === '후기' && (
           <S.ReviewSection>
-            <S.ReviewInput className="review-input">
+            <S.ReviewInput>
               <S.InputHeader>
                 <S.ProfileSection>
                   <S.Profileimg src={profileData.profileImage} alt="프로필" />
                   <S.ProfileName>{profileData.name}</S.ProfileName>
-                  <S.Rating>
-                    {'⭐'.repeat(profileData.rating)}
-                    {'☆'.repeat(profileData.maxRating - profileData.rating)}
-                  </S.Rating>
+                  <S.StarRatingInput>
+                    {[1, 2, 3, 4].map((star) => (
+                      <span key={star} onClick={() => setInputRating(star)}>
+                        <img
+                          src={star <= inputRating ? StarFull : StarEm}
+                          alt="star"
+                          width="20"
+                          height="20"
+                        />
+                      </span>
+                    ))}
+                  </S.StarRatingInput>
                 </S.ProfileSection>
                 <S.InputSection>
                   <S.TextArea
@@ -304,15 +290,15 @@ const EventPage = () => {
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
                   />
-                  <S.ReviewButton onClick={handleReviewSubmit}>
-                    {editingReview ? '수정하기' : '등록하기'}
-                  </S.ReviewButton>
+                  <S.ReviewButton onClick={handleReviewSubmit}>등록하기</S.ReviewButton>
                 </S.InputSection>
               </S.InputHeader>
             </S.ReviewInput>
+
             <S.ReviewCount>
               한 줄 리뷰 ({reviews.length})<span>평균 평점: {calculateAverageRating(reviews)}</span>
             </S.ReviewCount>
+
             <S.ReviewList>
               {reviews.map((review) => (
                 <S.ReviewCard key={review.id}>
@@ -320,21 +306,45 @@ const EventPage = () => {
                     <S.Avatar src={review.profileImage} alt="프로필" />
                     <S.UserInfo>
                       <S.UserName>{review.username}</S.UserName>
-                      <S.Rating>
-                        {'⭐'.repeat(review.rating)}
-                        {'☆'.repeat(review.maxRating - review.rating)}
-                      </S.Rating>
+                      {editingId === review.id ? (
+                        <S.StarRatingInput>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star} onClick={() => setEditRating(star)}>
+                              <img
+                                src={star <= editRating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </S.StarRatingInput>
+                      ) : (
+                        <S.ReviewStarRating>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star}>
+                              <img
+                                src={star <= review.rating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </S.ReviewStarRating>
+                      )}
                     </S.UserInfo>
-                    {editingId === review.id ? (
-                      <S.InlineEditTextArea
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        autoFocus
-                      />
-                    ) : (
-                      <S.ReviewContent>{review.content}</S.ReviewContent>
-                    )}
                   </S.ReviewHeader>
+
+                  {editingId === review.id ? (
+                    <S.InlineEditTextArea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      autoFocus
+                    />
+                  ) : (
+                    <S.ReviewContent>{review.content}</S.ReviewContent>
+                  )}
 
                   {review.username === profileData.name && (
                     <S.EditDeleteButtons>
@@ -343,6 +353,7 @@ const EventPage = () => {
                           <S.ActionButton onClick={() => handleEditComplete(review.id)}>
                             완료
                           </S.ActionButton>
+                          <img src={dividerLine} alt="divider" className="h-4 mx-1" />
                           <S.ActionButton onClick={handleEditCancel}>취소</S.ActionButton>
                         </>
                       ) : (
@@ -350,6 +361,7 @@ const EventPage = () => {
                           <S.ActionButton onClick={() => handleEditStart(review)}>
                             수정
                           </S.ActionButton>
+                          <img src={dividerLine} alt="divider" className="h-4 mx-1" />
                           <S.ActionButton onClick={() => handleDelete(review.id)}>
                             삭제
                           </S.ActionButton>
@@ -360,18 +372,23 @@ const EventPage = () => {
 
                   <S.FeedbackButtons>
                     <S.IconButton onClick={() => handleLike(review.id)}>
-                      <ThumbsUp size={20} />
+                      <ThumbsUp
+                        size={20}
+                        color={review.userVote === 'like' ? '#ffd700' : '#0c004b'}
+                      />
                       <span>{review.likes}</span>
                     </S.IconButton>
                     <S.IconButton onClick={() => handleDislike(review.id)}>
-                      <ThumbsDown size={20} />
+                      <ThumbsDown
+                        size={20}
+                        color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
+                      />
                       <span>{review.dislikes}</span>
                     </S.IconButton>
                   </S.FeedbackButtons>
                 </S.ReviewCard>
               ))}
             </S.ReviewList>
-
             <S.ReviewCount>후기 게시물 (10)</S.ReviewCount>
             <S.PostGrid>
               {postData.map((post) => (
