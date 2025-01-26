@@ -9,7 +9,7 @@ import sparkleIcon from '../assets/sparkle-icon.png'; // 반짝이 아이콘
 const Container = styled.div`
   display: flex;
   align-items: center;
-  background-color: #0c004b;
+  background-color: #2a3f92;
   height: 100vh;
   width: 100vw;
 `;
