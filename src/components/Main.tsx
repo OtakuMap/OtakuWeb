@@ -232,14 +232,20 @@ const EventDetails = styled.div`
 `;
 
 const EventName = styled.h4`
-  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.2rem;
+  color: #fff;
+  font-family: 'Gothic A1';
+  font-size: 18px;
+  font-weight: 600;
 `;
 
 const EventDates = styled.p`
-  font-size: 0.9rem;
-  color: #666;
+  color: #fff;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 16px;
+  font-weight: 600;
 `;
 
 const DetailsSection = styled.section`
@@ -327,18 +333,23 @@ const Rank = styled.div`
   position: absolute;
   left: 10px;
   bottom: 10px;
-  font-size: 40px; /* 숫자 크기 키우기 */
   font-weight: bold;
   color: black;
   z-index: 10; /* 숫자가 그라데이션보다 위에 표시되도록 설정 */
+  font-family: 'Gothic A1';
+  font-size: 85px;
+  font-weight: 600;
 `;
 
 const Description = styled.p`
-  font-size: 18.5px;
-  font-weight: bold; /* 글씨를 두껍게 */
   word-wrap: break-word;
   overflow-wrap: break-word;
   margin-top: 10px;
+  color: #fff;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 22px;
+  font-weight: 600;
 `;
 
 const ImageWrapper = styled.div<{ src: string }>`
@@ -372,7 +383,10 @@ const SectionTitle = styled.h2`
   display: flex;
   align-items: center; /* 텍스트와 이미지를 세로로 가운데 정렬 */
   line-height: 1.5; /* 텍스트의 높이를 적절히 조정 */
-  color: white;
+  color: #fff;
+  font-family: 'Gothic A1';
+  font-size: 30px;
+  font-weight: 800;
 `;
 
 const Image = styled.img`
@@ -385,10 +399,13 @@ const Image = styled.img`
 `;
 
 const Footer = styled.footer`
-  text-align: center;
-  font-size: 0.8rem;
   color: #666;
   margin-top: 2rem;
+  color: #fff;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 15px;
+  font-weight: 300;
 `;
 
 const Divider = styled.div`

@@ -41,7 +41,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       {!isLoggedIn ? (
         <Routes>
-          <Route path="/" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
+          <Route path="/" element={<LoginPage onLogin={() => setIsLoggedIn(false)} />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/search-id-pw" element={<SearchIdPWPage />} />
           <Route path="/newsetpw" element={<NewSetPWPage />} />
