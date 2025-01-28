@@ -13,3 +13,10 @@ export interface LoginResponse {
     refreshToken: string;
   };
 }
+
+export interface LogoutResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: string;
+}
