@@ -27,9 +27,8 @@ const MapPage = () => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [showLocationDetail, setShowLocationDetail] = useState(false);
 
-  const handleFilterChange = (isActive: boolean) => {
-    // 필터 상태 변경 시 처리할 로직
-    console.log('Filter state:', isActive);
+  const handleFilterChange = (filter: 'spot' | 'event') => {
+    console.log('Filter state:', filter);
   };
 
   const handlePlaceSelect = (place: Place) => {

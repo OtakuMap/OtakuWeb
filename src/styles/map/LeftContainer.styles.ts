@@ -24,7 +24,7 @@ export const ButtonContainer = styled.div`
 export const SavedRoutesButton = styled.button<{ isActive?: boolean }>`
   width: 160px;
   height: 96px;
-  background: ${(props) => (props.isActive ? '#8B7BD8' : '#d1c1ff')};
+  background: ${(props) => (props.isActive ? ' #9A86D3' : '#d1c1ff')};
   border-radius: 15px;
   border: none;
   cursor: pointer;
@@ -57,7 +57,7 @@ export const SavedRoutesButton = styled.button<{ isActive?: boolean }>`
 export const FavoritePlacesButton = styled.button<{ isActive?: boolean }>`
   width: 155px;
   height: 96px;
-  background: ${(props) => (props.isActive ? '#D4B654' : '#fff5d5')};
+  background: ${(props) => (props.isActive ? '#FFC50C' : '#fff5d5')};
   border-radius: 15px;
   border: none;
   outline: none;

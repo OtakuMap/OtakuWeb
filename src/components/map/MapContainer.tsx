@@ -104,7 +104,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       geodesic: true,
       strokeColor: '#252660',
       strokeOpacity: 1,
-      strokeWeight: 8,
+      strokeWeight: 4,
       map: mapInstance.current,
     });
   }, [locations]);
@@ -114,13 +114,41 @@ const MapContainer: React.FC<MapContainerProps> = ({
     (location: RouteLocation) => {
       if (!mapInstance.current) return null;
 
+      const getMarkerSize = (zoomLevel: number) => {
+        // 기본 크기 설정
+        const baseWidth = 20; // 기본 너비의 절반
+        const baseHeight = 38; // 기본 높이의 절반
+
+        // 줌 레벨에 따른 크기 조정
+        if (zoomLevel <= 10) {
+          return { width: baseWidth * 0.5, height: baseHeight * 0.5 };
+        } else if (zoomLevel <= 12) {
+          return { width: baseWidth * 0.7, height: baseHeight * 0.7 };
+        } else if (zoomLevel <= 14) {
+          return { width: baseWidth * 0.9, height: baseHeight * 0.9 };
+        }
+        return { width: baseWidth, height: baseHeight };
+      };
+
+      const initialSize = getMarkerSize(mapInstance.current?.getZoom() || 12);
+
       const marker = new window.google.maps.Marker({
         position: { lat: location.latitude, lng: location.longitude },
         map: mapInstance.current,
         icon: {
           url: '/src/assets/pin.png',
-          scaledSize: new window.google.maps.Size(54, 104),
+          scaledSize: new window.google.maps.Size(initialSize.width * 2, initialSize.height * 2),
         },
+      });
+
+      // 줌 변경 시 마커 크기 업데이트
+      mapInstance.current?.addListener('zoom_changed', () => {
+        const newZoom = mapInstance.current?.getZoom() || 12;
+        const newSize = getMarkerSize(newZoom);
+        marker.setIcon({
+          url: '/src/assets/pin.png',
+          scaledSize: new window.google.maps.Size(newSize.width * 2, newSize.height * 2),
+        });
       });
 
       // 클릭 핸들러를 별도 함수로 분리
