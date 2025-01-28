@@ -14,7 +14,7 @@ export const useAuth = () => {
     setLoading(true);
     try {
       const response = await authAPI.login({ userId, password });
-      console.log('Login response:', response);
+      console.log('Login response:', response); //응답 확인
 
       if (response.isSuccess && response.result) {
         //성공 시 두 토큰 모두 저장
