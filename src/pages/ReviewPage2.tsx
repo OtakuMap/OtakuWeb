@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
 import baseball from '../assets/baseball.png';
+import { useLocation } from 'react-router-dom';
 
 const reviewData = [
   {
@@ -175,10 +176,24 @@ const ReviewImage = styled.img`
 `;
 
 const ReviewPage2: React.FC = () => {
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    // location.state에서 검색어를 가져옴
+    if (location.state && location.state.searchQuery) {
+      setSearchQuery(location.state.searchQuery);
+    }
+  }, [location]);
+
   return (
     <Container>
       <SearchBar>
-        <SearchInput type="text" value="다이아몬드 에이스" readOnly />
+        <SearchInput
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
         <SearchButton>
           <FaSearch />
         </SearchButton>
