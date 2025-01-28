@@ -1,7 +1,7 @@
 // newsetpw
 import { Container,NewsetpwBox, Title, DetailText, 
   FormGroup,Name,Input,Divider, ActionLink, Text} 
-  from '../styles/login/newsetpw.style';
+  from '../../styles/login/newsetpw.style';
   
 const NewSetPWPage: React.FC = () => {
   return (

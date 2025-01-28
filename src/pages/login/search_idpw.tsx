@@ -1,6 +1,6 @@
 import { Container,SearchIdPwBox, Section,Title, DetailText,
   FormGroup, Name, Input, InputShort, Divider, ActionButton, ActionButtonShort}
-   from '../styles/login/search_idpw.style';
+   from '../../styles/login/search_idpw.style';
 
 const SearchIdPWPage: React.FC = () => {
   return (

@@ -1,10 +1,80 @@
-import { Container, SignupBox, Title, InputBox,
-  FormGroup, Name,Input, InputShort, VerifyButton, VerifyButtonShort,
-  FormGroup2, FormGroup3, FormGroup4, DetailText, CheckboxGroup, CheckboxItem, Checkbox, 
-  CheckboxLabel, Divider, ActionLink, Openbutton
- } from '../styles/login/signup.style';
+import { validateSignup } from "../../utils/validate";
+import { useNavigate } from 'react-router-dom';
+import { 
+  Container, 
+  SignupBox, 
+  Title, 
+  InputBox,
+  FormGroup, 
+  Name,
+  Input, 
+  InputShort, 
+  VerifyButton, 
+  VerifyButtonShort,
+  FormGroup2, 
+  FormGroup3, 
+  FormGroup4, 
+  DetailText, 
+  CheckboxGroup, 
+  CheckboxItem, 
+  Checkbox, 
+  CheckboxLabel, 
+  Divider, 
+  ActionLink, 
+  Openbutton
+ } from '../../styles/login/signup.style';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate(); 
+
+      const { values, errors, touched, getTextInputProps } = useForm({
+        initialValues: {
+            name: '',
+            nickname: '',
+            email: '',
+            verificationCode: '',
+            pw:'',
+            pw2: '',
+        },
+        validate: validateSignup,
+    });
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        
+        if (Object.keys(errors).length === 0) {
+            // 회원가입 API 호출
+            const response = await fetch('http://3.39.72.211:8080/swagger-ui/index.html#/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: values.name,
+                  id: values.id,
+                  email: values.email,
+                  verificationCode: values.verificationCode,
+                  pw: values.pw,
+                  pw2: values.pw2,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log('회원가입 성공:', data);
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('email', values.email);  // 이메일 저장
+                navigate('/login', { replace: true });
+            } else {
+                console.error('회원가입 실패:', data);
+            }
+        } else {
+            console.log("Validation errors:", errors);
+        }
+    };
+
+
   return (
     <Container>
       <SignupBox>
