@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { useAuth } from '@/hooks/login/useAuth';
 import styled from 'styled-components';
 import logoImage from '../../assets/logo.png';
 import alarmIcon from '../../assets/alarm.png';
@@ -216,14 +218,40 @@ const MenuItem = styled.li`
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [showPopup, setShowPopup] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
     { id: 2, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
     { id: 3, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
   ]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // 토큰이 정말 삭제되었는지 확인
+      console.log('Tokens after logout:', {
+        access: localStorage.getItem('accessToken'),
+        refresh: localStorage.getItem('refreshToken'),
+      });
+      setShowProfilePopup(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const handleLogin = () => {
+    navigate('/');
+    setShowProfilePopup(false);
+  };
+
+  const handleMyPage = () => {
+    navigate('/my-page');
+    setShowProfilePopup(false);
+  };
 
   const deleteNotification = (id: number) => {
     setNotifications((prev) => prev.filter((notification) => notification.id !== id));
@@ -246,8 +274,15 @@ const Navbar = () => {
         <ProfileName>비회원</ProfileName>
       </ProfileSection>
       <MenuList>
-        <MenuItem>로그인</MenuItem>
-        <MenuItem>회원가입</MenuItem>
+        <MenuItem onClick={handleLogin}>로그인</MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate('/signup');
+            setShowProfilePopup(false);
+          }}
+        >
+          회원가입
+        </MenuItem>
       </MenuList>
     </>
   );
@@ -261,8 +296,8 @@ const Navbar = () => {
         <ProfileName>닉네임</ProfileName>
       </ProfileSection>
       <MenuList>
-        <MenuItem>마이페이지</MenuItem>
-        <MenuItem>로그아웃</MenuItem>
+        <MenuItem onClick={() => handleMyPage()}>마이페이지</MenuItem>
+        <MenuItem onClick={() => handleLogout()}>로그아웃</MenuItem>
       </MenuList>
     </>
   );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../api/login/authAPI';
-import { loginSuccess, loginFailure } from '../../store/auth/authSlice';
+import { loginSuccess, loginFailure, logout as logoutAction } from '../../store/auth/authSlice';
 import { tokenStorage } from '@/utils/token';
 
 export const useAuth = () => {
@@ -35,5 +35,21 @@ export const useAuth = () => {
     }
   };
 
-  return { login, loading };
+  const logout = async () => {
+    try {
+      const response = await authAPI.logout();
+
+      if (response.isSuccess) {
+        dispatch(logoutAction());
+        tokenStorage.clearTokens();
+        navigate('/');
+      } else {
+        console.error('Logout failed:', response.message);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  return { login, logout, loading };
 };

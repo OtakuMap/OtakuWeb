@@ -39,8 +39,13 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.error = action.payload;
     },
-    logout: () => {
-      return initialState;
+    logout: (state) => {
+      state.isLoggedIn = false;
+      state.userId = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.error = null;
+      tokenStorage.clearTokens(); // 로그아웃 시 토큰 제거
     },
   },
 });
