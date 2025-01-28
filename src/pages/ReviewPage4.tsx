@@ -2,6 +2,9 @@ import styled from 'styled-components';
 import { MapPin } from 'lucide-react';
 import profile from '../assets/profile.png';
 import profile2 from '../assets/profile2.png';
+import StarFull from '../assets/StarFull.png';
+import StarEm from '../assets/StarEm.png';
+import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
 
@@ -14,6 +17,7 @@ interface Review {
   likes: number;
   dislikes: number;
   content: string;
+  userVote: 'like' | 'dislike' | null;
 }
 
 const profileData = {
@@ -192,6 +196,9 @@ const ReviewGrid = styled.div`
 
 const ProfileContainer = styled.div`
   align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-left: 20px;
 `;
@@ -209,17 +216,13 @@ const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 `;
 
 const ProfileName = styled.div`
   font-size: 16px;
   font-weight: bold;
   color: white;
-`;
-
-const StarRating = styled.div`
-  font-size: 14px;
-  color: #ffd700; /* Gold color for stars */
 `;
 
 const ReviewProfileContainer = styled.div`
@@ -251,11 +254,6 @@ const ReviewProfileName = styled.div`
   text-align: left;
 `;
 
-const ReviewStarRating = styled.div`
-  font-size: 20px;
-  color: #ffd700; /* Gold color for stars */
-`;
-
 const FeedbackSection = styled.div`
   display: flex;
   align-items: center;
@@ -272,6 +270,7 @@ const FeedbackInput = styled.textarea`
   font-size: 14px;
   resize: none;
   box-sizing: border-box;
+  outline: none;
 `;
 
 const Header = styled.h1`
@@ -319,6 +318,10 @@ const ReviewContent = styled.p`
   text-align: left;
   white-space: pre-line;
   margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: 'Gothic A1';
+  font-weight: '600';
+  word-wrap: 'break-word';
 `;
 const SubmitButton = styled.button`
   background-color: white;
@@ -341,17 +344,29 @@ const EditDeleteButtons = styled.div`
   bottom: 10px;
   left: 10px;
   display: flex;
-  gap: 10px;
+  gap: 0px;
+  outline: none;
+  margin-left: 5px;
 `;
 
 const ActionButton = styled.button`
   background: white;
   color: black;
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 14px;
+  padding: 1px 1px;
+  font-size: 12px;
   cursor: pointer;
+  outline: none;
+  color: '#464654';
+
+  font-family: 'Gothic A1';
+  font-weight: '500';
+  word-wrap: 'break-word';
+  &:focus {
+    outline: none;
+    border: none;
+  }
 
   &:hover {
     background: #f5f5f5;
@@ -379,66 +394,116 @@ const FeedbackButton = styled.div`
   &:hover {
     opacity: 0.8;
   }
+  outline: none;
 `;
 
 // InlineEditTextArea 추가
 const InlineEditTextArea = styled.textarea`
-  width: 85%;
-  height: 60px;
-  border: 1px solid #e0e0e0;
+  width: 100%;
+  height: 120px;
+  outline: none;
   border-radius: 8px;
-  padding: 10px;
   font-size: 18px;
+  margin-top: 20px;
   line-height: 1.5;
   color: black;
+  font-weight: bold;
   resize: none;
-  margin-left: 20px;
+  margin: 10px 0;
   font-family: inherit;
   overflow-y: auto;
 `;
+const StarRatingInput = styled.div`
+  display: flex;
+  gap: 4px;
+  height: 32px;
+
+  span {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const ReviewStarRating = styled.div`
+  display: flex;
+  gap: 4px;
+  height: 32px;
+
+  span {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const ButtonDivider = styled.img`
+  height: 17px; // 필요한 높이로 조절
+  margin: 5px;
+`;
 
 const ReviewPage4 = () => {
-  const [reviews, setReviews] = useState<Review[]>(reviewData);
+  const [reviews, setReviews] = useState<Review[]>(
+    reviewData.map((review) => ({
+      ...review,
+      userVote: null,
+    })),
+  );
   const [reviewText, setReviewText] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
+  const [inputRating, setInputRating] = useState(0);
+  const [editRating, setEditRating] = useState(0);
 
   // 리뷰 추가 핸들러
   const handleReviewSubmit = () => {
-    if (reviewText.trim() === '') return;
-
+    if (reviewText.trim() === '') {
+      window.confirm('후기를 등록해주세요!');
+      return;
+    }
+    if (inputRating === 0) {
+      window.confirm('별점을 등록해주세요!');
+      return;
+    }
     const newReview: Review = {
       id: reviews.length + 1,
       profileImage: profileData.profileImage,
       username: profileData.name,
-      rating: profileData.rating,
-      maxRating: profileData.maxRating,
+      rating: inputRating, // profileData.rating 대신 inputRating 사용
+      maxRating: 4, // 최대 별점을 4로 고정
       likes: 0,
       dislikes: 0,
       content: reviewText,
+      userVote: null,
     };
 
     setReviews([newReview, ...reviews]);
     setReviewText('');
+    setInputRating(0); // 입력 후 별점 초기화
   };
+
   const handleEditStart = (review: Review) => {
     setEditingId(review.id);
     setEditText(review.content);
+    setEditRating(review.rating);
   };
 
   // 수정 취소
   const handleEditCancel = () => {
     setEditingId(null);
     setEditText('');
+    setEditRating(0);
   };
 
   // 수정 완료
   const handleEditComplete = (reviewId: number) => {
     setReviews(
-      reviews.map((review) => (review.id === reviewId ? { ...review, content: editText } : review)),
+      reviews.map((review) =>
+        review.id === reviewId ? { ...review, content: editText, rating: editRating } : review,
+      ),
     );
     setEditingId(null);
     setEditText('');
+    setEditRating(0);
   };
 
   const handleDelete = (reviewId: number) => {
@@ -449,19 +514,45 @@ const ReviewPage4 = () => {
 
   const handleLike = (reviewId: number) => {
     setReviews(
-      reviews.map((review) =>
-        review.id === reviewId ? { ...review, likes: review.likes + 1 } : review,
-      ),
+      reviews.map((review) => {
+        if (review.id === reviewId) {
+          if (review.userVote === 'like') {
+            // 이미 좋아요를 눌렀다면 취소
+            return { ...review, likes: review.likes - 1, userVote: null };
+          } else {
+            // 처음 좋아요를 누르는 경우
+            const newLikes = review.likes + 1;
+            // 싫어요를 눌렀던 상태라면 싫어요도 취소
+            const newDislikes =
+              review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
+            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
+          }
+        }
+        return review;
+      }),
     );
   };
 
   const handleDislike = (reviewId: number) => {
     setReviews(
-      reviews.map((review) =>
-        review.id === reviewId ? { ...review, dislikes: review.dislikes + 1 } : review,
-      ),
+      reviews.map((review) => {
+        if (review.id === reviewId) {
+          if (review.userVote === 'dislike') {
+            // 이미 싫어요를 눌렀다면 취소
+            return { ...review, dislikes: review.dislikes - 1, userVote: null };
+          } else {
+            // 처음 싫어요를 누르는 경우
+            const newDislikes = review.dislikes + 1;
+            // 좋아요를 눌렀던 상태라면 좋아요도 취소
+            const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
+            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
+          }
+        }
+        return review;
+      }),
     );
   };
+
   return (
     <Container>
       <ContentWrapper>
@@ -487,10 +578,21 @@ const ReviewPage4 = () => {
               <ProfileImage src={profileData.profileImage} alt="프로필 이미지" />
               <ProfileInfo>
                 <ProfileName>{profileData.name}</ProfileName>
-                <StarRating>
-                  {'⭐'.repeat(profileData.rating)}
-                  {'☆'.repeat(profileData.maxRating - profileData.rating)}
-                </StarRating>
+
+                <div style={{ marginBottom: '10px' }}>
+                  <StarRatingInput>
+                    {[1, 2, 3, 4].map((star) => (
+                      <span key={star} onClick={() => setInputRating(star)}>
+                        <img
+                          src={star <= inputRating ? StarFull : StarEm}
+                          alt="star"
+                          width="20"
+                          height="20"
+                        />
+                      </span>
+                    ))}
+                  </StarRatingInput>
+                </div>
               </ProfileInfo>
             </ProfileContainer>
             <div style={{ position: 'relative', width: '800px' }}>
@@ -513,10 +615,33 @@ const ReviewPage4 = () => {
                     <ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
                     <ReviewProfileInfo>
                       <ReviewProfileName>{review.username}</ReviewProfileName>
-                      <ReviewStarRating>
-                        {'⭐'.repeat(review.rating)}
-                        {'☆'.repeat(review.maxRating - review.rating)}
-                      </ReviewStarRating>
+                      {editingId === review.id ? (
+                        <StarRatingInput>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star} onClick={() => setEditRating(star)}>
+                              <img
+                                src={star <= editRating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </StarRatingInput>
+                      ) : (
+                        <ReviewStarRating>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star}>
+                              <img
+                                src={star <= review.rating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </ReviewStarRating>
+                      )}
                     </ReviewProfileInfo>
                   </ReviewProfileContainer>
 
@@ -537,11 +662,13 @@ const ReviewPage4 = () => {
                           <ActionButton onClick={() => handleEditComplete(review.id)}>
                             완료
                           </ActionButton>
+                          <ButtonDivider src={dividerLine} alt="divider" />
                           <ActionButton onClick={handleEditCancel}>취소</ActionButton>
                         </>
                       ) : (
                         <>
                           <ActionButton onClick={() => handleEditStart(review)}>수정</ActionButton>
+                          <ButtonDivider src={dividerLine} alt="divider" />
                           <ActionButton onClick={() => handleDelete(review.id)}>삭제</ActionButton>
                         </>
                       )}
@@ -551,13 +678,19 @@ const ReviewPage4 = () => {
                   <FeedbackButtonsWrapper>
                     <FeedbackButton onClick={() => handleLike(review.id)}>
                       <IconContainer>
-                        <ThumbsUp size={20} />
+                        <ThumbsUp
+                          size={20}
+                          color={review.userVote === 'like' ? '#ffd700' : '#0c004b'} // 활성화시 파란색, 기본은 회색
+                        />
                         <span>{review.likes}</span>
                       </IconContainer>
                     </FeedbackButton>
                     <FeedbackButton onClick={() => handleDislike(review.id)}>
                       <IconContainer>
-                        <ThumbsDown size={20} />
+                        <ThumbsDown
+                          size={20}
+                          color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
+                        />
                         <span>{review.dislikes}</span>
                       </IconContainer>
                     </FeedbackButton>

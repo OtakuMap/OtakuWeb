@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 import Backgroundimg from '../../assets/logorepeat.png';
 import '../font.css';
 
@@ -13,7 +13,7 @@ export const Container = styled.div`
   position: relative;
   background-image: url(${Backgroundimg});
   background-size: cover; // 화면 크기에 맞게 이미지 크기 조정
-  background-position: center;  // 이미지 중앙 정렬
+  background-position: center; // 이미지 중앙 정렬
 `;
 
 export const LoginBox = styled.div`
@@ -46,7 +46,8 @@ export const Logo = styled.img`
 `;
 
 export const InputBox = styled.div`
-  width: 464px; height:132px;
+  width: 464px;
+  height: 132px;
   background-color: #101148;
   border-radius: 20px;
   border: 2px solid #d1c1ff;
@@ -54,15 +55,15 @@ export const InputBox = styled.div`
   margin-bottom: 10px;
 `;
 
-export const Form = styled.div`
+export const Form = styled.form`
   display: flex;
   flex-direction: column;
 `;
 
 export const FormGroup = styled.div`
   display: flex;
-  flex-direction: space-between; 
-  align-items: flex-start; 
+  flex-direction: space-between;
+  align-items: flex-start;
 `;
 
 export const Label1 = styled.label`
@@ -70,9 +71,9 @@ export const Label1 = styled.label`
   font-size: 24px;
   font-weight: 600;
   color: #ffffff;
-  position:relative;
-  top:-20px;
-  margin-right: 20px; 
+  position: relative;
+  top: -20px;
+  margin-right: 20px;
 `;
 
 export const Label2 = styled.label`
@@ -80,8 +81,8 @@ export const Label2 = styled.label`
   font-size: 24px;
   font-weight: 600;
   color: #ffffff;
-  position:relative;
-  margin-right: 10px; 
+  position: relative;
+  margin-right: 10px;
 `;
 
 export const Input = styled.input`
@@ -100,21 +101,21 @@ export const Input = styled.input`
 
   &:-webkit-autofill {
     background-color: #101148 !important;
-    -webkit-text-fill-color: #ffffff !important;  /* 자동 완성된 텍스트 색상 */
+    -webkit-text-fill-color: #ffffff !important; /* 자동 완성된 텍스트 색상 */
     -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
     color: #ffffff !important;
   }
 
-   &::placeholder {
+  &::placeholder {
     color: #999797; /* Placeholder 색상 */
     font-size: 18px; /* Placeholder 글꼴 크기 */
-    line-height:22.5px;
+    line-height: 22.5px;
   }
 `;
 
 export const Input2 = styled.input`
-position:relative;
-bottom:-20px;
+  position: relative;
+  bottom: -20px;
   padding: 10px;
   font-size: 16px;
   background-color: #101148;
@@ -129,7 +130,7 @@ bottom:-20px;
 
   &:-webkit-autofill {
     background-color: #101148 !important;
-    -webkit-text-fill-color: #ffffff !important;  /* 자동 완성된 텍스트 색상 */
+    -webkit-text-fill-color: #ffffff !important; /* 자동 완성된 텍스트 색상 */
     -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
     color: #ffffff !important;
   }
@@ -145,7 +146,7 @@ export const Divider = styled.hr`
 export const Actions = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items:center;
+  align-items: center;
   width: 65%;
   margin-bottom: 25px;
 `;
@@ -153,7 +154,7 @@ export const Actions = styled.div`
 export const Actions2 = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items:center;
+  align-items: center;
   width: 90%;
   margin-bottom: 25px;
 `;
@@ -165,7 +166,7 @@ export const ActionButton = styled.button`
   border-radius: 20px;
   font-size: 20px;
   font-weight: 600;
-  line-height:25px;
+  line-height: 25px;
   cursor: pointer;
   text-align: center;
   margin: 0 auto;
@@ -193,7 +194,7 @@ export const ActionLink2 = styled.a`
 export const ShortDivider = styled.hr`
   border: 0;
   height: 1px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   width: 170px;
 `;
 

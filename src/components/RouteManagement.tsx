@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
+import starFilledIcon from '../assets/star-filled.png';
+import starEmptyIcon from '../assets/white-star.png';
+import spaceIcon from '../assets/space-icon.png';
 
 interface RouteItem {
   id: number;
   title: string;
   author?: string;
-  isStarred?: boolean;
+  isStarred: boolean;
 }
 
 const Container = styled.div`
@@ -16,66 +18,79 @@ const Container = styled.div`
   min-height: 100vh;
   padding: 40px;
   width: 100vw;
-  position: relative; /* 아이콘 위치를 위한 기준 */
+  position: relative;
 `;
 
-// 아이콘 컨테이너
+const ContentWrapper = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
 const IconContainer = styled.div`
   position: absolute;
-  top: 80px; /* 상단 여백 */
-  right: 50px; /* 우측 여백 */
+  top: 80px;
+  right: 50px;
   display: flex;
   align-items: center;
 `;
 
-// 아이콘 이미지 스타일
 const IconImage = styled.img``;
 
-const ContentWrapper = styled.div`
-  width: 100%;
-  margin: 0 auto;
-`;
-
 const Title = styled.h1`
-  font-size: 24px;
   color: #fff;
-  margin: 50px 0 30px 0;
+  font-family: 'Gothic A1';
+  font-size: 38px;
+  font-weight: 600;
+  margin: 48px 0;
 `;
 
 const TabContainer = styled.div`
-  position: relative;
   display: flex;
   gap: 8px;
+  position: relative;
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
-  padding: 12px 24px;
+  width: 194px;
+  height: 82px;
   border: none;
-  background-color: ${(props) => (props.active ? '#fff' : 'rgba(255, 255, 255, 0.2)')};
-  color: ${(props) => (props.active ? '#0c004b' : '#fff')};
-  border-radius: 8px;
+  background-color: ${(props) => (props.active ? '#fff' : '#CCC')};
+  color: ${(props) => (props.active ? '#000' : '#464654')};
+  border-radius: 20px 20px 0px 0px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 `;
 
 const RouteListContainer = styled.div`
   background: white;
-  border-radius: 16px;
+  border-radius: 0px 20px 20px 20px;
   padding: 24px 80px;
 `;
 
 const ListHeader = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   margin-bottom: 16px;
 `;
 
 const ListTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
+  color: #000;
+  font-family: 'Gothic A1';
+  font-size: 30px;
+  font-weight: 700;
+`;
+
+const HeaderDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #464654;
+  margin: 16px 0;
 `;
 
 const ListActions = styled.div`
@@ -83,6 +98,7 @@ const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
+  margin-left: 630px;
 
   button {
     background: none;
@@ -97,18 +113,32 @@ const ListActions = styled.div`
   }
 `;
 
-const RouteItem = styled.div`
+// 새로운 스타일 컴포넌트 추가
+const RouteContent = styled.div`
   display: flex;
   align-items: center;
+  width: 879px;
+  height: 56px;
+  flex: 1;
+  background-color: #e9e2ff;
   padding: 16px;
-  background-color: #f8f7ff;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  transition: background-color 0.2s;
-
+  border-radius: 15px;
+  margin-bottom: 55px;
+  color: #000;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-size: 20px;
+  font-weight: 600;
   &:hover {
     background-color: #f0f0ff;
   }
+`;
+
+// RouteItemContainer 수정
+const RouteItemContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px; // 내용물과 별표 사이의 간격
 `;
 
 const RadioButton = styled.div<{ checked: boolean }>`
@@ -136,21 +166,28 @@ const RadioButton = styled.div<{ checked: boolean }>`
 const RouteTitle = styled.span`
   flex: 1;
   color: #333;
-  font-size: 15px;
+  font-size: 14px;
 `;
 
-const StarButton = styled.button<{ isStarred?: boolean }>`
+// StarButton 수정
+const StarButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: ${(props) => (props.isStarred ? '#7B66FF' : '#DBDBFF')};
-  font-size: 24px;
   padding: 8px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px; // 왼쪽 여백 추가
+  margin-bottom: 55px;
+`;
+
+const StarIcon = styled.img`
+  margin-right: 64px;
 `;
 
 const RouteManagement: React.FC = () => {
-  const [routes] = React.useState<RouteItem[]>([
+  const [routes, setRoutes] = useState<RouteItem[]>([
     { id: 1, title: '오사카 굿즈샵 뿌시기', isStarred: false },
     { id: 2, title: '오사카 굿즈샵 뿌시기 오사카 굿즈샵 뿌시기', isStarred: false },
     {
@@ -162,12 +199,35 @@ const RouteManagement: React.FC = () => {
     { id: 5, title: '제목제목제목제목제목제목제목제목제목제목제목제목제목', isStarred: false },
   ]);
 
-  const [selectedRoute, setSelectedRoute] = React.useState<number | null>(null);
+  const [selectedRoutes, setSelectedRoutes] = useState<number[]>([]);
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
+
+  const handleRouteSelect = (id: number) => {
+    setSelectedRoutes((prev) =>
+      prev.includes(id) ? prev.filter((routeId) => routeId !== id) : [...prev, id],
+    );
+  };
+
+  const handleToggleStar = (id: number) => {
+    setRoutes((prev) =>
+      prev.map((route) => (route.id === id ? { ...route, isStarred: !route.isStarred } : route)),
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    setRoutes((prev) => prev.filter((route) => !selectedRoutes.includes(route.id)));
+    setSelectedRoutes([]);
+  };
+
+  const handleShowStarredOnly = () => {
+    setShowStarredOnly((prev) => !prev);
+  };
+
+  const filteredRoutes = showStarredOnly ? routes.filter((route) => route.isStarred) : routes;
 
   return (
     <Container>
       <ContentWrapper>
-        {/* 아이콘 컨테이너 */}
         <IconContainer>
           <IconImage src={spaceIcon} alt="Space Icon" />
         </IconContainer>
@@ -176,29 +236,39 @@ const RouteManagement: React.FC = () => {
 
         <TabContainer>
           <Tab active>저장한 루트</Tab>
-          <Tab>편한 장소</Tab>
+          <Tab>저장한 장소</Tab>
           <Tab>저장한 이벤트</Tab>
         </TabContainer>
 
         <RouteListContainer>
           <ListHeader>
-            <ListTitle>저장한 루트 (5)</ListTitle>
+            <ListTitle>저장한 루트 ({filteredRoutes.length})</ListTitle>
+            <HeaderDivider />
             <ListActions>
-              <button>선택 삭제</button>
+              <button onClick={handleDeleteSelected}>선택 삭제</button>
               <span>/</span>
-              <button>즐겨찾기</button>
+              <button onClick={handleShowStarredOnly}>
+                {showStarredOnly ? '전체 보기' : '즐겨찾기'}
+              </button>
             </ListActions>
           </ListHeader>
 
-          {routes.map((route) => (
-            <RouteItem key={route.id}>
-              <RadioButton
-                checked={selectedRoute === route.id}
-                onClick={() => setSelectedRoute(route.id)}
-              />
-              <RouteTitle>{route.title}</RouteTitle>
-              <StarButton isStarred={route.isStarred}>★</StarButton>
-            </RouteItem>
+          {filteredRoutes.map((route) => (
+            <RouteItemContainer key={route.id}>
+              <RouteContent>
+                <RadioButton
+                  checked={selectedRoutes.includes(route.id)}
+                  onClick={() => handleRouteSelect(route.id)}
+                />
+                <RouteTitle>{route.title}</RouteTitle>
+              </RouteContent>
+              <StarButton onClick={() => handleToggleStar(route.id)}>
+                <StarIcon
+                  src={route.isStarred ? starFilledIcon : starEmptyIcon}
+                  alt={route.isStarred ? 'Starred' : 'Not starred'}
+                />
+              </StarButton>
+            </RouteItemContainer>
           ))}
         </RouteListContainer>
       </ContentWrapper>
