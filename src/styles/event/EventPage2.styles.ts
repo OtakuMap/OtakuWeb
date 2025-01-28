@@ -241,11 +241,11 @@ export const ReviewList = styled.div`
   gap: 15px;
 `;
 
-export const ReviewCard = styled.div`
+export const ReviewCard = styled.div<{ isMyReview: boolean }>`
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  background: white;
+  background: ${(props) => (props.isMyReview ? '#FFF5D5' : 'white')};
   position: relative;
   display: flex;
   flex-direction: column;
@@ -459,7 +459,7 @@ export const EditDeleteButtons = styled.div`
 `;
 
 export const ActionButton = styled.button`
-  background: white;
+  background: #fff5d5;
   color: black;
   border: none;
   border-radius: 4px;

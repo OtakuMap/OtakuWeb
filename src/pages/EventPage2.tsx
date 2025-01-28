@@ -12,6 +12,7 @@ import eventImage from '../assets/eventImg.png';
 import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
 import product from '../assets/product.png';
+import { useNavigate } from 'react-router-dom';
 
 interface Review {
   id: number;
@@ -135,6 +136,7 @@ const EventPage = () => {
   const [inputRating, setInputRating] = useState(0);
   const [editRating, setEditRating] = useState(0);
   const [activeTab, setActiveTab] = useState('후기');
+  const navigate = useNavigate();
   const [reviews, setReviews] = useState<Review[]>(
     reviewData.map((review) => ({
       ...review,
@@ -249,7 +251,7 @@ const EventPage = () => {
             <S.EventInfo>
               <S.EventTitle>{eventData.title}</S.EventTitle>
               <S.EventSubtitle>{eventData.subtitle}</S.EventSubtitle>
-              <S.SaveButton>이벤트 저장하기</S.SaveButton>
+              <S.SaveButton onClick={() => navigate('/saved-events')}>이벤트 저장하기</S.SaveButton>
             </S.EventInfo>
           </S.EventHeaderInner>
         </S.EventHeader>
@@ -263,6 +265,52 @@ const EventPage = () => {
             ))}
           </S.TabInner>
         </S.TabWrapper>
+
+        {activeTab === '기본정보' && (
+          <S.EventInfoSection>
+            <S.Section>
+              <S.SectionTitle>이벤트 이름</S.SectionTitle>
+              <S.SectionText>{eventData.titleJp}</S.SectionText>
+            </S.Section>
+
+            <S.Section>
+              <S.SectionTitle>일자</S.SectionTitle>
+              <S.SectionText>
+                {eventData.date.start} - {eventData.date.end}
+              </S.SectionText>
+            </S.Section>
+
+            <S.Section>
+              <S.SectionTitle>위치</S.SectionTitle>
+              <S.SectionText>{eventData.location.name}</S.SectionText>
+              <S.MapWrapper>
+                <MapContainer
+                  apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                  center={eventData.location.coordinates}
+                  zoom={17}
+                  locations={[
+                    {
+                      id: 1,
+                      latitude: eventData.location.coordinates.lat,
+                      longitude: eventData.location.coordinates.lng,
+                      name: eventData.location.name,
+                      isSelected: false,
+                      animeName: '다이아몬드 에이스 ACT2',
+                      address: 'Tokyo AMNIBUS STORE(MAGNET by SHIBUYA109 5F)',
+                      hashtags: ['팝업스토어', '다이아몬드에이스'],
+                    },
+                  ]}
+                />
+              </S.MapWrapper>
+            </S.Section>
+            <S.Section>
+              <S.SectionTitle>판매제품</S.SectionTitle>
+              <S.ProductContainer>
+                <S.ProductImage src={eventData.productImage} alt="판매제품 목록" />
+              </S.ProductContainer>
+            </S.Section>
+          </S.EventInfoSection>
+        )}
 
         {activeTab === '후기' && (
           <S.ReviewSection>
@@ -301,7 +349,7 @@ const EventPage = () => {
 
             <S.ReviewList>
               {reviews.map((review) => (
-                <S.ReviewCard key={review.id}>
+                <S.ReviewCard key={review.id} isMyReview={review.username === profileData.name}>
                   <S.ReviewHeader>
                     <S.Avatar src={review.profileImage} alt="프로필" />
                     <S.UserInfo>
