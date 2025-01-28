@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import profileImage from '../assets/profile.png';
 import mapImage from '../assets/mapData.png';
@@ -202,8 +203,71 @@ const SupportButton = styled(Button)`
   background-color: #ffc50c;
   color: #252660;
 `;
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+  width: 606px;
+  height: 152px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ModalTitle = styled.div`
+  color: black;
+  font-size: 24px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #000;
+  text-align: center;
+  font-family: 'Gothic A1';
+  font-weight: 600;
+  word-wrap: break-word;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 150px;
+  margin-top: 15px;
+`;
+
+const ModalButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: black;
+  padding: 10px;
+  font-family: 'Gothic A1';
+  font-weight: 600;
+  word-wrap: break-word;
+`;
 
 const ReviewPage5 = () => {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const isLoggedIn = false; // 실제로는 로그인 상태 관리 로직이 필요합니다
+
+  const handleSaveRoute = () => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+    } else {
+      // 루트 저장 로직
+      console.log('루트 저장');
+    }
+  };
   const reviewData = {
     id: 1,
     title: '유명한이 지금까지 코난한테 맞은 마취총 개수 아는 사람',
@@ -252,7 +316,7 @@ const ReviewPage5 = () => {
           </MainContent>
 
           <SideContent>
-            <SaveRouteButton>루트 저장하기</SaveRouteButton>
+            <SaveRouteButton onClick={handleSaveRoute}>루트 저장하기</SaveRouteButton>
             <RouteList>
               {sortedRouteData.map((route) => (
                 <RouteItem key={route.id}>
@@ -268,6 +332,17 @@ const ReviewPage5 = () => {
           </SideContent>
         </ContentContainer>
       </WhiteContainer>
+      {showLoginModal && (
+        <ModalOverlay>
+          <ModalContent>
+            <ModalTitle>로그인 후 이용해주세요</ModalTitle>
+            <ButtonGroup>
+              <ModalButton onClick={() => setShowLoginModal(false)}>뒤로가기</ModalButton>
+              <ModalButton>로그인</ModalButton>
+            </ButtonGroup>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </Container>
   );
 };

@@ -4,6 +4,8 @@ import profile from '../assets/profile.png';
 import profile2 from '../assets/profile2.png';
 import StarFull from '../assets/StarFull.png';
 import StarEm from '../assets/StarEm.png';
+import BackPage from '../assets/BackPage.png';
+import NextPage from '../assets/NextPage.png';
 import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
@@ -80,6 +82,26 @@ const reviewData = [
   },
   {
     id: 6,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 7,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 8,
     profileImage: profile2,
     username: 'Otkkk011',
     rating: 3,
@@ -440,14 +462,55 @@ const ButtonDivider = styled.img`
   height: 17px; // 필요한 높이로 조절
   margin: 5px;
 `;
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+  color: white;
+`;
+
+const PaginationButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  img {
+    width: 8px;
+    height: 15px;
+  }
+`;
 
 const ReviewPage4 = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 6;
   const [reviews, setReviews] = useState<Review[]>(
     reviewData.map((review) => ({
       ...review,
       userVote: null,
     })),
   );
+  const indexOfLastReview = currentPage * reviewsPerPage;
+  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+  const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
   const [reviewText, setReviewText] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
@@ -606,7 +669,7 @@ const ReviewPage4 = () => {
           </FeedbackSection>
 
           <ReviewGrid>
-            {reviews.map(
+            {currentReviews.map(
               (
                 review, // reviewData를 reviews로 변경
               ) => (
@@ -700,6 +763,15 @@ const ReviewPage4 = () => {
             )}
           </ReviewGrid>
         </WhiteContainer>
+        <Pagination>
+          <PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
+            <img src={BackPage} alt="이전 페이지" />
+          </PaginationButton>
+          {currentPage}/{totalPages}
+          <PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+            <img src={NextPage} alt="다음 페이지" />
+          </PaginationButton>
+        </Pagination>
       </ContentWrapper>
     </Container>
   );

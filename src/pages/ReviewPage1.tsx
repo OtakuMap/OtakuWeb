@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import conanImage from '../assets/conan.png';
-import sectionImage from '../assets/1.png'; // 1.png 이미지 경로 가져오기
+import sectionImage from '../assets/1.png';
+import deleteIcon from '../assets/X.png';
+
+const DeleteIcon = styled.img`
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+`;
 
 const ImageWrapper = styled.div<{ src: string }>`
   position: relative;
@@ -46,22 +54,87 @@ const Image = styled.img`
   align-self: center; /* 이미지가 텍스트와 세로로 정렬되도록 설정 */
 `;
 
+interface SearchItem {
+  text: string;
+  date: string;
+}
+
 const ReviewPage1: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState('');
+  const [recentSearches, setRecentSearches] = useState<SearchItem[]>(() => {
+    const saved = localStorage.getItem('recentSearches');
+    return saved
+      ? JSON.parse(saved)
+      : [
+          { text: '검색어검색어', date: '2024.12.04' },
+          { text: '검색어검색어', date: '2024.11.14' },
+          { text: '검색어검색어', date: '2024.11.14' },
+        ];
+  });
+
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      // 새로운 검색어를 최근 검색어 목록에 추가
+      const newSearch = {
+        text: searchInput,
+        date: new Date()
+          .toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })
+          .split(' ')
+          .join('')
+          .replace(/\./g, '')
+          .replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3'),
+      };
+
+      const updatedSearches = [newSearch, ...recentSearches].slice(0, 3);
+      setRecentSearches(updatedSearches);
+
+      // localStorage에 저장
+      localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
+
+      // ReviewPage2로 검색어와 함께 이동
+      navigate('/review2', { state: { searchQuery: searchInput } });
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleDelete = (index: number) => {
+    const updatedSearches = recentSearches.filter((_item: SearchItem, i: number) => i !== index);
+    setRecentSearches(updatedSearches);
+    localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
+  };
+
   return (
     <Container>
       <SearchWrapper>
         <SearchBarWrapper>
-          <SearchInput placeholder="검색할 후기의 관련 키워드를 입력하세요" />
-          <SearchButton>
+          <SearchInput
+            placeholder="검색할 후기의 관련 키워드를 입력하세요"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
+          <SearchButton onClick={handleSearch}>
             <FaSearch />
           </SearchButton>
         </SearchBarWrapper>
         <RecentSearch>
           <Title>최근검색어</Title>
           <SearchList>
-            {recentSearches.map((search, index) => (
+            {recentSearches.map((search: SearchItem, index: number) => (
               <SearchItem key={index}>
-                <DeleteButton>✕</DeleteButton>
+                <DeleteButton onClick={() => handleDelete(index)}>
+                  <DeleteIcon src={deleteIcon} alt="delete" />
+                </DeleteButton>
                 <SearchText>{search.text}</SearchText>
                 <SearchDate>{search.date}</SearchDate>
               </SearchItem>
@@ -106,12 +179,6 @@ const topReviews = [
     image: conanImage,
     description: '유명한이 지금까지 코난한테 맞은 마취총 개수 아는사람',
   },
-];
-
-const recentSearches = [
-  { text: '검색어검색어', date: '2024.12.04' },
-  { text: '검색어검색어', date: '2024.11.14' },
-  { text: '검색어검색어', date: '2024.11.14' },
 ];
 
 const Container = styled.div`
