@@ -95,6 +95,7 @@ export interface EmailVerifyCodeResponse {
       verified: boolean;
     };
 }
+
 export interface LogoutResponse {
   isSuccess: boolean;
   code: string;
