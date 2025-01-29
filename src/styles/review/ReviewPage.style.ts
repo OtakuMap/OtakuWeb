@@ -14,11 +14,17 @@ export const Container = styled.div`
   overflow-x: hidden;
 `;
 
+export const NavigationWrapper = styled.div`
+  width: calc(100% - 112px);
+  margin: 0 56px;
+  align-self: flex-start; // 추가: 부모의 중앙 정렬을 무시하고 왼쪽 정렬을 강제
+`;
+
 export const WhiteContainer = styled.div`
   background-color: white;
   border-radius: 20px;
   padding: 30px;
-  margin: 0px 56px 40px 56px;
+  margin: 10px 56px 40px 56px;
   box-sizing: border-box;
   width: calc(100% - 112px);
   height: 1182px;
@@ -44,6 +50,20 @@ export const Header = styled.div`
   max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+`;
+
+export const BHeader = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  color: black;
 `;
 
 // ReviewPage1 specific styles
@@ -94,7 +114,6 @@ export const SectionTitle = styled.h2`
   line-height: 1.5;
 `;
 export const BSectionTitle = styled.h2`
-  font-size: 28px;
   margin-bottom: 20px;
   text-align: left;
   margin-left: 20px;
@@ -102,6 +121,13 @@ export const BSectionTitle = styled.h2`
   align-items: center;
   line-height: 1.5;
   color: black;
+  font-family: Gothic A1;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
 `;
 
 export const Image = styled.img`
@@ -129,6 +155,7 @@ export const SearchBarWrapper = styled.div`
   border-radius: 20px;
   width: 100%;
   height: 100%;
+  margin-top: 20px;
 `;
 
 export const SearchInput = styled.input`
@@ -170,11 +197,17 @@ export const Title = styled.h2`
   border-bottom: 2px solid rgba(255, 255, 255, 0.5);
 `;
 export const BTitle = styled.h2`
-  font-size: 18px;
   margin-bottom: 10px;
   padding-bottom: 15px;
   border-bottom: 2px solid rgba(255, 255, 255, 0.5);
   color: black;
+  font-family: Gothic A1;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 37.5px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
 `;
 
 export const SearchList = styled.ul`
@@ -265,21 +298,23 @@ export const ReviewContent = styled.div`
 `;
 
 export const ReviewTitle = styled.h3`
-  font-size: 18px;
+  font-size: 25px;
   font-weight: bold;
   color: #000;
-  margin-bottom: 10px;
+  margin-bottom: 26px;
 `;
 
 export const ReviewText = styled.p`
-  font-size: 14px;
-  color: #666;
+  font-size: 20px;
+  color: #605f5f;
   line-height: 1.5;
+  width: 1000px;
+  height: 125px;
 `;
 
 export const ReviewImageWrapper = styled.div`
-  width: 200px;
-  height: 120px;
+  width: 349px;
+  height: 189px;
   border-radius: 8px;
   overflow: hidden;
 `;
@@ -306,6 +341,7 @@ export const SearchBar = styled.div`
   background-color: white;
   border-radius: 20px; /* 둥근 검색창 */
   width: 80%;
+  margin-top: 20px;
   max-width: 600px;
   height: 50px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
@@ -324,6 +360,7 @@ export const LocationBar = styled.div`
   border-radius: 20px;
   height: 50px;
   margin-bottom: 10px;
+  margin-top: 20px;
   padding: 0 20px;
   width: 400px;
   position: relative;

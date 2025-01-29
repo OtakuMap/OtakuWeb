@@ -36,7 +36,7 @@ const ReviewPage3 = () => {
 
   return (
     <S.Container>
-      <S.ContentWrapper>
+      <S.NavigationWrapper>
         <S.LocationBar>
           <S.LocationInput>
             <MapPin size={20} color="#0c004b" />
@@ -53,28 +53,28 @@ const ReviewPage3 = () => {
           <S.Tag>#고시엔</S.Tag>
           <S.Tag>#아구에니</S.Tag>
         </S.TagContainer>
+      </S.NavigationWrapper>
 
-        <S.WhiteContainer>
-          <S.Header>
-            <div>한 줄 후기 &gt; ⭐️⭐️⭐️⭐️</div>
-            <div>최신순 / 조회순</div>
-          </S.Header>
+      <S.WhiteContainer>
+        <S.BHeader>
+          <div>한 줄 후기 &gt; ⭐️⭐️⭐️⭐️</div>
+          <div>최신순 / 조회순</div>
+        </S.BHeader>
 
-          <S.ReviewList>
-            {reviewData.map((review) => (
-              <S.ReviewItem key={review.id}>
-                <S.ReviewContent>
-                  <S.ReviewTitle>{review.title}</S.ReviewTitle>
-                  <S.ReviewText>{review.content}</S.ReviewText>
-                </S.ReviewContent>
-                <S.ReviewImageWrapper>
-                  <S.ReviewImage src={baseball} alt="Review" />
-                </S.ReviewImageWrapper>
-              </S.ReviewItem>
-            ))}
-          </S.ReviewList>
-        </S.WhiteContainer>
-      </S.ContentWrapper>
+        <S.ReviewList>
+          {reviewData.map((review) => (
+            <S.ReviewItem key={review.id}>
+              <S.ReviewContent>
+                <S.ReviewTitle>{review.title}</S.ReviewTitle>
+                <S.ReviewText>{review.content}</S.ReviewText>
+              </S.ReviewContent>
+              <S.ReviewImageWrapper>
+                <S.ReviewImage src={baseball} alt="Review" />
+              </S.ReviewImageWrapper>
+            </S.ReviewItem>
+          ))}
+        </S.ReviewList>
+      </S.WhiteContainer>
     </S.Container>
   );
 };
