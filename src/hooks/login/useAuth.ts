@@ -41,27 +41,14 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      const response = await authAPI.logout();
-
-      if (response.isSuccess) {
-        dispatch(logoutAction());
-        tokenStorage.clearTokens();
-        navigate('/');
-      } else {
-        console.error('Logout failed:', response.message);
-        // 실패해도 로그아웃 처리
-        dispatch(logoutAction());
-        tokenStorage.clearTokens();
-        navigate('/');
-      }
+      await authAPI.logout(); // API 호출 시도
     } catch (error) {
       console.error('Logout error:', error);
-      // 에러가 나도 로그아웃 처리
-      dispatch(logoutAction());
-      tokenStorage.clearTokens();
+    } finally {
+      // 성공/실패 여부와 관계없이 항상 실행
+      dispatch(logoutAction()); // 이 action에서 이미 tokenStorage.clearTokens()를 호출함
       navigate('/');
     }
   };
-
   return { login, logout, loading };
 };

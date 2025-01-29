@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import { PlaceLike } from '@/types/map/favorite';
 import { getFavoritePlaces } from '@/api/map/favorite';
-import { Place } from '@/types/map/place';
 
 interface FetchParams {
-  userId: number;
   lastId?: number;
   limit?: number;
 }
 
 export const useFavoritePlaces = () => {
-  const [favoritePlaces, setFavoritePlaces] = useState<Place[]>([]);
+  const [favoritePlaces, setFavoritePlaces] = useState<PlaceLike[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [hasNext, setHasNext] = useState(false);
@@ -22,23 +20,13 @@ export const useFavoritePlaces = () => {
       setError(null);
       const response = await getFavoritePlaces(params);
 
-      // PlaceLike를 Place 타입으로 변환
-      const convertedPlaces: Place[] = response.result.placeLikes.map((place) => ({
-        id: place.id,
-        title: place.name,
-        name: place.name,
-        isSelected: false,
-        latitude: 0, // API 응답에 없는 데이터
-        longitude: 0, // API 응답에 없는 데이터
-        animeName: '',
-        address: place.detail,
-        hashtags: [],
-        relatedPlaces: [],
-      }));
-
-      setFavoritePlaces(convertedPlaces);
-      setHasNext(response.result.hasNext);
-      setLastId(response.result.lastId);
+      if (response.isSuccess) {
+        setFavoritePlaces(response.result.placeLikes);
+        setHasNext(response.result.hasNext);
+        setLastId(response.result.lastId);
+      } else {
+        throw new Error(response.message);
+      }
     } catch (err) {
       setError(err as Error);
     } finally {
