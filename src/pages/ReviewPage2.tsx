@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
 import baseball from '../assets/baseball.png';
 import { useLocation } from 'react-router-dom';
+import * as S from '../styles/review/ReviewPage.style';
 
 const reviewData = [
   {
@@ -32,149 +32,6 @@ const reviewData = [
   },
 ];
 
-const Container = styled.div`
-  background-color: #0c004b;
-  width: 100vw;
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 60px;
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: white;
-  border-radius: 20px; /* 둥근 검색창 */
-  width: 80%;
-  max-width: 600px;
-  height: 50px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  padding: 10px;
-  padding-left: 20px; /* 왼쪽 여백을 추가하여 placeholder 왼쪽으로 이동 */
-  width: 100%;
-  font-size: 14px;
-  border-radius: 20px;
-  outline: none; /* 포커스 시 외곽선 제거 */
-`;
-
-const SearchButton = styled.button`
-  background: none;
-  border: none;
-  padding: 10px;
-  color: #0c004b;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px; /* 오른쪽 여백 */
-  font-size: 16px;
-
-  &:hover {
-    color: #6200ea; /* 호버 시 색상 변경 */
-  }
-`;
-
-const WhiteContainer = styled.div`
-  background-color: white;
-  width: 90%;
-  max-width: 1200px;
-  border-radius: 20px;
-  padding: 30px;
-  margin: 20px auto;
-  box-sizing: border-box; /* padding을 포함한 크기 계산 */
-`;
-
-const Header = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0 20px; /* 양쪽에 여백 추가 */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  max-width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box; /* padding을 포함한 크기 계산 */
-`;
-
-const Title = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 5px;
-`;
-
-const SortOptionsWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px; /* 검색 결과와 약간의 간격 추가 */
-  padding: 0 20px;
-`;
-
-const SortOptions = styled.div`
-  font-size: 14px;
-  color: #888;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 20px;
-  color: #000;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  margin-top: 0px;
-  padding-left: 20px; /* 오른쪽 여백 추가 */
-`;
-
-const ReviewList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const ReviewItem = styled.div`
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-`;
-
-const ReviewContent = styled.div`
-  flex: 1;
-`;
-
-const ReviewTitle = styled.h3`
-  font-size: 18px;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 10px;
-`;
-
-const ReviewText = styled.p`
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-`;
-
-const ReviewImageWrapper = styled.div`
-  width: 200px;
-  height: 120px;
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const ReviewImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
 const ReviewPage2: React.FC = () => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -187,42 +44,42 @@ const ReviewPage2: React.FC = () => {
   }, [location]);
 
   return (
-    <Container>
-      <SearchBar>
-        <SearchInput
+    <S.Container>
+      <S.SearchBar>
+        <S.SearchInput
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <SearchButton>
+        <S.SearchButton>
           <FaSearch />
-        </SearchButton>
-      </SearchBar>
+        </S.SearchButton>
+      </S.SearchBar>
 
-      <WhiteContainer>
-        <Header>
-          <Title>검색 결과</Title>
-        </Header>
-        <SortOptionsWrapper>
-          <SortOptions>최신순 / 조회순</SortOptions>
-        </SortOptionsWrapper>
+      <S.WhiteContainer>
+        <S.Header>
+          <S.BTitle>검색 결과</S.BTitle>
+        </S.Header>
+        <S.SortOptionsWrapper>
+          <S.SortOptions>최신순 / 조회순</S.SortOptions>
+        </S.SortOptionsWrapper>
 
-        <SectionTitle>후기 전체 &gt;</SectionTitle>
-        <ReviewList>
+        <S.BSectionTitle>후기 전체 &gt;</S.BSectionTitle>
+        <S.ReviewList>
           {reviewData.map((review) => (
-            <ReviewItem key={review.id}>
-              <ReviewContent>
-                <ReviewTitle>{review.title}</ReviewTitle>
-                <ReviewText>{review.content}</ReviewText>
-              </ReviewContent>
-              <ReviewImageWrapper>
-                <ReviewImage src={baseball} alt="" />
-              </ReviewImageWrapper>
-            </ReviewItem>
+            <S.ReviewItem key={review.id}>
+              <S.ReviewContent>
+                <S.ReviewTitle>{review.title}</S.ReviewTitle>
+                <S.ReviewText>{review.content}</S.ReviewText>
+              </S.ReviewContent>
+              <S.ReviewImageWrapper>
+                <S.ReviewImage src={baseball} alt="" />
+              </S.ReviewImageWrapper>
+            </S.ReviewItem>
           ))}
-        </ReviewList>
-      </WhiteContainer>
-    </Container>
+        </S.ReviewList>
+      </S.WhiteContainer>
+    </S.Container>
   );
 };
 

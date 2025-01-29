@@ -88,21 +88,21 @@ export const Label2 = styled.label`
 export const Input = styled.input`
   padding: 10px;
   font-size: 18px;
-  background-color: #101148;
+  background-color: transparent;
   color: #ffffff;
   border: none;
   outline: none;
   width: 90%;
 
   &:focus {
-    background-color: #101148;
+    background-color: transparent;
     color: #ffffff;
   }
 
   &:-webkit-autofill {
-    background-color: #101148 !important;
+    background-color: transparent !important;
     -webkit-text-fill-color: #ffffff !important; /* 자동 완성된 텍스트 색상 */
-    -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
     color: #ffffff !important;
   }
 
@@ -118,20 +118,20 @@ export const Input2 = styled.input`
   bottom: -20px;
   padding: 10px;
   font-size: 16px;
-  background-color: #101148;
+  background-color: transparent;
   color: #ffffff;
   border: none;
   outline: none;
   width: 90%;
   &:focus {
-    background-color: #101148;
+    background-color: transparent;
     color: #ffffff;
   }
 
   &:-webkit-autofill {
-    background-color: #101148 !important;
+    background-color: transparent !important;
     -webkit-text-fill-color: #ffffff !important; /* 자동 완성된 텍스트 색상 */
-    -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
     color: #ffffff !important;
   }
 `;
