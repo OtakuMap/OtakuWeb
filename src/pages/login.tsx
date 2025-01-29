@@ -1,5 +1,5 @@
 // login page
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/login/useAuth';
 import '../styles/font.css';
@@ -66,9 +66,14 @@ const LoginPage: React.FC = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null); // error 상태 추가
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // 이미 제출 중이면 중단
+    if (isSubmitting || loading) return;
 
     if (!userId || !password) {
       setError('아이디와 비밀번호를 모두 입력해주세요.');
@@ -76,13 +81,20 @@ const LoginPage: React.FC = () => {
     }
 
     try {
+      setIsSubmitting(true);
       await login(userId, password);
-      // 성공 시에만 여기에 도달
       console.log('Login form submission successful');
     } catch (err) {
       console.error('Login form submission failed');
       setError('로그인에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleButtonClick = () => {
+    if (isSubmitting || loading) return;
+    formRef.current?.requestSubmit(); // dispatchEvent 대신 requestSubmit 사용
   };
 
   return (
@@ -93,7 +105,7 @@ const LoginPage: React.FC = () => {
           <Logo src={logoIcon} />
         </Title>
         <InputBox>
-          <Form onSubmit={handleSubmit}>
+          <Form ref={formRef} onSubmit={handleSubmit}>
             <FormGroup>
               <Label1>ID</Label1>
               <Input
@@ -113,16 +125,19 @@ const LoginPage: React.FC = () => {
                 placeholder="비밀번호를 입력하세요"
               />
             </FormGroup>
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-            <ActionButton as="button" type="submit" disabled={loading}>
-              {loading ? '로그인 중...' : '로그인하기'}
-            </ActionButton>
+            {error && (
+              <div style={{ color: 'red', marginTop: '14px', fontSize: '9px' }}>{error}</div>
+            )}
+            <button type="submit" style={{ display: 'none' }}></button>
           </Form>
         </InputBox>
         <Actions>
           <ActionLink onClick={() => navigate('/search-id-pw')}>아이디/비밀번호 찾기</ActionLink>
           <ActionLink onClick={() => navigate('/signup')}>회원가입</ActionLink>
         </Actions>
+        <ActionButton onClick={handleButtonClick} disabled={loading}>
+          {loading ? '로그인 중...' : '로그인하기'}
+        </ActionButton>
         <Actions2>
           <ShortDivider />
           <ActionLink2>간편 회원가입/로그인</ActionLink2>
