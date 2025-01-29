@@ -24,7 +24,7 @@ export const useAuth = () => {
           String(response.result.id), // userId 추가
         );
         dispatch(loginSuccess(response.result));
-        navigate('/main');
+        navigate('/');
         console.log('Login successful');
       } else {
         dispatch(loginFailure(response.message));

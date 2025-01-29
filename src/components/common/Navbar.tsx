@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { useAuth } from '@/hooks/login/useAuth';
+import { useNotifications } from '@/hooks/user/useNotifications';
+import { NotificationType } from '@/types/user/notification';
 import logoImage from '../../assets/logo.png';
 import alarmIcon from '../../assets/alarm.png';
 import menuIcon from '../../assets/menu.png';
@@ -12,21 +14,13 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const { notifications, isLoading, refetchNotifications, markAsRead } = useNotifications();
   const [showPopup, setShowPopup] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
-    { id: 2, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
-    { id: 3, title: '알림 제목제목', message: '알림 내용 알림 내용 알림 내용 알림 내용' },
-  ]);
 
   const handleLogout = async () => {
     try {
       await logout();
-      console.log('Tokens after logout:', {
-        access: localStorage.getItem('accessToken'),
-        refresh: localStorage.getItem('refreshToken'),
-      });
       setShowProfilePopup(false);
     } catch (error) {
       console.error('Logout error:', error);
@@ -43,8 +37,28 @@ const Navbar = () => {
     setShowProfilePopup(false);
   };
 
-  const deleteNotification = (id: number) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
+  const handleNotificationClick = () => {
+    if (isLoggedIn) {
+      setShowPopup((prev) => !prev);
+      if (!showPopup) {
+        refetchNotifications();
+      }
+    }
+  };
+
+  const handleNotificationDelete = async (e: React.MouseEvent, notificationId: number) => {
+    e.stopPropagation(); // 클릭 이벤트 전파 방지
+    try {
+      const success = await markAsRead(notificationId);
+      if (success) {
+        // markAsRead 내부에서 이미 상태를 업데이트하므로 추가 처리 필요 없음
+        console.log('알림이 성공적으로 읽음 처리되었습니다.');
+      } else {
+        console.error('알림 읽음 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('알림 읽음 처리 중 오류 발생:', error);
+    }
   };
 
   const handleLogoClick = () => {
@@ -98,7 +112,7 @@ const Navbar = () => {
         <img src={logoImage} alt="Otaku Map" />
       </S.Logo>
       <S.IconsContainer>
-        <S.IconWrapper onClick={() => setShowPopup((prev) => !prev)}>
+        <S.IconWrapper onClick={handleNotificationClick}>
           <img src={alarmIcon} alt="Alarm" />
           {notifications.length > 0 && <span>{notifications.length}</span>}
         </S.IconWrapper>
@@ -117,14 +131,19 @@ const Navbar = () => {
           <S.AlarmPopup>
             <h4>알림</h4>
             <ul>
-              {notifications.length === 0 ? (
+              {isLoading ? (
+                <li>알림을 불러오는 중...</li>
+              ) : notifications.length === 0 ? (
                 <li>알림이 없습니다.</li>
               ) : (
                 notifications.map((notification) => (
-                  <li key={notification.id}>
-                    <h5>{notification.title}</h5>
+                  <li
+                    key={notification.id}
+                    // onClick={() => handleNotificationItemClick(notification.url)}
+                  >
+                    <h5>{getNotificationTitle(notification.type)}</h5>
                     <p>{notification.message}</p>
-                    <button onClick={() => deleteNotification(notification.id)}>X</button>
+                    <button onClick={(e) => handleNotificationDelete(e, notification.id)}>X</button>
                   </li>
                 ))
               )}
@@ -134,6 +153,21 @@ const Navbar = () => {
       </S.IconsContainer>
     </S.Nav>
   );
+};
+
+const getNotificationTitle = (type: NotificationType): string => {
+  switch (type) {
+    case 'COMMUNITY_ACTIVITY':
+      return '커뮤니티 알림';
+    case 'POST_SAVE':
+      return '저장 알림';
+    case 'POST_SUPPORT':
+      return '후원 알림';
+    case 'SERVICE_NOTICE':
+      return '서비스 공지';
+    default:
+      return '알림';
+  }
 };
 
 export default Navbar;

@@ -30,7 +30,7 @@ instance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -42,20 +42,16 @@ instance.interceptors.response.use(
           return Promise.reject(new Error('No refresh token available'));
         }
 
-        // 토큰 재발급 요청 수정
-        const response = await axios.post(
-          '/api/auth/reissue', // 엔드포인트 수정
-          null, // body는 비움
-          {
-            headers: {
-              RefreshToken: refreshToken, // 헤더에 refreshToken 추가
-            },
+        // 토큰 재발급 요청
+        const response = await axios.post('/api/auth/reissue', null, {
+          headers: {
+            RefreshToken: refreshToken,
           },
-        );
+        });
 
-        // 응답에서 새 토큰들 저장
-        const { accessToken, refreshToken: newRefreshToken } = response.data.result;
-        tokenStorage.setTokens(accessToken, newRefreshToken);
+        // 응답에서 새 토큰들 저장 (userId 포함)
+        const { accessToken, refreshToken: newRefreshToken, userId } = response.data.result;
+        tokenStorage.setTokens(accessToken, newRefreshToken, userId);
 
         // 원래 요청 재시도
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;

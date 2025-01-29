@@ -5,7 +5,7 @@ export const Nav = styled.nav`
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 89px;
   background-color: #0c004b;
   display: flex;
   justify-content: space-between;
@@ -13,13 +13,15 @@ export const Nav = styled.nav`
   padding: 0 20px;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid #e9e2ff;
+  // border-bottom: 2px solid #e9e2ff;
 `;
 
 export const Logo = styled.div`
   cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 25px;
   img {
-    height: 40px;
+    height: 44px;
     object-fit: contain;
   }
 `;
@@ -32,8 +34,8 @@ export const IconsContainer = styled.div`
 
 export const IconWrapper = styled.div`
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
 
   img {
