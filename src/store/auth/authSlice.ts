@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { tokenStorage } from '@/utils/token';
 
 export interface AuthState {
   isLoggedIn: boolean;
@@ -8,11 +9,12 @@ export interface AuthState {
   error: string | null;
 }
 
+// localStorage의 토큰으로 초기 상태 설정
 const initialState: AuthState = {
-  isLoggedIn: false,
+  isLoggedIn: !!tokenStorage.getAccessToken(), // 토큰 존재하면 true
   userId: null,
-  accessToken: null,
-  refreshToken: null,
+  accessToken: tokenStorage.getAccessToken(),
+  refreshToken: tokenStorage.getRefreshToken(),
   error: null,
 };
 
@@ -37,8 +39,13 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.error = action.payload;
     },
-    logout: () => {
-      return initialState;
+    logout: (state) => {
+      state.isLoggedIn = false;
+      state.userId = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.error = null;
+      tokenStorage.clearTokens(); // 로그아웃 시 토큰 제거
     },
   },
 });
