@@ -13,6 +13,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getAccessToken();
+    console.log('Request interceptor token:', token); // 토큰 확인 로그
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
 import Search from '../common/Search';
@@ -31,10 +31,15 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
 
-  // API 연동을 위한 hook 사용
-  const { favoritePlaces, isLoading, fetchFavoritePlaces } = useFavoritePlaces();
-  const tempUserId = '1'; // 임시 userId
+  // 데이터 로깅
+  useEffect(() => {
+    if (favoritePlaces.length > 0) {
+      console.log('Received favorite places:', favoritePlaces);
+      console.log('First place data structure:', favoritePlaces[0]);
+    }
+  }, [favoritePlaces]);
 
   // 뒤로가기 처리
   const handleBack = () => {
@@ -56,11 +61,19 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
     setRecentSearches((prev) => prev.filter((item) => item !== searchText));
   };
 
-  const handlePlaceClick = (place: Place) => {
+  // Place 타입을 처리하는 함수
+  const handleSearchPlaceSelect = (place: Place) => {
     setSelectedPlace(place);
     if (onPlaceSelect) {
       onPlaceSelect(place);
     }
+  };
+
+  // placeId를 처리하는 함수
+  const handleFavoritePlaceClick = (placeId: number) => {
+    console.log('Fetching details for place:', placeId);
+    // TODO: placeId를 사용하여 장소 상세 정보를 가져오는 API 호출
+    // 예: navigate(`/place/${placeId}`);
   };
 
   const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
@@ -76,10 +89,26 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
 
   // favoritePlaces 버튼 클릭 핸들러
   const handleFavoritePlacesClick = () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
     const newView = activeView === 'favoritePlaces' ? 'none' : 'favoritePlaces';
     setActiveView(newView);
+
     if (newView === 'favoritePlaces') {
-      fetchFavoritePlaces(tempUserId);
+      fetchFavoritePlaces({
+        lastId: 0,
+        limit: 10,
+      }).catch((error) => {
+        if (error.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          navigate('/login');
+        }
+      });
     }
   };
 
@@ -101,12 +130,15 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
           <S.RecommendationsContainer>
             {isLoading ? (
               <div>로딩 중...</div>
+            ) : error ? (
+              <div>에러가 발생했습니다: {error.message}</div>
+            ) : favoritePlaces.length === 0 ? (
+              <div>저장된 장소가 없습니다.</div>
             ) : (
               favoritePlaces.map((place) => (
                 <S.RecommendationItem
                   key={place.id}
-                  onClick={() => handlePlaceClick(place)}
-                  $isSelected={selectedPlace?.id === place.id}
+                  onClick={() => handleFavoritePlaceClick(place.placeId)}
                 >
                   <S.RecommendationText>{place.name}</S.RecommendationText>
                 </S.RecommendationItem>
@@ -122,7 +154,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   return (
     <S.Container>
       <BackButton onClick={handleBack} />
-      <Search onSearch={handleSearch} onSuggestionSelect={(place) => handlePlaceClick(place)} />
+      <Search onSearch={handleSearch} onSuggestionSelect={handleSearchPlaceSelect} />
       <S.ButtonContainer>
         <S.SavedRoutesButton
           isActive={activeView === 'savedRoutes'}

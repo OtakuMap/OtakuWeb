@@ -8,4 +8,5 @@ export interface Place {
   animeName: string;
   address: string;
   hashtags: string[];
+  relatedPlaces: Place[];
 }
