@@ -91,14 +91,14 @@ checkIdDuplication: async (userId: string): Promise<CheckIDDuplicationResponse> 
 
 
   // 이메일 중복 확인
-  checkEmailDuplication: async (userEmail: string): Promise<CheckEmailDuplicationResponse> => {
+  checkEmailDuplication: async (email: string): Promise<CheckEmailDuplicationResponse> => {
     try {
       console.log('Request URL:', '/auth/check-email');
-      console.log('Request Data:', { userEmail }); // userId만 전달
+      console.log('Request Data:', { email }); // userId만 전달
   
       // GET 방식으로 URL에 쿼리 파라미터로 전달
       const response = await instance.get<CheckEmailDuplicationResponse>('/auth/check-email', {
-        params: { userEmail }, // 쿼리 파라미터로 전달
+        params: { email }, // 쿼리 파라미터로 전달
       });
       console.log('Response:', response);
       return response.data;
@@ -126,13 +126,13 @@ checkIdDuplication: async (userId: string): Promise<CheckIDDuplicationResponse> 
       }
     },
 
-    // 이메일 인증
-    EmailVerifyCode: async (userData: EmailVerifyCodeRequest): Promise<EmailVerifyCodeResponse> => {
+    // 이메일 인증 //에러발생 수정필요
+    EmailVerifyCode: async (email: EmailVerifyCodeRequest): Promise<EmailVerifyCodeResponse> => {
       try {
         console.log('Request URL:', '/auth/verify-code');
-        console.log('Request Data:', userData);
+        console.log('Request Data:', email);
   
-        const response = await instance.post<EmailVerifyCodeResponse>('/auth/verify-code', userData);
+        const response = await instance.post<EmailVerifyCodeResponse>('/auth/verify-code', email);
         console.log('Response:', response);
         return response.data;
       } catch (error: unknown) {

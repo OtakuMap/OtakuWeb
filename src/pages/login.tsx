@@ -1,11 +1,12 @@
 // login page
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/login/useAuth';
-import kakaoIcon from '../../assets/img/kakao-icon.png';
-import naverIcon from '../../assets/img/naver-icon.png';
-import googleIcon from '../../assets/img/google-icon.png';
-import logoIcon from '../../assets/logo.png';
+import { useAuth } from '@/hooks/login/useAuth';
+import '../styles/font.css';
+import kakaoIcon from '../assets/img/kakao-icon.png';
+import naverIcon from '../assets/img/naver-icon.png';
+import googleIcon from '../assets/img/google-icon.png';
+import logoIcon from '../assets/logo.png';
 import {
   Container,
   LoginBox,
@@ -28,7 +29,7 @@ import {
   ShortDivider,
   SocialLogin,
   SocialIcon,
-} from '../../styles/login/login.style';
+} from '../styles/login/login.style';
 
 const {
   VITE_KAKAO_CLIENT_ID,
@@ -62,8 +63,8 @@ const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login, loading } = useAuth();
-  const [userId, setUserId] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null); // error 상태 추가
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

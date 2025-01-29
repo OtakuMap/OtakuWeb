@@ -4,7 +4,7 @@ import { Container, SignupBox, Title, InputBox,
   FormGroup2, FormGroup3, FormGroup4, DetailText, CheckboxGroup, CheckboxItem, Checkbox, 
   CheckboxLabel, Divider, ActionLink, Openbutton
  } from '../styles/login/signup.style';
- import {authAPI} from '../api/login/authAPI';
+import {authAPI} from '../api/login/authAPI';
 
 const SignupPage: React.FC = () => {
   const [userId, setUserId] = useState('');
