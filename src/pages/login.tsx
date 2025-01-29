@@ -84,7 +84,7 @@ const LoginPage: React.FC = () => {
       setIsSubmitting(true);
       await login(userId, password);
       console.log('Login form submission successful');
-    } catch (_err) {
+    } catch (err) {
       console.error('Login form submission failed');
       setError('로그인에 실패했습니다.');
     } finally {
