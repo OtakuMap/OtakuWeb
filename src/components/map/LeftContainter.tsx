@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
 import Search from '../common/Search';
 import BackButton from '../common/BackButton';
 import { Place } from '@/types/map/place';
 import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
+import { useAppSelector } from '@/hooks/reduxHooks';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
@@ -32,9 +33,18 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
-  // API 연동을 위한 hook 사용
+  const authState = useAppSelector((state) => state.auth);
+
+  const { userId } = authState;
   const { favoritePlaces, isLoading, fetchFavoritePlaces } = useFavoritePlaces();
-  const tempUserId = '1'; // 임시 userId
+
+  // userId 변경시 로깅
+  useEffect(() => {
+    if (favoritePlaces.length > 0) {
+      console.log('Received favorite places:', favoritePlaces);
+      console.log('First place data structure:', favoritePlaces[0]);
+    }
+  }, [favoritePlaces]);
 
   // 뒤로가기 처리
   const handleBack = () => {
@@ -77,9 +87,37 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   // favoritePlaces 버튼 클릭 핸들러
   const handleFavoritePlacesClick = () => {
     const newView = activeView === 'favoritePlaces' ? 'none' : 'favoritePlaces';
+
     setActiveView(newView);
+
     if (newView === 'favoritePlaces') {
-      fetchFavoritePlaces(tempUserId);
+      if (!userId) {
+        console.error('No userId available');
+        return;
+      }
+
+      try {
+        const userIdNumber = Number(userId);
+
+        if (isNaN(userIdNumber)) {
+          console.error('Invalid userId format');
+          return;
+        }
+
+        console.log('Calling fetchFavoritePlaces with:', {
+          userId: userIdNumber,
+          lastId: 0,
+          limit: 10,
+        });
+
+        fetchFavoritePlaces({
+          userId: userIdNumber,
+          lastId: 0,
+          limit: 10,
+        });
+      } catch (error) {
+        console.error('Error in handleFavoritePlacesClick:', error);
+      }
     }
   };
 

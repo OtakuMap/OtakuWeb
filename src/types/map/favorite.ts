@@ -2,16 +2,13 @@ export interface PlaceLike {
   id: number;
   placeId: number;
   name: string;
-  detail: string;
-  lat: number;
-  lng: number;
-  savedAt: string;
   isFavorite: boolean;
+  detail: string;
 }
 
 export interface PlaceLikesResponse {
   isSuccess: boolean;
-  code: number;
+  code: string;
   message: string;
   result: {
     placeLikes: PlaceLike[];
