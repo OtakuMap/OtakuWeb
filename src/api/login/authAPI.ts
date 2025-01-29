@@ -79,7 +79,10 @@ export const authAPI = {
   },
 
   // OAuth 로그인
-  oauthLogin: async (provider: 'google' | 'kakao' | 'naver', oauthData: OAuthLoginRequest): Promise<LoginResponse> => {
+  oauthLogin: async (
+    provider: 'google' | 'kakao' | 'naver',
+    oauthData: OAuthLoginRequest,
+  ): Promise<LoginResponse> => {
     try {
       const url = `/auth/social/${provider}`;
       console.log('Request URL:', url);
@@ -178,13 +181,38 @@ export const authAPI = {
   // 로그아웃
   logout: async (): Promise<LogoutResponse> => {
     try {
-      console.log('Sending logout request');
-      const response = await instance.post<LogoutResponse>('/auth/logout');
+      // 요청 전 토큰 확인을 위한 로그
+      console.log('Logout request headers:', {
+        Authorization: `Bearer ${tokenStorage.getAccessToken()}`,
+      });
+
+      const response = await instance.post<LogoutResponse>('/auth/logout', null, {
+        headers: {
+          Authorization: `Bearer ${tokenStorage.getAccessToken()}`,
+        },
+      });
+
       console.log('Logout response:', response.data);
       return response.data;
     } catch (error: unknown) {
       console.error('Error during logout:', error);
-      return handleError<LogoutResponse>(error);
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<LogoutResponse>;
+        console.log('Error details:', {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data,
+        });
+        return {
+          isSuccess: false,
+          code: axiosError.response?.data?.code || 'UNKNOWN_ERROR',
+          message: axiosError.response?.data?.message || '로그아웃 중 오류가 발생했습니다.',
+        };
+      }
+      return {
+        isSuccess: false,
+        code: 'UNKNOWN_ERROR',
+        message: '로그아웃 중 오류가 발생했습니다.',
+      };
     }
   },
 };

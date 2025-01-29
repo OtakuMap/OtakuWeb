@@ -14,11 +14,15 @@ export const useAuth = () => {
     setLoading(true);
     try {
       const response = await authAPI.login({ userId, password });
-      console.log('Login response:', response); //응답 확인
+      console.log('Login response:', response);
 
       if (response.isSuccess && response.result) {
-        //성공 시 두 토큰 모두 저장
-        tokenStorage.setTokens(response.result.accessToken, response.result.refreshToken);
+        // userId도 함께 저장하도록 수정
+        tokenStorage.setTokens(
+          response.result.accessToken,
+          response.result.refreshToken,
+          String(response.result.id), // userId 추가
+        );
         dispatch(loginSuccess(response.result));
         navigate('/main');
         console.log('Login successful');
@@ -37,19 +41,14 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      const response = await authAPI.logout();
-
-      if (response.isSuccess) {
-        dispatch(logoutAction());
-        tokenStorage.clearTokens();
-        navigate('/');
-      } else {
-        console.error('Logout failed:', response.message);
-      }
+      await authAPI.logout(); // API 호출 시도
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      // 성공/실패 여부와 관계없이 항상 실행
+      dispatch(logoutAction()); // 이 action에서 이미 tokenStorage.clearTokens()를 호출함
+      navigate('/');
     }
   };
-
   return { login, logout, loading };
 };

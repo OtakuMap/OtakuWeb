@@ -9,10 +9,9 @@ export interface AuthState {
   error: string | null;
 }
 
-// localStorage의 토큰으로 초기 상태 설정
 const initialState: AuthState = {
-  isLoggedIn: !!tokenStorage.getAccessToken(), // 토큰 존재하면 true
-  userId: null,
+  isLoggedIn: !!tokenStorage.getAccessToken(),
+  userId: tokenStorage.getUserId(),
   accessToken: tokenStorage.getAccessToken(),
   refreshToken: tokenStorage.getRefreshToken(),
   error: null,
@@ -30,10 +29,14 @@ const authSlice = createSlice({
         refreshToken: string;
       }>,
     ) => {
+      const userId = String(action.payload.id);
       state.isLoggedIn = true;
+      state.userId = userId;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.error = null;
+
+      tokenStorage.setTokens(action.payload.accessToken, action.payload.refreshToken, userId);
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.isLoggedIn = false;
@@ -45,7 +48,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.error = null;
-      tokenStorage.clearTokens(); // 로그아웃 시 토큰 제거
+      tokenStorage.clearTokens();
     },
   },
 });
