@@ -60,29 +60,37 @@ export const authAPI = {
   },
   logout: async (): Promise<LogoutResponse> => {
     try {
-      console.log('Sending logout request');
-      const response = await instance.post<LogoutResponse>('/auth/logout');
+      // 요청 전 토큰 확인을 위한 로그
+      console.log('Logout request headers:', {
+        Authorization: `Bearer ${tokenStorage.getAccessToken()}`,
+      });
+
+      const response = await instance.post<LogoutResponse>('/auth/logout', null, {
+        headers: {
+          Authorization: `Bearer ${tokenStorage.getAccessToken()}`,
+        },
+      });
+
       console.log('Logout response:', response.data);
       return response.data;
     } catch (error: unknown) {
       console.error('Error during logout:', error);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<LogoutResponse>;
-        console.log('Logout error details:', {
+        console.log('Error details:', {
           status: axiosError.response?.status,
           data: axiosError.response?.data,
-          headers: axiosError.response?.headers,
         });
         return {
           isSuccess: false,
           code: axiosError.response?.data?.code || 'UNKNOWN_ERROR',
-          message: axiosError.response?.data?.message || '서버 에러, 관리자에게 문의 바랍니다.',
+          message: axiosError.response?.data?.message || '로그아웃 중 오류가 발생했습니다.',
         };
       }
       return {
         isSuccess: false,
         code: 'UNKNOWN_ERROR',
-        message: '서버 에러, 관리자에게 문의 바랍니다.',
+        message: '로그아웃 중 오류가 발생했습니다.',
       };
     }
   },

@@ -14,11 +14,15 @@ export const useAuth = () => {
     setLoading(true);
     try {
       const response = await authAPI.login({ userId, password });
-      console.log('Login response:', response); //응답 확인
+      console.log('Login response:', response);
 
       if (response.isSuccess && response.result) {
-        //성공 시 두 토큰 모두 저장
-        tokenStorage.setTokens(response.result.accessToken, response.result.refreshToken);
+        // userId도 함께 저장하도록 수정
+        tokenStorage.setTokens(
+          response.result.accessToken,
+          response.result.refreshToken,
+          String(response.result.id), // userId 추가
+        );
         dispatch(loginSuccess(response.result));
         navigate('/main');
         console.log('Login successful');
@@ -45,9 +49,17 @@ export const useAuth = () => {
         navigate('/');
       } else {
         console.error('Logout failed:', response.message);
+        // 실패해도 로그아웃 처리
+        dispatch(logoutAction());
+        tokenStorage.clearTokens();
+        navigate('/');
       }
     } catch (error) {
       console.error('Logout error:', error);
+      // 에러가 나도 로그아웃 처리
+      dispatch(logoutAction());
+      tokenStorage.clearTokens();
+      navigate('/');
     }
   };
 
