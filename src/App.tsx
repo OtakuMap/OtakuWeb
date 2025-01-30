@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 import { useAppSelector } from './hooks/reduxHooks';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import styled from 'styled-components';
 import './App.css';
@@ -40,6 +41,8 @@ const AppContainer = styled.div`
 
 //   return hideNavbarPaths.includes(location.pathname) ? null : <Navbar />;
 // };
+
+const queryClient = new QueryClient();
 
 // 라우팅을 담당할 새로운 컴포넌트
 const AppRoutes: React.FC = () => {
@@ -83,13 +86,15 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </PersistGate>
+      </Provider>
+    </QueryClientProvider>
   );
 };
 
