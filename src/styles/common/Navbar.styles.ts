@@ -27,14 +27,15 @@ export const Logo = styled.div`
 
 export const IconsContainer = styled.div`
   display: flex;
-  gap: 23px; // 29px * 0.8
+  gap: 29px; // 29px * 0.8
+  // margin-left: 29px;
   align-items: center;
 `;
 
 export const IconWrapper = styled.div<{ isActive?: boolean; isProfile?: boolean }>`
   position: relative;
-  width: 22px; // 28px * 0.8
-  height: 22px; // 28px * 0.8
+  width: 28px; // 28px * 0.8
+  height: 28px; // 28px * 0.8
   cursor: pointer;
 
   img {
@@ -58,11 +59,12 @@ export const IconWrapper = styled.div<{ isActive?: boolean; isProfile?: boolean 
       &::after {
         content: '';
         position: absolute;
-        width: 18px; // 28px * 0.8
+        width: 28px; // 28px * 0.8
         height: 0;
-        left: 0;
-        top: 30px; // 42px * 0.8
-        border: 3px solid #fff5d5; // 4px * 0.8
+        left: -1.7px;
+        top: 36px; // 42px * 0.8
+        border: 2px solid #fff5d5; // 4px * 0.8
+        border-radius: 4px;
       }
     `}
 
@@ -175,7 +177,7 @@ export const AlarmPopup = styled.div`
 
 export const ProfilePopup = styled.div`
   position: absolute;
-  top: 56px; // 70px * 0.8
+  top: 71px; // 70px * 0.8
   right: 16px; // 20px * 0.8
   background: white;
   border: 1px solid #ddd;
