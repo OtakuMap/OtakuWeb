@@ -158,6 +158,19 @@ export const SearchBarWrapper = styled.div`
   margin-top: 20px;
 `;
 
+export const ReviewTypeButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0c004b;
+  font-weight: bold;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const SearchInput = styled.input`
   border: none;
   padding: 10px;

@@ -33,7 +33,11 @@ const reviewData = [
 
 const ReviewPage3 = () => {
   const navigate = useNavigate();
+  const placeId = 1; // 여기에 실제 장소 ID를 설정해주세요
 
+  const handleShortReviewClick = () => {
+    navigate(`/review4/${placeId}`);
+  };
   return (
     <S.Container>
       <S.NavigationWrapper>
@@ -57,7 +61,10 @@ const ReviewPage3 = () => {
 
       <S.WhiteContainer>
         <S.BHeader>
-          <div>한 줄 후기 &gt; ⭐️⭐️⭐️⭐️</div>
+          <div>
+            <S.ReviewTypeButton onClick={handleShortReviewClick}>한 줄 후기</S.ReviewTypeButton>
+            &gt; ⭐️⭐️⭐️⭐️
+          </div>
           <div>최신순 / 조회순</div>
         </S.BHeader>
 

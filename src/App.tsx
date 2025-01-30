@@ -71,7 +71,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/review3" element={<ReviewPage3 />} />
-        <Route path="/review4" element={<ReviewPage4 />} />
+        <Route path="/review4/:placeId" element={<ReviewPage4 />} />
         <Route path="/review5" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
