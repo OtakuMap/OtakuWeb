@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
 import MapContainer from '../../components/map/MapContainer';
@@ -91,6 +91,7 @@ const sampleLocations: RouteLocation[] = [
 ];
 
 const RoutePage = () => {
+  const mapInstance = useRef<google.maps.Map | null>(null); // 추가
   const [locations, setLocations] = useState<RouteLocation[]>(sampleLocations);
   const [selectedLocation, setSelectedLocation] = useState<RouteLocation | null>(null);
   const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<PlaceDetails | undefined>(
@@ -107,6 +108,11 @@ const RoutePage = () => {
   const handleCloseDetail = () => {
     setSelectedLocation(null);
     setSelectedPlaceDetails(undefined);
+    // mapSettings의 zoom level로 되돌리기
+    if (window.google?.maps && mapInstance.current) {
+      mapInstance.current.setZoom(mapSettings.zoom);
+      mapInstance.current.panTo(mapSettings.center);
+    }
   };
 
   const handleLocationsChange = (newLocations: RouteLocation[]) => {
@@ -171,7 +177,9 @@ const RoutePage = () => {
           center={mapSettings.center}
           zoom={mapSettings.zoom}
           locations={locations}
+          selectedLocation={selectedLocation}
           onMarkerClick={handleMarkerClick}
+          ref={mapInstance}
         />
         {selectedLocation && (
           <LocationDetail
