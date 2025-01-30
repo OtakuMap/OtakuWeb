@@ -1,7 +1,19 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import * as S from '../../styles/map/MapContainer.styles';
 import { RouteLocation } from '../../types/map/route';
+import { getPlaceDetails, PlaceDetails } from '../../utils/mapUtils';
 
+// interface MapContainerProps {
+//   apiKey: string;
+//   center: {
+//     lat: number;
+//     lng: number;
+//   };
+//   zoom?: number;
+//   mapId?: string;
+//   locations?: RouteLocation[];
+//   onMarkerClick?: (location: RouteLocation) => void;
+// }
 interface MapContainerProps {
   apiKey: string;
   center: {
@@ -11,7 +23,7 @@ interface MapContainerProps {
   zoom?: number;
   mapId?: string;
   locations?: RouteLocation[];
-  onMarkerClick?: (location: RouteLocation) => void;
+  onMarkerClick?: (location: RouteLocation, placeDetails?: PlaceDetails) => void;
 }
 
 declare global {
@@ -49,7 +61,7 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
   GOOGLE_MAPS_LOADING_STATE.loading = true;
 
   const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=beta`;
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&v=beta`;
   script.async = true;
 
   GOOGLE_MAPS_LOADING_STATE.promise = new Promise((resolve, reject) => {
@@ -152,29 +164,45 @@ const MapContainer: React.FC<MapContainerProps> = ({
       });
 
       // 클릭 핸들러를 별도 함수로 분리
-      const handleMarkerClick = () => {
-        if (onMarkerClick) {
-          onMarkerClick(location);
-        }
+      const handleMarkerClick = async () => {
+        try {
+          // mapInstance.current가 확실히 존재할 때만 실행
+          if (!mapInstance.current) return;
 
-        // requestAnimationFrame을 사용하여 다음 프레임에서 지도 업데이트
-        requestAnimationFrame(() => {
-          const map = mapInstance.current;
-          if (!map) return;
+          const placeDetails = await getPlaceDetails(
+            location.latitude,
+            location.longitude,
+            apiKey,
+            mapInstance.current,
+          );
 
-          map.setCenter({
-            lat: location.latitude,
-            lng: location.longitude,
+          if (onMarkerClick) {
+            onMarkerClick(location, placeDetails);
+          }
+
+          requestAnimationFrame(() => {
+            const map = mapInstance.current;
+            if (!map) return;
+
+            map.setCenter({
+              lat: location.latitude,
+              lng: location.longitude,
+            });
+            map.setZoom(17);
           });
-          map.setZoom(17);
-        });
+        } catch (error) {
+          console.error('Error getting place details:', error);
+          // 에러가 발생해도 기본적인 마커 클릭 동작은 수행
+          if (onMarkerClick) {
+            onMarkerClick(location);
+          }
+        }
       };
 
       marker.addListener('click', handleMarkerClick);
-
       return marker;
     },
-    [onMarkerClick], // mapInstance 제거
+    [apiKey, onMarkerClick],
   );
 
   // 마커 업데이트

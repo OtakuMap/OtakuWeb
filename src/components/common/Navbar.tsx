@@ -17,6 +17,13 @@ const Navbar = () => {
   const { notifications, isLoading, refetchNotifications, markAsRead } = useNotifications();
   const [showPopup, setShowPopup] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
+  // const [showMenuPopup, setShowMenuPopup] = useState(false);
+
+  // 팝업 상태를 모두 닫는 함수
+  const closeAllPopups = () => {
+    setShowPopup(false);
+    setShowProfilePopup(false);
+  };
 
   const handleLogout = async () => {
     try {
@@ -39,10 +46,26 @@ const Navbar = () => {
 
   const handleNotificationClick = () => {
     if (isLoggedIn) {
-      setShowPopup((prev) => !prev);
       if (!showPopup) {
+        closeAllPopups(); // 여기서 먼저 모든 팝업을 닫고
+        setShowPopup(true); // 그 다음 알림창을 열기
         refetchNotifications();
+      } else {
+        closeAllPopups();
       }
+    }
+  };
+
+  const handleMenuClick = () => {
+    closeAllPopups(); // 열려있는 팝업이 있다면 닫기
+    navigate('/category');
+  };
+
+  const handleProfileClick = () => {
+    closeAllPopups(); // 항상 먼저 모든 팝업을 닫고
+    if (!showProfilePopup) {
+      // 프로필 팝업이 닫혀있었다면
+      setShowProfilePopup(true); // 프로필 팝업을 열기
     }
   };
 
@@ -63,10 +86,6 @@ const Navbar = () => {
 
   const handleLogoClick = () => {
     navigate('/');
-  };
-
-  const handleMenuClick = () => {
-    navigate('/category');
   };
 
   const GuestProfileContent = (
@@ -107,51 +126,53 @@ const Navbar = () => {
   );
 
   return (
-    <S.Nav>
-      <S.Logo onClick={handleLogoClick}>
-        <img src={logoImage} alt="Otaku Map" />
-      </S.Logo>
-      <S.IconsContainer>
-        <S.IconWrapper onClick={handleNotificationClick}>
-          <img src={alarmIcon} alt="Alarm" />
-          {notifications.length > 0 && <span>{notifications.length}</span>}
-        </S.IconWrapper>
-        <S.IconWrapper onClick={handleMenuClick}>
-          <img src={menuIcon} alt="Menu" />
-        </S.IconWrapper>
-        <S.IconWrapper onClick={() => setShowProfilePopup((prev) => !prev)}>
-          <img src={profileIcon} alt="Profile" />
-        </S.IconWrapper>
+    <>
+      <S.Nav>
+        <S.Logo onClick={handleLogoClick}>
+          <img src={logoImage} alt="Otaku Map" />
+        </S.Logo>
+        <S.IconsContainer>
+          <S.IconWrapper onClick={handleNotificationClick} isActive={showPopup}>
+            <img src={alarmIcon} alt="Alarm" />
+            {notifications.length > 0 && <span>{notifications.length}</span>}
+          </S.IconWrapper>
+          <S.IconWrapper onClick={handleMenuClick}>
+            <img src={menuIcon} alt="Menu" />
+          </S.IconWrapper>
+          <S.IconWrapper onClick={handleProfileClick} isActive={showProfilePopup} isProfile>
+            <img src={profileIcon} alt="Profile" />
+          </S.IconWrapper>
 
-        {showProfilePopup && (
-          <S.ProfilePopup>{isLoggedIn ? UserProfileContent : GuestProfileContent}</S.ProfilePopup>
-        )}
+          {showProfilePopup && (
+            <S.ProfilePopup>{isLoggedIn ? UserProfileContent : GuestProfileContent}</S.ProfilePopup>
+          )}
 
-        {showPopup && (
-          <S.AlarmPopup>
-            <h4>알림</h4>
-            <ul>
-              {isLoading ? (
-                <li>알림을 불러오는 중...</li>
-              ) : notifications.length === 0 ? (
-                <li>알림이 없습니다.</li>
-              ) : (
-                notifications.map((notification) => (
-                  <li
-                    key={notification.id}
-                    // onClick={() => handleNotificationItemClick(notification.url)}
-                  >
-                    <h5>{getNotificationTitle(notification.type)}</h5>
-                    <p>{notification.message}</p>
-                    <button onClick={(e) => handleNotificationDelete(e, notification.id)}>X</button>
-                  </li>
-                ))
-              )}
-            </ul>
-          </S.AlarmPopup>
-        )}
-      </S.IconsContainer>
-    </S.Nav>
+          {showPopup && (
+            <S.AlarmPopup>
+              <h4>알림</h4>
+              <ul>
+                {isLoading ? (
+                  <li>알림을 불러오는 중...</li>
+                ) : notifications.length === 0 ? (
+                  <li>알림이 없습니다.</li>
+                ) : (
+                  notifications.map((notification) => (
+                    <li key={notification.id}>
+                      <h5>{getNotificationTitle(notification.type)}</h5>
+                      <p>{notification.message}</p>
+                      <button onClick={(e) => handleNotificationDelete(e, notification.id)}>
+                        X
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </S.AlarmPopup>
+          )}
+        </S.IconsContainer>
+      </S.Nav>
+      <S.Overlay isVisible={showPopup || showProfilePopup} />
+    </>
   );
 };
 
