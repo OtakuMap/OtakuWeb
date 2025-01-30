@@ -12,7 +12,7 @@ export const getPlaceDetails = async (
   map: google.maps.Map,
 ): Promise<PlaceDetails> => {
   try {
-    // 1. 주소 가져오기
+    // 1. 역지오코딩으로 주소 가져오기
     const geocoder = new google.maps.Geocoder();
     const latlng = { lat: latitude, lng: longitude };
 
@@ -34,20 +34,16 @@ export const getPlaceDetails = async (
 
     // 2. Places API로 상세 정보 가져오기
     const service = new google.maps.places.PlacesService(map);
-
-    // 위도/경도를 기반으로 검색 쿼리 생성
     const query = `${latitude},${longitude}`;
 
     const searchRequest = {
       query: query,
       location: latlng,
-      radius: 100, // 미터 단위
+      radius: 100,
     };
 
     const places = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
       service.textSearch(searchRequest, (results, status) => {
-        console.log('Text search results:', results);
-        console.log('Text search status:', status);
         if (status === 'OK' && results) {
           resolve(results);
         } else {
@@ -64,16 +60,12 @@ export const getPlaceDetails = async (
       name = places[0].name;
       placeId = places[0].place_id;
 
-      // places[0].photos가 있다면 바로 사용
       if (places[0].photos && places[0].photos.length > 0) {
         photoUrl = places[0].photos[0].getUrl({
           maxWidth: 800,
           maxHeight: 600,
         });
-        console.log('Generated photo URL from search:', photoUrl);
-      }
-      // 없다면 place details로 추가 정보 가져오기
-      else if (placeId) {
+      } else if (placeId) {
         const detailsRequest = {
           placeId: placeId,
           fields: ['photos', 'formatted_address', 'name'],
@@ -96,15 +88,13 @@ export const getPlaceDetails = async (
             maxWidth: 800,
             maxHeight: 600,
           });
-          console.log('Generated photo URL from details:', photoUrl);
         }
       }
     }
 
-    // 사진이 없는 경우 Street View를 사용
+    // 이미지가 없는 경우 기본 이미지 사용
     if (!photoUrl) {
-      photoUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x600&location=${latitude},${longitude}&key=${apiKey}&heading=0&pitch=0&fov=90`;
-      console.log('Using Street View fallback:', photoUrl);
+      photoUrl = '/src/assets/logorepeat.png';
     }
 
     return {
@@ -115,12 +105,9 @@ export const getPlaceDetails = async (
     };
   } catch (error) {
     console.error('Error fetching place details:', error);
-    // 에러 발생 시 Street View 이미지 반환
-    const fallbackUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x600&location=${latitude},${longitude}&key=${apiKey}&heading=0&pitch=0&fov=90`;
-    console.log('Using error fallback URL:', fallbackUrl);
     return {
       address: '',
-      photoUrl: fallbackUrl,
+      photoUrl: '/src/assets/logorepeat.png',
       name: undefined,
       placeId: undefined,
     };

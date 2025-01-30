@@ -166,8 +166,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
       // 클릭 핸들러를 별도 함수로 분리
       const handleMarkerClick = async () => {
         try {
-          // mapInstance.current가 확실히 존재할 때만 실행
-          if (!mapInstance.current) return;
+          console.log('Marker clicked:', location);
+
+          if (!mapInstance.current) {
+            console.error('Map instance not available');
+            return;
+          }
 
           const placeDetails = await getPlaceDetails(
             location.latitude,
@@ -175,6 +179,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
             apiKey,
             mapInstance.current,
           );
+
+          console.log('Place details received:', placeDetails);
 
           if (onMarkerClick) {
             onMarkerClick(location, placeDetails);
@@ -191,8 +197,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             map.setZoom(17);
           });
         } catch (error) {
-          console.error('Error getting place details:', error);
-          // 에러가 발생해도 기본적인 마커 클릭 동작은 수행
+          console.error('Error in marker click handler:', error);
           if (onMarkerClick) {
             onMarkerClick(location);
           }

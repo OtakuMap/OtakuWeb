@@ -5,41 +5,33 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { PlaceDetails } from '../../utils/mapUtils';
 
-// interface LocationDetailProps {
-//   location: LocationDetailType;
-//   onClose?: () => void;
-// }
 interface LocationDetailProps {
   location: LocationDetailType;
   placeDetails?: PlaceDetails;
   onClose?: () => void;
 }
 
+const DEFAULT_IMAGE =
+  'https://images.unsplash.com/photo-1581790064141-de9de7145e93?q=80&w=1000&auto=format&fit=crop';
+
 const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails, onClose }) => {
   const navigate = useNavigate();
-  // 현재 장소와 관련 장소들을 하나의 배열로 합침
   const allPlaces = [location, ...(location.relatedPlaces || [])];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const currentPlace = allPlaces[currentIndex];
 
-  // Street View 이미지 URL을 생성하는 함수
-  const getStreetViewUrl = (lat: number, lng: number) => {
-    return `/api/streetview?latitude=${lat}&longitude=${lng}`; // 프록시를 통해 요청
-  };
-
   const handleNextLocation = () => {
     setCurrentIndex((prev) => (prev === allPlaces.length - 1 ? 0 : prev + 1));
   };
 
   const handleReviewClick = () => {
-    navigate('/review3'); // review3 페이지로 이동
+    navigate('/review3');
   };
 
   const handleFavClick = () => {
     setIsFavorited(!isFavorited);
-    // Log the current location data
     console.log('Favorited Location Data:', {
       id: currentPlace.id,
       name: currentPlace.name,
@@ -50,17 +42,14 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails,
   };
 
   const imageSource = useMemo(() => {
-    if (imageLoadFailed) {
-      return getStreetViewUrl(currentPlace.latitude, currentPlace.longitude);
+    if (imageLoadFailed || !placeDetails?.photoUrl) {
+      return DEFAULT_IMAGE;
     }
-    if (placeDetails?.photoUrl) {
-      return placeDetails.photoUrl;
-    }
-    return getStreetViewUrl(currentPlace.latitude, currentPlace.longitude);
-  }, [placeDetails?.photoUrl, currentPlace, imageLoadFailed]);
+    return placeDetails.photoUrl;
+  }, [placeDetails?.photoUrl, imageLoadFailed]);
 
   const handleImageError = useCallback(() => {
-    console.log('Image load failed, switching to Street View');
+    console.log('Image load failed, switching to default image');
     setImageLoadFailed(true);
   }, []);
 
@@ -80,7 +69,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails,
         src={imageSource}
         alt={currentPlace.name}
         onError={handleImageError}
-        key={imageSource} // URL이 변경될 때 이미지를 강제로 다시 로드
+        key={imageSource}
       />
       {allPlaces.length > 1 && (
         <>
