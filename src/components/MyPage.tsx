@@ -1,414 +1,334 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getUserInfo } from '../api/userInfo';
+import { updateNickname } from '../api/userInfo/nickname';
+import { reportEvent } from '../api/userInfo/report-event';
+import { updateNotificationSettings } from '../api/userInfo/notification-settings';
+import { UserInfo } from '../types/userInfo/userType';
+import { deleteAllReviews } from '../api/userInfo/deleteReviews';
 import StarIcon from '../assets/star.png';
 import SpaceIcon from '../assets/space.png';
 import PencilIcon from '../assets/pencil.png';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #0c004b;
-  min-height: 100vh;
-  padding: 20px;
-  color: #fff;
-  width: 100vw;
-  overflow-y: auto;
-  position: relative;
-`;
-
-const Icon = styled.img`
-  position: absolute;
-`;
-
-const TopLeftIcon = styled(Icon)`
-  top: 265px;
-  left: 88px;
-`;
-
-const BottomRightIcon = styled(Icon)`
-  bottom: 130px;
-  right: 91px;
-`;
-
-const ProfileContainer = styled.div`
-  margin-top: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-`;
-
-const Avatar = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #ddd;
-  margin-bottom: 10px;
-`;
-
-const Nickname = styled.h1`
-  font-size: 18px;
-  font-weight: bold;
-`;
-
-const Email = styled.p`
-  font-size: 14px;
-  color: #cccccc;
-  margin-top: 5px;
-`;
-
-const Section = styled.div`
-  background-color: rgb(255, 255, 255);
-  width: 100%;
-  max-width: 500px;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  color: black;
-  text-align: center;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 16px;
-  color: black;
-  margin-bottom: 10px;
-  text-align: center;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgb(0, 0, 0);
-`;
-
-const FormRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-`;
-
-const Label = styled.span`
-  font-size: 14px;
-  color: black;
-  font-weight: 600;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const InputField = styled.input`
-  width: 288px;
-  height: 34px;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  background-color: #e8e8e8;
-  font-size: 14px;
-`;
-
-const Text = styled.span`
-  font-size: 14px;
-  width: 288px;
-  padding: 8px;
-  text-align: left;
-`;
-
-const EditButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-`;
-
-const EditIcon = styled.img`
-  width: 16px;
-  height: 16px;
-`;
-
-const DuplicateCheckButton = styled.button`
-  background-color: #d1c1ff;
-  color: black;
-  border: none;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 12px;
-  cursor: pointer;
-`;
-
-const Button = styled.button`
-  width: 173px;
-  height: 38px;
-  padding: 10px;
-  background-color: #d1c1ff;
-  color: black;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  display: block;
-  margin: 20px auto 0;
-`;
-
-const ReviewSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  margin: 10px 0;
-`;
-
-const ReviewButton = styled.button`
-  width: 140px;
-  height: 30px;
-  background-color: #e8e8e8;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-left: auto;
-
-  &:hover {
-    background-color: #d1d1d1;
-  }
-`;
-
-const ReviewTitle = styled.span`
-  font-size: 14px;
-  font-weight: 600;
-  margin-right: auto;
-`;
-
-const ReviewRow = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 8px;
-`;
-
-const ReviewAmount = styled.p`
-  font-size: 14px;
-  margin: 8px 0;
-  text-align: left;
-`;
-
-const ToggleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-`;
-
-const ToggleLabel = styled.span`
-  font-size: 14px;
-  color: black;
-`;
-
-const ToggleSwitch = styled.input.attrs({ type: 'checkbox' })`
-  width: 40px;
-  height: 20px;
-  appearance: none;
-  background-color: #bbb;
-  border-radius: 20px;
-  position: relative;
-  outline: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:checked {
-    background-color: #ffc50c;
-  }
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background-color: white;
-    border-radius: 50%;
-    transition: left 0.2s;
-  }
-
-  &:checked:before {
-    left: 22px;
-  }
-`;
-
-const LogoutButton = styled.button`
-  width: 215px;
-  padding: 10px;
-  background-color: #ff3b30;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 20px 0;
-
-  &:hover {
-    background-color: #e03228;
-  }
-`;
+import * as S from '../styles/mypage/mypage.style';
 
 const MyPage = () => {
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isEditing, setIsEditing] = useState({
     nickname: false,
     email: false,
     password: false,
   });
-
   const [formData, setFormData] = useState({
-    nickname: 'b1234otaku',
-    email: 'conandaisuki@gmail.com',
+    nickname: '',
+    email: '',
     password: 'xxxxxxxxxxxxx',
   });
+  const [eventForm, setEventForm] = useState({
+    event_name: '',
+    animation_name: '',
+    additional_info: '',
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const [showDuplicateCheck, setShowDuplicateCheck] = useState(false);
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await getUserInfo();
+        setUserInfo(response.result);
+        setFormData((prev) => ({
+          ...prev,
+          nickname: response.result.nickname,
+          email: response.result.email,
+        }));
+        setLoading(false);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('알 수 없는 오류가 발생했습니다.');
+        }
+        setLoading(false);
+      }
+    };
 
-  const handleEdit = (field) => {
+    fetchUserInfo();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      if (isEditing.nickname) {
+        const response = await updateNickname(formData.nickname);
+        if (response.isSuccess) {
+          setUserInfo((prev) => (prev ? { ...prev, nickname: formData.nickname } : null));
+          setIsEditing((prev) => ({ ...prev, nickname: false }));
+          alert('닉네임이 성공적으로 수정되었습니다.');
+        }
+      }
+    } catch (error) {
+      alert('닉네임 수정에 실패했습니다.');
+    }
+  };
+
+  const handleEdit = (field: string) => {
     setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (field === 'nickname') {
-      setShowDuplicateCheck(true);
-    }
   };
 
   const checkDuplicate = () => {
     alert('닉네임 중복 확인이 완료되었습니다.');
-    setShowDuplicateCheck(false);
   };
 
+  const handleEventFormChange = (field: string, value: string) => {
+    setEventForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // 후기 페이지 이동 핸들러 추가
+  const handleReviewClick = () => {
+    navigate('/review6');
+  };
+
+  const handleEventSubmit = async () => {
+    try {
+      if (!eventForm.event_name || !eventForm.animation_name) {
+        alert('이벤트명과 애니메이션명은 필수 입력사항입니다.');
+        return;
+      }
+
+      const response = await reportEvent(eventForm);
+      if (response.isSuccess) {
+        alert('이벤트가 성공적으로 제보되었습니다.');
+        setEventForm({
+          event_name: '',
+          animation_name: '',
+          additional_info: '',
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('이벤트 제보에 실패했습니다.');
+      }
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await deleteAllReviews();
+      if (response.isSuccess) {
+        alert('모든 후기가 성공적으로 삭제되었습니다.');
+        // 사용자 정보 다시 불러오기 (donation 정보 업데이트를 위해)
+        const userResponse = await getUserInfo();
+        setUserInfo(userResponse.result);
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '후기 삭제에 실패했습니다.');
+    }
+    setShowDeleteModal(false);
+  };
+
+  const handleNotificationToggle = async (type: number, isEnabled: boolean) => {
+    try {
+      const response = await updateNotificationSettings({
+        notificationType: type,
+        isEnabled: !isEnabled,
+      });
+
+      if (response.isSuccess) {
+        setUserInfo((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            community_activity: type === 1 ? !isEnabled : prev.community_activity,
+            event_benefits_info: type === 2 ? !isEnabled : prev.event_benefits_info,
+          };
+        });
+      }
+    } catch (error) {
+      alert('알림 설정 변경에 실패했습니다.');
+    }
+  };
+
+  if (loading) {
+    return <S.Container>Loading...</S.Container>;
+  }
+
+  if (error) {
+    return <S.Container>Error: {error}</S.Container>;
+  }
+
   return (
-    <Container>
-      <TopLeftIcon src={StarIcon} alt="Star Icon" />
+    <S.Container>
+      <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
 
-      <ProfileContainer>
-        <Avatar />
-        <Nickname>닉네임</Nickname>
-        <Email>conandaisuki@gmail.com</Email>
-      </ProfileContainer>
+      <S.ProfileContainer>
+        <S.Avatar imageUrl={userInfo?.profileImageUrl} />
+        <S.Nickname>{userInfo?.nickname}</S.Nickname>
+        <S.Email>{userInfo?.email}</S.Email>
+      </S.ProfileContainer>
 
-      <Section>
-        <SectionTitle>내 정보 수정</SectionTitle>
+      <S.Section>
+        <S.SectionTitle>내 정보 수정</S.SectionTitle>
 
-        <FormRow>
-          <Label>닉네임 수정</Label>
-          <InputContainer>
+        <S.FormRow>
+          <S.Label>닉네임</S.Label>
+          <S.InputContainer>
             {isEditing.nickname ? (
-              <>
-                <InputField
-                  type="text"
-                  value={formData.nickname}
-                  onChange={(e) => handleChange('nickname', e.target.value)}
-                />
-                {showDuplicateCheck && (
-                  <DuplicateCheckButton onClick={checkDuplicate}>중복확인</DuplicateCheckButton>
-                )}
-              </>
+              <S.InputField
+                type="text"
+                value={formData.nickname}
+                onChange={(e) => handleChange('nickname', e.target.value)}
+              />
             ) : (
-              <Text>{formData.nickname}</Text>
+              <S.Text>{formData.nickname}</S.Text>
             )}
-            <EditButton onClick={() => handleEdit('nickname')}>
-              <EditIcon src={PencilIcon} alt="edit" />
-            </EditButton>
-          </InputContainer>
-        </FormRow>
+            <S.DuplicateCheckButton onClick={checkDuplicate}>중복확인</S.DuplicateCheckButton>
+            <S.EditButton onClick={() => handleEdit('nickname')}>
+              <S.EditIcon src={PencilIcon} alt="edit" />
+            </S.EditButton>
+          </S.InputContainer>
+        </S.FormRow>
 
-        <FormRow>
-          <Label>이메일 수정</Label>
-          <InputContainer>
+        <S.FormRow>
+          <S.Label>이메일</S.Label>
+          <S.InputContainer>
             {isEditing.email ? (
-              <InputField
+              <S.InputField
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
               />
             ) : (
-              <Text>{formData.email}</Text>
+              <S.Text>{formData.email}</S.Text>
             )}
-            <EditButton onClick={() => handleEdit('email')}>
-              <EditIcon src={PencilIcon} alt="edit" />
-            </EditButton>
-          </InputContainer>
-        </FormRow>
+            <S.EditButton onClick={() => handleEdit('email')}>
+              <S.EditIcon src={PencilIcon} alt="edit" />
+            </S.EditButton>
+          </S.InputContainer>
+        </S.FormRow>
 
-        <FormRow>
-          <Label>비밀번호 변경</Label>
-          <InputContainer>
+        <S.FormRow>
+          <S.Label>비밀번호</S.Label>
+          <S.InputContainer>
             {isEditing.password ? (
-              <InputField
+              <S.InputField
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleChange('password', e.target.value)}
               />
             ) : (
-              <Text>{formData.password}</Text>
+              <S.Text>{formData.password}</S.Text>
             )}
-            <EditButton onClick={() => handleEdit('password')}>
-              <EditIcon src={PencilIcon} alt="edit" />
-            </EditButton>
-          </InputContainer>
-        </FormRow>
+            <S.EditButton onClick={() => handleEdit('password')}>
+              <S.EditIcon src={PencilIcon} alt="edit" />
+            </S.EditButton>
+          </S.InputContainer>
+        </S.FormRow>
 
-        <Button>저장하기</Button>
-      </Section>
+        <S.Button onClick={handleSave}>저장하기</S.Button>
+      </S.Section>
 
-      <Section>
-        <SectionTitle>내 후기 관리</SectionTitle>
-        <ReviewSection>
-          <ReviewRow>
-            <ReviewTitle>후기 관리</ReviewTitle>
-            <ReviewButton>내 후기 전체보기</ReviewButton>
-          </ReviewRow>
-          <ReviewRow>
-            <ReviewButton>내 후기 전체 삭제하기</ReviewButton>
-          </ReviewRow>
-          <ReviewAmount>후기 후원금 내역: 총 000000원</ReviewAmount>
-        </ReviewSection>
-      </Section>
+      <S.Section>
+        <S.SectionTitle>내 후기 관리</S.SectionTitle>
+        <S.ReviewSection>
+          <S.ReviewRow>
+            <S.ReviewTitle>후기 관리</S.ReviewTitle>
+            <S.ReviewButton onClick={handleReviewClick}>내 후기 전체보기</S.ReviewButton>
+          </S.ReviewRow>
+          <S.ReviewRow>
+            <S.ReviewButton onClick={handleDeleteClick}>내 후기 전체 삭제하기</S.ReviewButton>
+          </S.ReviewRow>
+          <S.ReviewAmount>후기 후원금 내역: 총 {userInfo?.donation || 0}원</S.ReviewAmount>
+        </S.ReviewSection>
+      </S.Section>
 
-      <Section>
-        <SectionTitle>이벤트 제보하기</SectionTitle>
-        <FormRow>
-          <Label>이벤트 이름</Label>
-          <InputField type="text" placeholder="입력해주세요" />
-        </FormRow>
-        <FormRow>
-          <Label>이벤트 애니명</Label>
-          <InputField type="text" placeholder="입력해주세요" />
-        </FormRow>
-        <FormRow>
-          <Label>추가사항</Label>
-          <InputField type="text" placeholder="입력해주세요" />
-        </FormRow>
-        <Button>저장하기</Button>
-      </Section>
+      {/* Modal 추가 */}
+      {showDeleteModal && (
+        <S.ModalOverlay>
+          <S.ModalContainer>
+            <S.ModalText>
+              삭제 뒤에는 복구할 수 없습니다
+              <br />
+              삭제하시겠습니까?
+            </S.ModalText>
+            <S.ModalButtonContainer>
+              <S.ModalButton onClick={handleDeleteCancel}>아니오</S.ModalButton>
+              <S.ModalButton onClick={handleDeleteConfirm}>네</S.ModalButton>
+            </S.ModalButtonContainer>
+          </S.ModalContainer>
+        </S.ModalOverlay>
+      )}
 
-      <Section>
-        <SectionTitle>알림 설정</SectionTitle>
-        <ToggleContainer>
-          <ToggleLabel>커뮤니티 활동 알림</ToggleLabel>
-          <ToggleSwitch />
-        </ToggleContainer>
-        <ToggleContainer>
-          <ToggleLabel>이벤트 및 혜택 정보 알림</ToggleLabel>
-          <ToggleSwitch />
-        </ToggleContainer>
-      </Section>
+      <S.Section>
+        <S.SectionTitle>이벤트 제보하기</S.SectionTitle>
+        <S.FormRow>
+          <S.Label>이벤트 이름</S.Label>
+          <S.InputField
+            type="text"
+            placeholder="입력해주세요"
+            value={eventForm.event_name}
+            onChange={(e) => handleEventFormChange('event_name', e.target.value)}
+          />
+        </S.FormRow>
+        <S.FormRow>
+          <S.Label>이벤트 애니명</S.Label>
+          <S.InputField
+            type="text"
+            placeholder="입력해주세요"
+            value={eventForm.animation_name}
+            onChange={(e) => handleEventFormChange('animation_name', e.target.value)}
+          />
+        </S.FormRow>
+        <S.FormRow>
+          <S.Label>추가사항</S.Label>
+          <S.InputField
+            type="text"
+            placeholder="입력해주세요"
+            value={eventForm.additional_info}
+            onChange={(e) => handleEventFormChange('additional_info', e.target.value)}
+          />
+        </S.FormRow>
+        <S.Button onClick={handleEventSubmit}>제출하기</S.Button>
+      </S.Section>
 
-      <LogoutButton>로그아웃</LogoutButton>
-      <BottomRightIcon src={SpaceIcon} alt="Space Icon" />
-    </Container>
+      <S.Section>
+        <S.SectionTitle>알림 설정</S.SectionTitle>
+        <S.ToggleContainer>
+          <S.ToggleLabel>커뮤니티 활동 알림</S.ToggleLabel>
+          <S.ToggleSwitch
+            checked={userInfo?.community_activity || false}
+            onChange={() => handleNotificationToggle(1, userInfo?.community_activity || false)}
+          />
+        </S.ToggleContainer>
+        <S.ToggleContainer>
+          <S.ToggleLabel>이벤트 및 혜택 정보 알림</S.ToggleLabel>
+          <S.ToggleSwitch
+            checked={userInfo?.event_benefits_info || false}
+            onChange={() => handleNotificationToggle(2, userInfo?.event_benefits_info || false)}
+          />
+        </S.ToggleContainer>
+      </S.Section>
+
+      <S.LogoutButton>로그아웃</S.LogoutButton>
+      <S.BottomRightIcon src={SpaceIcon} alt="Space Icon" />
+    </S.Container>
   );
 };
 

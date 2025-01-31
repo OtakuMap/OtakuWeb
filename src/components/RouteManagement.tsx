@@ -25,6 +25,7 @@ const ContentWrapper = styled.div`
   max-width: 960px;
   margin: 0 auto;
   width: 100%;
+  margin: 0 208px;
 `;
 
 const IconContainer = styled.div`
@@ -69,8 +70,9 @@ const Tab = styled.button<{ active?: boolean }>`
 
 const RouteListContainer = styled.div`
   background: white;
+  width: 1197px;
   border-radius: 0px 20px 20px 20px;
-  padding: 24px 80px;
+  padding: 45px 72px;
 `;
 
 const ListHeader = styled.div`
@@ -98,7 +100,7 @@ const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
-  margin-left: 630px;
+  margin-left: 985px;
 
   button {
     background: none;

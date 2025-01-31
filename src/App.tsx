@@ -25,7 +25,8 @@ import ReviewPage2 from './pages/ReviewPage2';
 import ReviewPage3 from './pages/ReviewPage3';
 import ReviewPage4 from './pages/ReviewPage4';
 import ReviewPage5 from './pages/ReviewPage5';
-import Main from './components/Main';
+import ReviewPage6 from './pages/ReviewPage6';
+import ReviewPage7 from './pages/ReviewPage7';
 
 const AppContainer = styled.div`
   position: relative;
@@ -54,6 +55,19 @@ const AppRoutes: React.FC = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/search-id-pw" element={<SearchIdPWPage />} />
         <Route path="/newsetpw" element={<NewSetPWPage />} />
+        <Route path="/my-page" element={<MyPage />} />
+        <Route path="/category" element={<Category />} />
+        <Route path="/route-management" element={<RouteManagement />} />
+        <Route path="/saved-places" element={<SavedPlaces />} />
+        <Route path="/saved-events" element={<SavedEvents />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/review1" element={<ReviewPage1 />} />
+        <Route path="/review2" element={<ReviewPage2 />} />
+        <Route path="/review3" element={<ReviewPage3 />} />
+        <Route path="/review4" element={<ReviewPage4 />} />
+        <Route path="/review5" element={<ReviewPage5 />} />
+        <Route path="/review6" element={<ReviewPage6 />} />
+        <Route path="/review7" element={<ReviewPage7 />} />
       </Routes>
     );
   }

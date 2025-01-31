@@ -41,7 +41,7 @@ const IconImage = styled.img``;
 const ContentWrapper = styled.div`
   width: 100%;
   max-width: 960px;
-  margin: 0 auto;
+  margin: 0 208px;
 `;
 
 const Title = styled.h1`
@@ -72,8 +72,9 @@ const Tab = styled.button<{ active?: boolean }>`
 
 const EventListContainer = styled.div`
   background: white;
+  width: 1197px;
   border-radius: 0px 20px 20px 20px;
-  padding: 24px 80px;
+  padding: 45px 72px;
 `;
 
 const ListHeader = styled.div`
