@@ -1,4 +1,4 @@
-import instance from '@/api/axios'; // instance import로 변경
+import instance from '@/api/axios';
 import {
   ShortReviewRequest,
   ShortReviewResponse,
@@ -20,24 +20,6 @@ export const getPlaceDetail = async (placeId: number): Promise<PlaceResponse> =>
 };
 
 /**
- * 특정 명소의 한 줄 리뷰 목록 조회 API
- */
-export const getShortReviewList = async (
-  placeId: number,
-  page: number,
-): Promise<ShortReviewListResponse> => {
-  try {
-    const response = await instance.get<ShortReviewListResponse>(
-      `/places/${placeId}/short-review?page=${page}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-    throw error;
-  }
-};
-
-/**
  * 한줄 리뷰 작성 API
  */
 export const createShortReview = async (
@@ -52,6 +34,24 @@ export const createShortReview = async (
     return response.data;
   } catch (error) {
     console.error('Error creating review:', error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 명소의 한 줄 리뷰 목록 조회 API
+ */
+export const getShortReviewList = async (
+  placeId: number,
+  page: number,
+): Promise<ShortReviewListResponse> => {
+  try {
+    const response = await instance.get<ShortReviewListResponse>(
+      `/places/${placeId}/short-review?page=${page}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
     throw error;
   }
 };

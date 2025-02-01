@@ -16,7 +16,12 @@ export const Container = styled.div`
   margin-top: 60px;
   overflow-x: hidden;
 `;
-
+export const ErrorMessage = styled.div`
+  color: #ff0000;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+`;
 export const Content = styled.div`
   max-width: 1200px;
   width: 100%;
@@ -241,11 +246,11 @@ export const ReviewList = styled.div`
   gap: 15px;
 `;
 
-export const ReviewCard = styled.div<{ isMyReview: boolean }>`
+export const ReviewCard = styled.div<{ $isMyReview: boolean }>`
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  background: ${(props) => (props.isMyReview ? '#FFF5D5' : 'white')};
+  background: ${(props) => (props.$isMyReview ? '#FFF5D5' : 'white')};
   position: relative;
   display: flex;
   flex-direction: column;
@@ -476,10 +481,6 @@ export const ActionButton = styled.button`
     outline: none;
     border: none;
   }
-
-  &:hover {
-    background: #f5f5f5;
-  }
 `;
 
 export const InlineEditTextArea = styled.textarea`
@@ -524,5 +525,33 @@ export const ReviewStarRating = styled.div`
   span {
     display: flex;
     align-items: center;
+  }
+`;
+
+export const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+  color: white;
+  margin-bottom: 20px;
+`;
+
+export const PaginationButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  img {
+    width: 8px;
+    height: 15px;
   }
 `;

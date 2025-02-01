@@ -7,15 +7,15 @@ import BackPage from '../assets/BackPage.png';
 import NextPage from '../assets/NextPage.png';
 import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import * as S from '../styles/review/ReviewPage.style';
-import { ShortReviewRequest, PlaceData } from '../types/review/short-review';
-import { createShortReview, getPlaceDetail, getShortReviewList } from '../api/review/short-review';
-import { useParams, useNavigate } from 'react-router-dom';
+import { createShortReview } from '@/api/review/short-review';
+import { ShortReviewRequest } from '@/types/review/short-review';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface Review {
   id: number;
-  placeId: number;
   profileImage: string;
   username: string;
   rating: number;
@@ -33,98 +33,133 @@ const profileData = {
   maxRating: 4,
 };
 
+const reviewData = [
+  {
+    id: 1,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 2,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 3,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 4,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 5,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 6,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 7,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+  {
+    id: 8,
+    profileImage: profile2,
+    username: 'Otkkk011',
+    rating: 3,
+    maxRating: 4,
+    likes: 10,
+    dislikes: 0,
+    content: '고시엔의 향기...\n고시엔의 흙...\n세이도의 기운을 느끼고 싶다면 여기로...',
+  },
+];
+
 const ReviewPage4 = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 6;
+  const [reviews, setReviews] = useState<Review[]>(
+    reviewData.map((review) => ({
+      ...review,
+      userVote: null,
+    })),
+  );
+  const indexOfLastReview = currentPage * reviewsPerPage;
+  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+  const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   const { placeId } = useParams<{ placeId: string }>();
   const navigate = useNavigate();
-
-  const [placeData, setPlaceData] = useState<PlaceData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const reviewsPerPage = 6;
 
-  const [reviews, setReviews] = useState<Review[]>([]);
+  useEffect(() => {
+    if (!placeId) {
+      console.error('No placeId available');
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      navigate('/places'); // 또는 적절한 페이지로 이동
+      return;
+    }
+  }, [placeId, navigate]);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   const [reviewText, setReviewText] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
   const [inputRating, setInputRating] = useState(0);
   const [editRating, setEditRating] = useState(0);
-  useEffect(() => {
-    console.log('Current URL:', window.location.pathname);
-    console.log('PlaceId from params:', placeId);
-  }, [placeId]);
-  // 장소 정보 가져오기
-  useEffect(() => {
-    const fetchPlaceData = async () => {
-      if (!placeId || isNaN(parseInt(placeId))) {
-        console.log('Invalid placeId:', placeId);
-        setPlaceData(null);
-        setIsLoading(false);
-        return;
-      }
 
-      setIsLoading(true);
-      try {
-        console.log('Fetching place data for ID:', placeId);
-        const response = await getPlaceDetail(parseInt(placeId));
-        console.log('Place data response:', response);
-        if (response.isSuccess) {
-          setPlaceData(response.result);
-        } else {
-          console.log('API returned false success status:', response);
-          setPlaceData(null);
-        }
-      } catch (error) {
-        console.error('Error fetching place data:', error);
-        setPlaceData(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPlaceData();
-  }, [placeId]);
-
-  // 한 줄 리뷰 목록 가져오기
-  useEffect(() => {
-    const fetchReviews = async () => {
-      if (!placeId) return;
-
-      try {
-        const response = await getShortReviewList(parseInt(placeId), currentPage);
-        if (response.isSuccess) {
-          const reviewData = response.result.shortReviews.map((review) => ({
-            id: review.id,
-            placeId: response.result.placeId,
-            profileImage: profile2,
-            username: review.user.nickname,
-            rating: review.rating,
-            maxRating: 4,
-            likes: review.likes,
-            dislikes: review.dislikes,
-            content: review.content,
-            userVote: null,
-          }));
-          setReviews(reviewData);
-          setTotalPages(response.result.totalPages);
-        }
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-      }
-    };
-
-    fetchReviews();
-  }, [placeId, currentPage]);
-
-  const indexOfLastReview = currentPage * reviewsPerPage;
-  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
-  const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
-
+  // 리뷰 추가 핸들러
   const handleReviewSubmit = async () => {
-    if (!placeData) {
-      window.confirm('장소 정보를 불러오는 데 실패했습니다. 다시 시도해 주세요.');
+    if (!placeId) {
+      window.confirm('장소 정보를 찾을 수 없습니다.');
       return;
     }
 
@@ -139,18 +174,20 @@ const ReviewPage4 = () => {
 
     setIsSubmitting(true);
     try {
+      console.log('Submitting review for placeId:', placeId);
+
       const reviewData: ShortReviewRequest = {
-        placeAnimationId: placeData.animationId,
+        placeAnimationId: 1, // 애니메이션 ID는 실제 데이터로 교체 필요
         rating: inputRating,
-        content: reviewText,
+        content: reviewText.trim(),
       };
 
-      const response = await createShortReview(parseInt(placeId || '0'), reviewData);
+      const response = await createShortReview(Number(placeId), reviewData);
+      console.log('Review submission response:', response);
 
       if (response.isSuccess) {
         const newReview: Review = {
           id: response.result.reviewId,
-          placeId: response.result.placeId,
           profileImage: profileData.profileImage,
           username: profileData.name,
           rating: inputRating,
@@ -176,26 +213,20 @@ const ReviewPage4 = () => {
     }
   };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
-
   const handleEditStart = (review: Review) => {
     setEditingId(review.id);
     setEditText(review.content);
     setEditRating(review.rating);
   };
 
+  // 수정 취소
   const handleEditCancel = () => {
     setEditingId(null);
     setEditText('');
     setEditRating(0);
   };
 
+  // 수정 완료
   const handleEditComplete = (reviewId: number) => {
     setReviews(
       reviews.map((review) =>
@@ -218,9 +249,12 @@ const ReviewPage4 = () => {
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'like') {
+            // 이미 좋아요를 눌렀다면 취소
             return { ...review, likes: review.likes - 1, userVote: null };
           } else {
+            // 처음 좋아요를 누르는 경우
             const newLikes = review.likes + 1;
+            // 싫어요를 눌렀던 상태라면 싫어요도 취소
             const newDislikes =
               review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
@@ -236,9 +270,12 @@ const ReviewPage4 = () => {
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'dislike') {
+            // 이미 싫어요를 눌렀다면 취소
             return { ...review, dislikes: review.dislikes - 1, userVote: null };
           } else {
+            // 처음 싫어요를 누르는 경우
             const newDislikes = review.dislikes + 1;
+            // 좋아요를 눌렀던 상태라면 좋아요도 취소
             const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
           }
@@ -248,21 +285,13 @@ const ReviewPage4 = () => {
     );
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!placeData) {
-    return <div>Place not found</div>;
-  }
-
   return (
     <S.Container>
       <S.ContentWrapper>
         <S.LocationBar>
           <S.LocationInput>
             <MapPin size={20} color="#0c004b" />
-            <S.LocationText value={placeData.name} readOnly />
+            <S.LocationText value="Hanshin Koshien Stadium" readOnly />
           </S.LocationInput>
           <S.SaveLocationButton onClick={() => navigate('/saved-places')}>
             명소 저장하기
@@ -283,6 +312,7 @@ const ReviewPage4 = () => {
               <S.ProfileImage src={profileData.profileImage} alt="프로필 이미지" />
               <S.ProfileInfo>
                 <S.ProfileName>{profileData.name}</S.ProfileName>
+
                 <div style={{ marginBottom: '10px' }}>
                   <S.StarRatingInput>
                     {[1, 2, 3, 4].map((star) => (
@@ -312,98 +342,102 @@ const ReviewPage4 = () => {
           </S.FeedbackSection>
 
           <S.ReviewGrid4>
-            {currentReviews.map((review) => (
-              <S.ReviewItem4 key={review.id}>
-                <S.ReviewProfileContainer>
-                  <S.ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
-                  <S.ReviewProfileInfo>
-                    <S.ReviewProfileName>{review.username}</S.ReviewProfileName>
-                    {editingId === review.id ? (
-                      <S.StarRatingInput>
-                        {[1, 2, 3, 4].map((star) => (
-                          <span key={star} onClick={() => setEditRating(star)}>
-                            <img
-                              src={star <= editRating ? StarFull : StarEm}
-                              alt="star"
-                              width="20"
-                              height="20"
-                            />
-                          </span>
-                        ))}
-                      </S.StarRatingInput>
-                    ) : (
-                      <S.ReviewStarRating>
-                        {[1, 2, 3, 4].map((star) => (
-                          <span key={star}>
-                            <img
-                              src={star <= review.rating ? StarFull : StarEm}
-                              alt="star"
-                              width="20"
-                              height="20"
-                            />
-                          </span>
-                        ))}
-                      </S.ReviewStarRating>
-                    )}
-                  </S.ReviewProfileInfo>
-                </S.ReviewProfileContainer>
+            {currentReviews.map(
+              (
+                review, // reviewData를 reviews로 변경
+              ) => (
+                <S.ReviewItem4 key={review.id}>
+                  <S.ReviewProfileContainer>
+                    <S.ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
+                    <S.ReviewProfileInfo>
+                      <S.ReviewProfileName>{review.username}</S.ReviewProfileName>
+                      {editingId === review.id ? (
+                        <S.StarRatingInput>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star} onClick={() => setEditRating(star)}>
+                              <img
+                                src={star <= editRating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </S.StarRatingInput>
+                      ) : (
+                        <S.ReviewStarRating>
+                          {[1, 2, 3, 4].map((star) => (
+                            <span key={star}>
+                              <img
+                                src={star <= review.rating ? StarFull : StarEm}
+                                alt="star"
+                                width="20"
+                                height="20"
+                              />
+                            </span>
+                          ))}
+                        </S.ReviewStarRating>
+                      )}
+                    </S.ReviewProfileInfo>
+                  </S.ReviewProfileContainer>
 
-                {editingId === review.id ? (
-                  <S.InlineEditTextArea
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    autoFocus
-                  />
-                ) : (
-                  <S.ReviewContent4>{review.content}</S.ReviewContent4>
-                )}
+                  {editingId === review.id ? (
+                    <S.InlineEditTextArea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      autoFocus
+                    />
+                  ) : (
+                    <S.ReviewContent4>{review.content}</S.ReviewContent4>
+                  )}
 
-                {review.username === profileData.name && (
-                  <S.EditDeleteButtons>
-                    {editingId === review.id ? (
-                      <>
-                        <S.ActionButton onClick={() => handleEditComplete(review.id)}>
-                          완료
-                        </S.ActionButton>
-                        <S.ButtonDivider src={dividerLine} alt="divider" />
-                        <S.ActionButton onClick={handleEditCancel}>취소</S.ActionButton>
-                      </>
-                    ) : (
-                      <>
-                        <S.ActionButton onClick={() => handleEditStart(review)}>
-                          수정
-                        </S.ActionButton>
-                        <S.ButtonDivider src={dividerLine} alt="divider" />
-                        <S.ActionButton onClick={() => handleDelete(review.id)}>
-                          삭제
-                        </S.ActionButton>
-                      </>
-                    )}
-                  </S.EditDeleteButtons>
-                )}
+                  {review.username === profileData.name && (
+                    <S.EditDeleteButtons>
+                      {editingId === review.id ? (
+                        <>
+                          <S.ActionButton onClick={() => handleEditComplete(review.id)}>
+                            완료
+                          </S.ActionButton>
+                          <S.ButtonDivider src={dividerLine} alt="divider" />
+                          <S.ActionButton onClick={handleEditCancel}>취소</S.ActionButton>
+                        </>
+                      ) : (
+                        <>
+                          <S.ActionButton onClick={() => handleEditStart(review)}>
+                            수정
+                          </S.ActionButton>
+                          <S.ButtonDivider src={dividerLine} alt="divider" />
+                          <S.ActionButton onClick={() => handleDelete(review.id)}>
+                            삭제
+                          </S.ActionButton>
+                        </>
+                      )}
+                    </S.EditDeleteButtons>
+                  )}
 
-                <S.FeedbackButtonsWrapper>
-                  <S.FeedbackButton onClick={() => handleLike(review.id)}>
-                    <S.IconContainer>
-                      <ThumbsUp
-                        size={20}
-                        color={review.userVote === 'like' ? '#ffd700' : '#0c004b'}
-                      />
-                      <span>{review.likes}</span>
-                    </S.IconContainer>
-                  </S.FeedbackButton>
-                  <S.FeedbackButton onClick={() => handleDislike(review.id)}>
-                    <S.IconContainer>
-                      <ThumbsDown
-                        size={20}
-                        color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
-                      />
-                      <span>{review.dislikes}</span>
-                    </S.IconContainer>
-                  </S.FeedbackButton>
-                </S.FeedbackButtonsWrapper>
-              </S.ReviewItem4>
-            ))}
+                  <S.FeedbackButtonsWrapper>
+                    <S.FeedbackButton onClick={() => handleLike(review.id)}>
+                      <S.IconContainer>
+                        <ThumbsUp
+                          size={20}
+                          color={review.userVote === 'like' ? '#ffd700' : '#0c004b'} // 활성화시 파란색, 기본은 회색
+                        />
+                        <span>{review.likes}</span>
+                      </S.IconContainer>
+                    </S.FeedbackButton>
+                    <S.FeedbackButton onClick={() => handleDislike(review.id)}>
+                      <S.IconContainer>
+                        <ThumbsDown
+                          size={20}
+                          color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
+                        />
+                        <span>{review.dislikes}</span>
+                      </S.IconContainer>
+                    </S.FeedbackButton>
+                  </S.FeedbackButtonsWrapper>
+                </S.ReviewItem4>
+              ),
+            )}
           </S.ReviewGrid4>
         </S.WhiteContainer4>
         <S.Pagination>
@@ -419,4 +453,5 @@ const ReviewPage4 = () => {
     </S.Container>
   );
 };
+
 export default ReviewPage4;
