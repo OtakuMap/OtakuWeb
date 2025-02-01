@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { useAuth } from '@/hooks/login/useAuth';
 import { useNotifications } from '@/hooks/user/useNotifications';
 import { NotificationType } from '@/types/user/notification';
 import { useUserProfile } from '@/hooks/user/useUserProfile';
+import { openLoginModal } from '@/store/slices/modalSlice';
 import logoImage from '../../assets/logo.png';
 import alarmIcon from '../../assets/alarm.png';
 import menuIcon from '../../assets/menu.png';
@@ -13,6 +15,7 @@ import * as S from '../../styles/common/Navbar.styles';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { logout } = useAuth();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const { notifications, isLoading, refetchNotifications, markAsRead } = useNotifications();
@@ -47,14 +50,17 @@ const Navbar = () => {
   };
 
   const handleNotificationClick = () => {
-    if (isLoggedIn) {
-      if (!showPopup) {
-        closeAllPopups(); // 여기서 먼저 모든 팝업을 닫고
-        setShowPopup(true); // 그 다음 알림창을 열기
-        refetchNotifications();
-      } else {
-        closeAllPopups();
-      }
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    if (!showPopup) {
+      closeAllPopups();
+      setShowPopup(true);
+      refetchNotifications();
+    } else {
+      closeAllPopups();
     }
   };
 

@@ -4,6 +4,9 @@ import { LocationDetail as LocationDetailType } from '../../types/map/route';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { PlaceDetails } from '../../utils/mapUtils';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface LocationDetailProps {
   location: LocationDetailType;
@@ -17,6 +20,8 @@ const DEFAULT_IMAGE =
 const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails, onClose }) => {
   const navigate = useNavigate();
   const allPlaces = [location, ...(location.relatedPlaces || [])];
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
@@ -31,6 +36,12 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails,
   };
 
   const handleFavClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    // 로그인된 상태일 때만 좋아요 기능 실행
     setIsFavorited(!isFavorited);
     console.log('Favorited Location Data:', {
       id: currentPlace.id,

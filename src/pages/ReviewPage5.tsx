@@ -1,20 +1,24 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 import profileImage from '../assets/profile.png';
 import mapImage from '../assets/mapData.png';
 import * as S from '../styles/review/ReviewPage.style';
 
 const ReviewPage5 = () => {
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const isLoggedIn = false; // 실제로는 로그인 상태 관리 로직이 필요합니다
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
 
   const handleSaveRoute = () => {
     if (!isLoggedIn) {
-      setShowLoginModal(true);
-    } else {
-      // 루트 저장 로직
-      console.log('루트 저장');
+      dispatch(openLoginModal());
+      return;
     }
+    // 루트 저장 로직
+    console.log('루트 저장');
   };
+
   const reviewData = {
     id: 1,
     title: '유명한이 지금까지 코난한테 맞은 마취총 개수 아는 사람',
@@ -79,17 +83,6 @@ const ReviewPage5 = () => {
           </S.SideContent>
         </S.ContentContainer>
       </S.WhiteContainer>
-      {showLoginModal && (
-        <S.ModalOverlay>
-          <S.ModalContent>
-            <S.ModalTitle>로그인 후 이용해주세요</S.ModalTitle>
-            <S.ButtonGroup>
-              <S.ModalButton onClick={() => setShowLoginModal(false)}>뒤로가기</S.ModalButton>
-              <S.ModalButton>로그인</S.ModalButton>
-            </S.ButtonGroup>
-          </S.ModalContent>
-        </S.ModalOverlay>
-      )}
     </S.Container>
   );
 };

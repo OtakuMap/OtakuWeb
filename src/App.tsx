@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
@@ -30,6 +30,7 @@ import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
 import EventPage from './pages/EventPage2';
 import Main from './components/Main';
+import LoginModal from './components/common/LoginModal';
 
 const AppContainer = styled.div`
   position: relative;
@@ -39,36 +40,23 @@ const AppContainer = styled.div`
 
 const queryClient = new QueryClient();
 
-const AppRoutes: React.FC = () => {
+// 보호된 라우트를 위한 wrapper 컴포넌트
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const location = useLocation();
+
+  if (!isLoggedIn) {
+    // 로그인 페이지로 리다이렉트하면서 이전 위치 저장
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AppRoutes: React.FC = () => {
   const location = useLocation();
   //navbar를 넣고 싶지 않은 페이지
   const hideNavbarPaths = ['/login', '/map', '/route', '/signup', '/search-id-pw', '/newsetpw'];
-
-  // 로그인이 필요한 보호된 라우트들
-  const protectedRoutes = [
-    '/route-management',
-    '/saved-places',
-    '/saved-events',
-    '/my-page',
-    '/review1',
-    '/review2',
-    '/review3',
-    '/review4',
-    '/review5',
-  ];
-
-  // 현재 경로가 보호된 라우트인지 확인
-  const isProtectedRoute = protectedRoutes.includes(location.pathname);
-
-  // 로그인이 되어있지 않고 보호된 라우트에 접근하려 할 때 로그인 페이지로 리다이렉트
-  if (!isLoggedIn && isProtectedRoute) {
-    return (
-      <Routes>
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    );
-  }
 
   return (
     <AppContainer>
@@ -83,6 +71,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/cover" element={<Cover />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/route" element={<RoutePage />} />
+        <Route path="/category" element={<Category />} />
+        <Route path="/main" element={<Main />} />
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/review3" element={<ReviewPage3 />} />
@@ -91,39 +81,65 @@ const AppRoutes: React.FC = () => {
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
         <Route path="/event" element={<EventPage />} />
-        <Route path="/route-management" element={<RouteManagement />} />
-        <Route path="/saved-places" element={<SavedPlaces />} />
-        <Route path="/saved-events" element={<SavedEvents />} />
-        <Route path="/my-page" element={<MyPage />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/category" element={<Category />} />
 
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
-        {isLoggedIn && (
-          <>
-            <Route path="/route-management" element={<RouteManagement />} />
-            <Route path="/saved-places" element={<SavedPlaces />} />
-            <Route path="/saved-events" element={<SavedEvents />} />
-            <Route path="/my-page" element={<MyPage />} />
-            <Route path="/review1" element={<ReviewPage1 />} />
-            <Route path="/review2" element={<ReviewPage2 />} />
-            <Route path="/review3" element={<ReviewPage3 />} />
-            <Route path="/review4" element={<ReviewPage4 />} />
-            <Route path="/review5" element={<ReviewPage5 />} />
-          </>
-        )}
+        <Route
+          path="/route-management"
+          element={
+            <ProtectedRoute>
+              <RouteManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-places"
+          element={
+            <ProtectedRoute>
+              <SavedPlaces />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-events"
+          element={
+            <ProtectedRoute>
+              <SavedEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-page"
+          element={
+            <ProtectedRoute>
+              <MyPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AppContainer>
   );
 };
 
+// Provider 내부에서 사용될 컴포넌트
+const AppContent: React.FC = () => {
+  const { isLoginModalOpen } = useAppSelector((state) => state.modal);
+
+  return (
+    <>
+      <AppRoutes />
+      {isLoginModalOpen && <LoginModal />}
+    </>
+  );
+};
+
+// 최상위 App 컴포넌트
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <BrowserRouter>
-            <AppRoutes />
+            <AppContent />
           </BrowserRouter>
         </PersistGate>
       </Provider>

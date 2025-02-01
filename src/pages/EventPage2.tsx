@@ -13,6 +13,9 @@ import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
 import product from '../assets/product.png';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface Review {
   id: number;
@@ -137,6 +140,8 @@ const EventPage = () => {
   const [editRating, setEditRating] = useState(0);
   const [activeTab, setActiveTab] = useState('후기');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [reviews, setReviews] = useState<Review[]>(
     reviewData.map((review) => ({
       ...review,
@@ -149,6 +154,23 @@ const EventPage = () => {
 
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1); // 소수점 한 자리까지 표시
+  };
+
+  const handleTextAreaClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      e.stopPropagation();
+      dispatch(openLoginModal());
+    }
+  };
+
+  const handleReviewButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    handleReviewSubmit();
   };
 
   const handleReviewSubmit = () => {
@@ -334,11 +356,15 @@ const EventPage = () => {
                 </S.ProfileSection>
                 <S.InputSection>
                   <S.TextArea
-                    placeholder="한 줄 후기를 남겨주세요!"
+                    placeholder={isLoggedIn ? '한 줄 후기를 남겨주세요!' : '로그인이 필요합니다.'}
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
+                    onClick={handleTextAreaClick}
+                    isNotLoggedIn={!isLoggedIn}
                   />
-                  <S.ReviewButton onClick={handleReviewSubmit}>등록하기</S.ReviewButton>
+                  <S.ReviewButton onClick={handleReviewButtonClick} isNotLoggedIn={!isLoggedIn}>
+                    등록하기
+                  </S.ReviewButton>
                 </S.InputSection>
               </S.InputHeader>
             </S.ReviewInput>

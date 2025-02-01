@@ -12,8 +12,13 @@ import { usePopularEvents } from '@/hooks/main/usePopularEvents';
 import ReviewSlider from './ReviewSlider';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 const Main = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const { data: reviews, isLoading, error } = useTopReviews();
   const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
   const navigate = useNavigate();
@@ -31,6 +36,10 @@ const Main = () => {
   };
 
   const handleHeartClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
     navigate('/route-management');
   };
 

@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import Slider from 'react-slick';
 import type { Settings } from 'react-slick';
-import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import * as S from '../styles/review/ReviewSlider.styles';
 
 interface Review {
   id?: string;
@@ -18,122 +18,6 @@ interface ReviewSliderProps {
   reviews?: Review[];
   onReviewClick: () => void;
 }
-
-const OuterWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  padding: 0 100px;
-`;
-
-const SliderWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const SliderContainer = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const SliderContent = styled.div`
-  position: relative;
-  width: 100%;
-  .slick-slider {
-    margin-bottom: 30px;
-  }
-
-  .slick-track {
-    display: flex;
-  }
-
-  .slick-slide {
-    padding: 0 10px;
-    > div {
-      width: 100%;
-    }
-  }
-
-  .slick-list {
-    margin: 0 -10px;
-  }
-
-  .slick-dots {
-    display: none !important;
-  }
-`;
-
-const SlideItem = styled.div`
-  width: 100%;
-  cursor: pointer;
-`;
-
-const ImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 190px;
-  border-radius: 15px;
-  overflow: hidden;
-`;
-
-const Image = styled.div<{ src: string }>`
-  position: absolute;
-  inset: 0;
-  background-image: url(${(props) => props.src});
-  background-size: cover;
-  background-position: center;
-`;
-
-const Gradient = styled.div`
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #ffffff 0%, rgba(115, 115, 115, 0) 100%);
-`;
-
-const Rank = styled.span`
-  position: absolute;
-  left: 20px;
-  bottom: 0;
-  font-family: 'Gothic A1';
-  font-weight: 600;
-  font-size: 85px;
-  line-height: 106px;
-  color: #101148;
-`;
-
-const Title = styled.p`
-  margin-top: 22px;
-  text-align: center;
-  font-family: 'Gothic A1';
-  font-weight: 600;
-  font-size: 22px;
-  color: white;
-`;
-
-const ArrowButton = styled.button`
-  position: absolute;
-  top: 95px;
-  transform: translateY(-50%);
-  z-index: 10;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  outline: none;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const PrevButton = styled(ArrowButton)`
-  left: 19px;
-`;
-
-const NextButton = styled(ArrowButton)`
-  right: 19px;
-`;
 
 const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -176,38 +60,40 @@ const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick
   const showRightArrow = currentSlide < reviews.length - 4;
 
   return (
-    <OuterWrapper>
+    <S.OuterWrapper>
       {showLeftArrow && (
-        <PrevButton onClick={() => sliderRef.current?.slickPrev()} aria-label="Previous slide">
+        <S.PrevButton onClick={() => sliderRef.current?.slickPrev()} aria-label="Previous slide">
           <ChevronLeft size={64} color="white" strokeWidth={1} />
-        </PrevButton>
+        </S.PrevButton>
       )}
 
-      <SliderWrapper>
-        <SliderContainer>
-          <SliderContent>
+      <S.SliderWrapper>
+        <S.SliderContainer>
+          <S.SliderContent>
             <Slider ref={sliderRef} {...settings}>
               {reviews.map((review, index) => (
-                <SlideItem key={review?.id || index} onClick={onReviewClick}>
-                  <ImageContainer>
-                    <Image src={review?.reviewImage?.fileUrl || 'https://picsum.photos/200/300'} />
-                    <Gradient />
-                    <Rank>{index + 1}</Rank>
-                  </ImageContainer>
-                  <Title>{review?.title || '제목 없음'}</Title>
-                </SlideItem>
+                <S.SlideItem key={review?.id || index} onClick={onReviewClick}>
+                  <S.ImageContainer>
+                    <S.Image
+                      src={review?.reviewImage?.fileUrl || 'https://picsum.photos/200/300'}
+                    />
+                    <S.Gradient />
+                    <S.Rank>{index + 1}</S.Rank>
+                  </S.ImageContainer>
+                  <S.Title>{review?.title || '제목 없음'}</S.Title>
+                </S.SlideItem>
               ))}
             </Slider>
-          </SliderContent>
-        </SliderContainer>
-      </SliderWrapper>
+          </S.SliderContent>
+        </S.SliderContainer>
+      </S.SliderWrapper>
 
       {showRightArrow && (
-        <NextButton onClick={() => sliderRef.current?.slickNext()} aria-label="Next slide">
+        <S.NextButton onClick={() => sliderRef.current?.slickNext()} aria-label="Next slide">
           <ChevronRight size={64} color="white" strokeWidth={1} />
-        </NextButton>
+        </S.NextButton>
       )}
-    </OuterWrapper>
+    </S.OuterWrapper>
   );
 };
 

@@ -537,19 +537,20 @@ export const ReviewProfileName = styled.div`
 `;
 
 export const SubmitButton = styled.button`
-  background-color: white;
-  color: #0c004b;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 20px;
+  bottom: 20px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  z-index: 2;
 
-  &:hover {
-    background-color: #f0f0f0;
+  &:focus {
+    outline: none;
+    border: none;
   }
 `;
 

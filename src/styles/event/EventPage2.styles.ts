@@ -198,7 +198,7 @@ export const InputSection = styled.div`
   display: flex;
 `;
 
-export const TextArea = styled.textarea`
+export const TextArea = styled.textarea<{ isNotLoggedIn?: boolean }>`
   width: 857px;
   height: 230px;
   border: 1px solid #e0e0e0;
@@ -211,9 +211,13 @@ export const TextArea = styled.textarea`
   &::placeholder {
     color: #999;
   }
+
+  background-color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#f5f5f5' : 'white')};
+  cursor: ${({ isNotLoggedIn }) => (isNotLoggedIn ? 'pointer' : 'text')};
+  color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#666' : 'inherit')};
 `;
 
-export const ReviewButton = styled.button`
+export const ReviewButton = styled.button<{ isNotLoggedIn?: boolean }>`
   position: absolute;
   right: 20px;
   bottom: 20px;
@@ -222,8 +226,10 @@ export const ReviewButton = styled.button`
   border: none;
   border-radius: 4px;
   padding: 8px 16px;
-  cursor: pointer;
+  cursor: ${({ isNotLoggedIn }) => (isNotLoggedIn ? 'pointer' : 'pointer')};
   z-index: 2;
+  opacity: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '0.5' : '1')};
+
   &:focus {
     outline: none;
     border: none;
