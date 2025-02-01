@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import profile from '../assets/profile.png';
 import baseballImage from '../assets/baseball.png';
 import vector from '../assets/Vector.png';
@@ -8,171 +7,7 @@ import diamondRight from '../assets/2.png';
 import { useNavigate } from 'react-router-dom';
 import BackPage from '../assets/BackPage.png';
 import NextPage from '../assets/NextPage.png';
-
-const Container = styled.div`
-  background-color: #0c004b;
-  width: 100vw;
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 60px;
-`;
-
-const WhiteContainer = styled.div`
-  background-color: white;
-  width: 90%;
-  max-width: 1200px;
-  border-radius: 20px;
-  padding: 30px;
-  margin: 20px 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const BackButton = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  position: absolute;
-  left: -570px;
-`;
-
-const ProfileSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 40px 0;
-  position: relative;
-`;
-
-const DiamondLeft = styled.img`
-  position: absolute;
-  left: -100px;
-  width: 100px;
-  height: 100px;
-  top: -30px;
-  object-fit: contain;
-`;
-
-const DiamondRight = styled.img`
-  position: absolute;
-  right: -100px;
-  width: 100px;
-  height: 100px;
-  top: 70px;
-  object-fit: contain;
-`;
-
-const ProfileImage = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: white;
-  margin-bottom: 10px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-`;
-
-const Username = styled.div`
-  color: white;
-  font-size: 18px;
-  margin-bottom: 25px;
-`;
-
-const WriteReviewButton = styled.button`
-  background-color: #fff5d5;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 24px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 170px;
-`;
-
-const SectionTitle = styled.div`
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: black;
-`;
-
-const SortOptions = styled.div`
-  font-size: 14px;
-  color: #666;
-`;
-
-const ReviewCard = styled.div`
-  display: flex;
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-  gap: 20px;
-`;
-
-const ReviewContent = styled.div`
-  flex: 1;
-`;
-
-const ReviewTitle = styled.h3`
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: black;
-`;
-
-const ReviewText = styled.p`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
-  line-height: 1.5;
-`;
-
-const ReviewImage = styled.img`
-  width: 200px;
-  height: 120px;
-  border-radius: 10px;
-  object-fit: cover;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-  color: white;
-`;
-
-const PaginationButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-
-  img {
-    width: 8px;
-    height: 15px;
-  }
-`;
+import * as S from '../styles/review/ReviewPage.style';
 
 const ReviewPage6 = () => {
   const navigate = useNavigate();
@@ -264,46 +99,46 @@ const ReviewPage6 = () => {
   };
 
   return (
-    <Container>
-      <ProfileSection>
-        <BackButton>
+    <S.Container>
+      <S.ProfileSection>
+        <S.BackButton>
           <img src={vector} alt="뒤로가기 아이콘" />
-        </BackButton>
-        <DiamondLeft src={diamondLeft} alt="Left Diamond" />
-        <ProfileImage>
+        </S.BackButton>
+        <S.DiamondLeft src={diamondLeft} alt="Left Diamond" />
+        <S.ProfileImage6>
           <img src={profileData.profileImage} alt={`${profileData.name}의 프로필`} />
-        </ProfileImage>
-        <DiamondRight src={diamondRight} alt="Right Diamond" />
-        <Username>{profileData.name}</Username>
-        <WriteReviewButton onClick={() => navigate('/review7')}>후기 쓰기</WriteReviewButton>
-      </ProfileSection>
+        </S.ProfileImage6>
+        <S.DiamondRight src={diamondRight} alt="Right Diamond" />
+        <S.Username6>{profileData.name}</S.Username6>
+        <S.WriteReviewButton onClick={() => navigate('/review7')}>후기 쓰기</S.WriteReviewButton>
+      </S.ProfileSection>
 
-      <WhiteContainer>
-        <SectionTitle>
+      <S.WhiteContainer6>
+        <S.SectionTitle6>
           내 후기
-          <SortOptions>최신순 / 조회순</SortOptions>
-        </SectionTitle>
+          <S.SortOptions>최신순 / 조회순</S.SortOptions>
+        </S.SectionTitle6>
 
         {currentReviews.map((review) => (
-          <ReviewCard key={review.id}>
-            <ReviewContent>
-              <ReviewTitle>{review.title}</ReviewTitle>
-              <ReviewText>{review.content}</ReviewText>
-            </ReviewContent>
-            <ReviewImage src={review.image} alt={review.title} />
-          </ReviewCard>
+          <S.ReviewCard6 key={review.id}>
+            <S.ReviewContent6>
+              <S.ReviewTitle6>{review.title}</S.ReviewTitle6>
+              <S.ReviewText6>{review.content}</S.ReviewText6>
+            </S.ReviewContent6>
+            <S.ReviewImage6 src={review.image} alt={review.title} />
+          </S.ReviewCard6>
         ))}
-      </WhiteContainer>
-      <Pagination>
-        <PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
+      </S.WhiteContainer6>
+      <S.Pagination>
+        <S.PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
           <img src={BackPage} alt="이전 페이지" />
-        </PaginationButton>
+        </S.PaginationButton>
         {currentPage}/{totalPages}
-        <PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+        <S.PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
           <img src={NextPage} alt="다음 페이지" />
-        </PaginationButton>
-      </Pagination>
-    </Container>
+        </S.PaginationButton>
+      </S.Pagination>
+    </S.Container>
   );
 };
 
