@@ -71,9 +71,10 @@ export const EventCard = styled.div`
 `;
 
 export const EventPoster = styled.img`
-  width: 100%;
-  height: auto;
+  width: 199px;
+  height: 208px;
   margin-bottom: 0.5rem;
+  object-fit: cover;
 `;
 
 export const EventDetails = styled.div`
@@ -81,7 +82,6 @@ export const EventDetails = styled.div`
 `;
 
 export const EventName = styled.h4`
-  font-weight: bold;
   margin-bottom: 0.2rem;
   color: #fff;
   font-family: 'Gothic A1';

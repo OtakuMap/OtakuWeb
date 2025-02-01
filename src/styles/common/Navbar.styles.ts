@@ -32,21 +32,34 @@ export const IconsContainer = styled.div`
   align-items: center;
 `;
 
-export const IconWrapper = styled.div<{ isActive?: boolean; isProfile?: boolean }>`
+export const IconWrapper = styled.div<{
+  isActive?: boolean;
+  isProfile?: boolean;
+  width?: string;
+  height?: string;
+  size?: number;
+}>`
   position: relative;
-  width: 28px; // 28px * 0.8
-  height: 28px; // 28px * 0.8
+  width: ${(props) => {
+    if (props.width) return props.width;
+    if (props.size) return `${props.size}px`;
+    return '28px';
+  }};
+  height: ${(props) => {
+    if (props.height) return props.height;
+    if (props.size) return `${props.size}px`;
+    return '28px';
+  }};
   cursor: pointer;
 
   img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     ${(props) =>
       props.isProfile &&
-      props.isActive &&
       css`
-        border: 2px solid #ffc50c; // 3px * 0.8
+        border: 3px solid ${props.isActive ? '#ffc50c' : '#d1c1ff'};
         border-radius: 50%;
         box-sizing: border-box;
       `}
@@ -59,29 +72,29 @@ export const IconWrapper = styled.div<{ isActive?: boolean; isProfile?: boolean 
       &::after {
         content: '';
         position: absolute;
-        width: 28px; // 28px * 0.8
+        width: 28px;
         height: 0;
         left: -1.7px;
-        top: 36px; // 42px * 0.8
-        border: 2px solid #fff5d5; // 4px * 0.8
+        top: 36px;
+        border: 2px solid #fff5d5;
         border-radius: 4px;
       }
     `}
 
   span {
     position: absolute;
-    top: -6px; // -8px * 0.8
-    right: -6px; // -8px * 0.8
+    top: -6px;
+    right: -6px;
     background-color: #ff334b;
     color: white;
-    font-size: 10px; // 12px * 0.8
-    min-width: 16px; // 20px * 0.8
-    height: 16px; // 20px * 0.8
-    padding: 0 5px; // 6px * 0.8
+    font-size: 10px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 8px; // 10px * 0.8
+    border-radius: 8px;
     font-weight: 500;
   }
 `;
@@ -215,6 +228,7 @@ export const ProfileImage = styled.div`
   margin-bottom: 8px; // 10px * 0.8
   border: 2px solid #d1c1ff;
   overflow: hidden;
+  flex-shrink: 0; // 이미지가 찌그러지지 않도록 방지
 
   img {
     width: 100%;

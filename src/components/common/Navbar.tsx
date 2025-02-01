@@ -4,6 +4,7 @@ import { useAppSelector } from '@/hooks/reduxHooks';
 import { useAuth } from '@/hooks/login/useAuth';
 import { useNotifications } from '@/hooks/user/useNotifications';
 import { NotificationType } from '@/types/user/notification';
+import { useUserProfile } from '@/hooks/user/useUserProfile';
 import logoImage from '../../assets/logo.png';
 import alarmIcon from '../../assets/alarm.png';
 import menuIcon from '../../assets/menu.png';
@@ -15,6 +16,7 @@ const Navbar = () => {
   const { logout } = useAuth();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const { notifications, isLoading, refetchNotifications, markAsRead } = useNotifications();
+  const { userProfile } = useUserProfile();
   const [showPopup, setShowPopup] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   // const [showMenuPopup, setShowMenuPopup] = useState(false);
@@ -35,7 +37,7 @@ const Navbar = () => {
   };
 
   const handleLogin = () => {
-    navigate('/');
+    navigate('/login');
     setShowProfilePopup(false);
   };
 
@@ -114,9 +116,13 @@ const Navbar = () => {
     <>
       <S.ProfileSection>
         <S.ProfileImage>
-          <img src={profileIcon} alt="User Profile" />
+          {userProfile?.profileImageUrl ? (
+            <img src={userProfile.profileImageUrl} alt="User Profile" />
+          ) : (
+            <img src={profileIcon} alt="Default Profile" />
+          )}
         </S.ProfileImage>
-        <S.ProfileName>닉네임</S.ProfileName>
+        <S.ProfileName>{userProfile?.nickname || '닉네임'}</S.ProfileName>
       </S.ProfileSection>
       <S.MenuList>
         <S.MenuItem onClick={() => handleMyPage()}>마이페이지</S.MenuItem>
@@ -132,15 +138,29 @@ const Navbar = () => {
           <img src={logoImage} alt="Otaku Map" />
         </S.Logo>
         <S.IconsContainer>
-          <S.IconWrapper onClick={handleNotificationClick} isActive={showPopup}>
+          <S.IconWrapper
+            onClick={handleNotificationClick}
+            isActive={showPopup}
+            width="27.01px"
+            height="30px"
+          >
             <img src={alarmIcon} alt="Alarm" />
             {notifications.length > 0 && <span>{notifications.length}</span>}
           </S.IconWrapper>
-          <S.IconWrapper onClick={handleMenuClick}>
+          <S.IconWrapper onClick={handleMenuClick} size={25}>
             <img src={menuIcon} alt="Menu" />
           </S.IconWrapper>
-          <S.IconWrapper onClick={handleProfileClick} isActive={showProfilePopup} isProfile>
-            <img src={profileIcon} alt="Profile" />
+          <S.IconWrapper
+            onClick={handleProfileClick}
+            isActive={showProfilePopup}
+            isProfile
+            size={48}
+          >
+            {userProfile?.profileImageUrl ? (
+              <img src={userProfile.profileImageUrl} alt="User Profile" />
+            ) : (
+              <img src={profileIcon} alt="Profile" />
+            )}
           </S.IconWrapper>
 
           {showProfilePopup && (

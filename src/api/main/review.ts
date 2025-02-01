@@ -11,7 +11,7 @@ export const getTopReviews = async () => {
       throw new Error('No authentication token found');
     }
 
-    const response = await instance.get<TopReviewsResponse>('/api/reviews/top7');
+    const response = await instance.get<TopReviewsResponse>('/reviews/top7');
     console.log('Top Reviews API Response:', {
       status: response.status,
       headers: response.headers,
