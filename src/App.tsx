@@ -39,15 +39,8 @@ const queryClient = new QueryClient();
 const AppRoutes: React.FC = () => {
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  const hideNavbarPaths = [
-    '/map',
-    '/route',
-    '/review1',
-    '/review2',
-    '/review3',
-    '/review4',
-    '/review5',
-  ];
+  //navbar를 넣고 싶지 않은 페이지
+  const hideNavbarPaths = ['/login', '/map', '/route', '/signup', '/search-id-pw', '/newsetpw'];
 
   // 로그인이 필요한 보호된 라우트들
   const protectedRoutes = [
