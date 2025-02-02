@@ -177,7 +177,7 @@ const ReviewPage4 = () => {
       console.log('Submitting review for placeId:', placeId);
 
       const reviewData: ShortReviewRequest = {
-        placeAnimationId: 1, // 애니메이션 ID는 실제 데이터로 교체 필요
+        placeAnimationId: 2, // 애니메이션 ID는 실제 데이터로 교체 필요
         rating: inputRating,
         content: reviewText.trim(),
       };
