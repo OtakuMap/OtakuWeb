@@ -13,18 +13,18 @@ import { RouteData } from '@/types/review/route';
 const ReviewPage5 = () => {
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-
-  const handleSaveRoute = () => {
-    if (!isLoggedIn) {
-      dispatch(openLoginModal());
-      return;
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  // const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // 토큰 스토리지로 로그인 상태 확인
   // const isLoggedIn = !!tokenStorage.getAccessToken();
 
   const handleSaveRoute = async () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     try {
       setIsSaving(true);
       const currentReviewId = reviewData.id;
@@ -47,8 +47,6 @@ const ReviewPage5 = () => {
     } finally {
       setIsSaving(false);
     }
-    // 루트 저장 로직
-    console.log('루트 저장');
   };
 
   const reviewData = {

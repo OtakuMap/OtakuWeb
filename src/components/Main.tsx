@@ -6,8 +6,8 @@ import MapIcon from '../assets/map.png';
 import ReviewIcon from '../assets/review.png';
 import EventIcon from '../assets/event.png';
 import HeartIcon from '../assets/heart.png';
-import EmptyHeartIcon from '../assets/heart-empty.png';
-import FilledHeartIcon from '../assets/heart-filled.png';
+// import EmptyHeartIcon from '../assets/heart-empty.png';
+// import FilledHeartIcon from '../assets/heart-filled.png';
 import Logo from '../assets/banner1.png';
 import sectionImage from '../assets/1.png';
 import { useTopReviews } from '@/hooks/main/useTopReviews';
@@ -19,43 +19,43 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 
-<!-- const EventCard = ({ poster, name, dates, eventId }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+// const EventCard = ({ poster, name, dates, eventId }) => {
+//   const [isFavorite, setIsFavorite] = useState(false);
 
-  const handleHeartClick = async (e) => {
-    e.stopPropagation();
-    try {
-      const params = {
-        name: name,
-        eventId: eventId,
-      };
+//   const handleHeartClick = async (e) => {
+//     e.stopPropagation();
+//     try {
+//       const params = {
+//         name: name,
+//         eventId: eventId,
+//       };
 
-      const response = await saveEventLike(params);
-      if (response.isSuccess) {
-        setIsFavorite(!isFavorite);
-      } else {
-        console.error('Failed to save event like:', response.message);
-      }
-    } catch (error) {
-      console.error('Error saving event like:', error);
-    }
-  };
+//       const response = await saveEventLike(params);
+//       if (response.isSuccess) {
+//         setIsFavorite(!isFavorite);
+//       } else {
+//         console.error('Failed to save event like:', response.message);
+//       }
+//     } catch (error) {
+//       console.error('Error saving event like:', error);
+//     }
+//   };
 
-  return (
-    <S.EventCardWrapper>
-      <S.EventPosterContainer>
-        <S.EventPoster src={poster} alt={name} />
-        <S.HeartButton onClick={handleHeartClick}>
-          <S.HeartImage src={isFavorite ? FilledHeartIcon : EmptyHeartIcon} alt="Favorite" />
-        </S.HeartButton>
-      </S.EventPosterContainer>
-      <S.EventDetails>
-        <S.EventName>{name}</S.EventName>
-        <S.EventDates>{dates}</S.EventDates>
-      </S.EventDetails>
-    </S.EventCardWrapper>
-  );
-}; -->
+//   return (
+//     <S.EventCardWrapper>
+//       <S.EventPosterContainer>
+//         <S.EventPoster src={poster} alt={name} />
+//         <S.HeartButton onClick={handleHeartClick}>
+//           <S.HeartImage src={isFavorite ? FilledHeartIcon : EmptyHeartIcon} alt="Favorite" />
+//         </S.HeartButton>
+//       </S.EventPosterContainer>
+//       <S.EventDetails>
+//         <S.EventName>{name}</S.EventName>
+//         <S.EventDates>{dates}</S.EventDates>
+//       </S.EventDetails>
+//     </S.EventCardWrapper>
+//   );
+// };
 
 const Main = () => {
   const dispatch = useDispatch();
@@ -73,7 +73,7 @@ const Main = () => {
   };
 
   const handleEventClick = () => {
-    navigate('/event');
+    navigate('/category');
   };
 
   const handleHeartClick = () => {
