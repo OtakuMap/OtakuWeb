@@ -4,10 +4,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface OAuthLoginRequest {
-    code: string;
-  }
-
 export interface LoginResponse {
   isSuccess: boolean;
   code: string;
@@ -18,6 +14,17 @@ export interface LoginResponse {
     refreshToken: string;
   };
 }
+
+export interface OAuthLoginRequest {
+    code: string;
+  }
+
+export interface LogoutResponse {
+    isSuccess: boolean;
+    code: string;
+    message: string;
+    result?: string;
+  }
 
 // 회원가입
 export interface RegisterRequest {
@@ -57,7 +64,7 @@ export interface RegisterRequest {
     userId: string;
   }
   
-  export interface CheckEmailDuplicationResponse {
+  export interface CheckIDDuplicationResponse {
     isSuccess: boolean;
     code: string;
     message: string;
@@ -81,6 +88,31 @@ export interface SearchIdResponse {
     };
 }
 
+// 비밀번호 찾기
+export interface SearchPwRequest {
+  name: string;
+  userId: string;
+}
+
+export interface SearchPwResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}
+
+// 회원가입시 이메일 코드 전송 
+export interface sendEmailVerifyCodeRequest {
+  email: string;
+}
+
+export interface sendEmailVerifyCodeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string; 
+  result: string;
+}
+
 // 회원가입시 이메일 코드 인증
 export interface EmailVerifyCodeRequest {
   code: string;
@@ -96,9 +128,4 @@ export interface EmailVerifyCodeResponse {
     };
 }
 
-export interface LogoutResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result?: string;
-}
+
