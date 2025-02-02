@@ -1,7 +1,4 @@
-export interface DeletePlacesRequest {
-  placeIds: number[];
-}
-
+// types/like/delete-places.ts
 export interface DeletePlacesResponse {
   isSuccess: boolean;
   code: string;
