@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { saveRoute } from '@/api/review/route';
+// import { tokenStorage } from '@/utils/token'; // 토큰 스토리지 import
 import profileImage from '../assets/profile.png';
 import mapImage from '../assets/mapData.png';
 import * as S from '../styles/review/ReviewPage.style';
+import { RouteData } from '@/types/review/route';
+// import axios from 'axios';
 
 const ReviewPage5 = () => {
   const dispatch = useDispatch();
@@ -14,6 +18,34 @@ const ReviewPage5 = () => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());
       return;
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // 토큰 스토리지로 로그인 상태 확인
+  // const isLoggedIn = !!tokenStorage.getAccessToken();
+
+  const handleSaveRoute = async () => {
+    try {
+      setIsSaving(true);
+      const currentReviewId = reviewData.id;
+
+      console.log('Attempting to save route:', {
+        reviewId: currentReviewId,
+        routeData,
+      });
+
+      const response = await saveRoute(currentReviewId, routeData);
+
+      if (response.isSuccess) {
+        alert('루트가 성공적으로 저장되었습니다.');
+      } else {
+        alert(response.message || '루트 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Full Error Object:', error);
+      alert('루트 저장 중 예상치 못한 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
     // 루트 저장 로직
     console.log('루트 저장');
@@ -29,7 +61,7 @@ const ReviewPage5 = () => {
     location: 'Teramachi-202 Maehibocho, Konan, Aichi 483-8336 일본',
   };
 
-  const routeData = [
+  const routeData: RouteData[] = [
     { id: 1, order: 1, name: '루트루트루트이룰이룰이룰', description: '첫 번째 장소' },
     { id: 2, order: 2, name: '루트루트이룰이룰이룰', description: '두 번째 장소' },
     { id: 3, order: 3, name: '루트루트이룰이룰이룰이룰', description: '세 번째 장소' },
@@ -67,7 +99,9 @@ const ReviewPage5 = () => {
           </S.MainContent>
 
           <S.SideContent>
-            <S.SaveRouteButton onClick={handleSaveRoute}>루트 저장하기</S.SaveRouteButton>
+            <S.SaveRouteButton onClick={handleSaveRoute} disabled={isSaving}>
+              {isSaving ? '저장 중...' : '루트 저장하기'}
+            </S.SaveRouteButton>
             <S.RouteList>
               {sortedRouteData.map((route) => (
                 <S.RouteItem key={route.id}>
