@@ -113,22 +113,30 @@ const ReviewPage6 = () => {
         <S.WriteReviewButton onClick={() => navigate('/review7')}>후기 쓰기</S.WriteReviewButton>
       </S.ProfileSection>
 
-      <S.WhiteContainer6>
-        <S.SectionTitle6>
-          내 후기
+      <S.WhiteContainer>
+        <S.Header>
+          <S.BTitle>내 후기</S.BTitle>
+        </S.Header>
+        <S.SortOptionsWrapper>
           <S.SortOptions>최신순 / 조회순</S.SortOptions>
-        </S.SectionTitle6>
+        </S.SortOptionsWrapper>
 
-        {currentReviews.map((review) => (
-          <S.ReviewCard6 key={review.id}>
-            <S.ReviewContent6>
-              <S.ReviewTitle6>{review.title}</S.ReviewTitle6>
-              <S.ReviewText6>{review.content}</S.ReviewText6>
-            </S.ReviewContent6>
-            <S.ReviewImage6 src={review.image} alt={review.title} />
-          </S.ReviewCard6>
-        ))}
-      </S.WhiteContainer6>
+        <S.BSectionTitle>후기 전체 &gt;</S.BSectionTitle>
+        <S.ReviewList>
+          {currentReviews.map((review) => (
+            <S.ReviewItem key={review.id}>
+              <S.ReviewContent>
+                <S.ReviewTitle>{review.title}</S.ReviewTitle>
+                <S.ReviewText>{review.content}</S.ReviewText>
+              </S.ReviewContent>
+              <S.ReviewImageWrapper>
+                <S.ReviewImage src={review.image} alt={review.title} />
+              </S.ReviewImageWrapper>
+            </S.ReviewItem>
+          ))}
+        </S.ReviewList>
+      </S.WhiteContainer>
+
       <S.Pagination>
         <S.PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
           <img src={BackPage} alt="이전 페이지" />

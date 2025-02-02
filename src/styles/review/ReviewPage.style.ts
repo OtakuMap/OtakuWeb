@@ -158,6 +158,29 @@ export const SearchBarWrapper = styled.div`
   margin-top: 20px;
 `;
 
+export const ErrorMessage = styled.div`
+  color: #ff6b6b;
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #fff5f5;
+  border-radius: 4px;
+  border: 1px solid #ffc9c9;
+`;
+
+export const ReviewTypeButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0c004b;
+  font-weight: bold;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const SearchInput = styled.input`
   border: none;
   padding: 10px;
@@ -1013,52 +1036,7 @@ export const ProfileImage6 = styled.div`
     object-fit: cover;
   }
 `;
-export const ReviewCard6 = styled.div`
-  display: flex;
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-  gap: 20px;
-`;
 
-export const ReviewContent6 = styled.div`
-  flex: 1;
-`;
-
-export const ReviewTitle6 = styled.h3`
-  font-family: Gothic A1;
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 37.5px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  color: black;
-  margin: 48px 30px 26px 53px;
-  width: 700px;
-  height: 70px;
-`;
-
-export const ReviewText6 = styled.p`
-  font-family: Gothic A1;
-  font-size: 20px;
-  font-weight: 300;
-  line-height: 25px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  margin: 0px 48px 0px 53px;
-  color: black;
-  width: 700px;
-  height: 125px;
-`;
-
-export const ReviewImage6 = styled.img`
-  width: 349px;
-  height: 189px;
-  border-radius: 15px;
-  object-fit: cover;
-  margin: 48px 67px 0px 0px;
-`;
 // ReviewPage7 specific styles
 export const ContentContainer7 = styled.div`
   display: flex;

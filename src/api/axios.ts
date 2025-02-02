@@ -54,8 +54,8 @@ instance.interceptors.response.use(
         );
 
         // 응답에서 새 토큰들 저장
-        const { accessToken, refreshToken: newRefreshToken } = response.data.result;
-        tokenStorage.setTokens(accessToken, newRefreshToken);
+        const { accessToken, refreshToken: newRefreshToken, role } = response.data.result;
+        tokenStorage.setTokens(accessToken, newRefreshToken, role);
 
         // 원래 요청 재시도
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;

@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import baseball from '../assets/baseball.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const reviewData = [
   {
@@ -33,6 +34,18 @@ const reviewData = [
 
 const ReviewPage3 = () => {
   const navigate = useNavigate();
+  const { placeId } = useParams<{ placeId: string }>();
+
+  const handleShortReviewClick = () => {
+    if (!placeId) {
+      console.error('No placeId available');
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    // 한줄 리뷰 페이지로 이동
+    navigate(`/places/${placeId}/short-review`);
+  };
 
   return (
     <S.Container>
@@ -57,7 +70,10 @@ const ReviewPage3 = () => {
 
       <S.WhiteContainer>
         <S.BHeader>
-          <div>한 줄 후기 &gt; ⭐️⭐️⭐️⭐️</div>
+          <div>
+            <S.ReviewTypeButton onClick={handleShortReviewClick}>한 줄 후기</S.ReviewTypeButton>
+            &gt; ⭐️⭐️⭐️⭐️
+          </div>
           <div>최신순 / 조회순</div>
         </S.BHeader>
 

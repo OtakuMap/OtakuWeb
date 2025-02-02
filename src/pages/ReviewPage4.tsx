@@ -9,6 +9,10 @@ import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
 import * as S from '../styles/review/ReviewPage.style';
+import { createShortReview } from '@/api/review/short-review';
+import { ShortReviewRequest } from '@/types/review/short-review';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface Review {
   id: number;
@@ -125,6 +129,18 @@ const ReviewPage4 = () => {
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const { placeId } = useParams<{ placeId: string }>();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!placeId) {
+      console.error('No placeId available');
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      navigate('/places'); // 또는 적절한 페이지로 이동
+      return;
+    }
+  }, [placeId, navigate]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -141,7 +157,12 @@ const ReviewPage4 = () => {
   const [editRating, setEditRating] = useState(0);
 
   // 리뷰 추가 핸들러
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
+    if (!placeId) {
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      return;
+    }
+
     if (reviewText.trim() === '') {
       window.confirm('후기를 등록해주세요!');
       return;
@@ -150,21 +171,46 @@ const ReviewPage4 = () => {
       window.confirm('별점을 등록해주세요!');
       return;
     }
-    const newReview: Review = {
-      id: reviews.length + 1,
-      profileImage: profileData.profileImage,
-      username: profileData.name,
-      rating: inputRating, // profileData.rating 대신 inputRating 사용
-      maxRating: 4, // 최대 별점을 4로 고정
-      likes: 0,
-      dislikes: 0,
-      content: reviewText,
-      userVote: null,
-    };
 
-    setReviews([newReview, ...reviews]);
-    setReviewText('');
-    setInputRating(0); // 입력 후 별점 초기화
+    setIsSubmitting(true);
+    try {
+      console.log('Submitting review for placeId:', placeId);
+
+      const reviewData: ShortReviewRequest = {
+        placeAnimationId: 2, // 애니메이션 ID는 실제 데이터로 교체 필요
+        rating: inputRating,
+        content: reviewText.trim(),
+      };
+
+      const response = await createShortReview(Number(placeId), reviewData);
+      console.log('Review submission response:', response);
+
+      if (response.isSuccess) {
+        const newReview: Review = {
+          id: response.result.reviewId,
+          profileImage: profileData.profileImage,
+          username: profileData.name,
+          rating: inputRating,
+          maxRating: 4,
+          likes: 0,
+          dislikes: 0,
+          content: reviewText,
+          userVote: null,
+        };
+
+        setReviews([newReview, ...reviews]);
+        setReviewText('');
+        setInputRating(0);
+        window.confirm('리뷰가 등록되었습니다!');
+      } else {
+        window.confirm('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Error creating review:', error);
+      window.confirm('리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEditStart = (review: Review) => {
@@ -247,7 +293,9 @@ const ReviewPage4 = () => {
             <MapPin size={20} color="#0c004b" />
             <S.LocationText value="Hanshin Koshien Stadium" readOnly />
           </S.LocationInput>
-          <S.SaveLocationButton>명소 저장하기</S.SaveLocationButton>
+          <S.SaveLocationButton onClick={() => navigate('/saved-places')}>
+            명소 저장하기
+          </S.SaveLocationButton>
         </S.LocationBar>
 
         <S.DropdownButton>다이아몬드 에이스 ▼</S.DropdownButton>
@@ -287,7 +335,9 @@ const ReviewPage4 = () => {
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
               />
-              <S.SubmitButton onClick={handleReviewSubmit}>등록하기</S.SubmitButton>
+              <S.SubmitButton onClick={handleReviewSubmit} disabled={isSubmitting}>
+                {isSubmitting ? '등록 중...' : '등록하기'}
+              </S.SubmitButton>
             </div>
           </S.FeedbackSection>
 
