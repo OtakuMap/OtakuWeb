@@ -29,7 +29,7 @@ import ReviewPage4 from './pages/ReviewPage4';
 import ReviewPage5 from './pages/ReviewPage5';
 import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
-import EventPage from './pages/EventPage';
+import EventPage from './pages/EventPage2';
 import LoginModal from './components/common/LoginModal';
 
 const AppContainer = styled.div`
@@ -72,7 +72,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/map" element={<MapPage />} />
         <Route path="/route" element={<RoutePage />} />
         <Route path="/category" element={<Category />} />
-        <Route path="/main" element={<Main />} />
+        {/* <Route path="/main" element={<Main />} /> */}
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/places/:placeId/review" element={<ReviewPage3 />} />
@@ -80,6 +80,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/review5" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
+        <Route path="/event" element={<EventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />
 
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
