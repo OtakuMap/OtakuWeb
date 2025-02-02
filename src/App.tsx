@@ -61,6 +61,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/saved-places" element={<SavedPlaces />} />
         <Route path="/saved-events" element={<SavedEvents />} />
         <Route path="/main" element={<Main />} />
+        <Route path="/cover" element={<Cover />} />
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/review3" element={<ReviewPage3 />} />
@@ -76,7 +77,7 @@ const AppRoutes: React.FC = () => {
     <AppContainer>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
       <Routes>
-        <Route path="/" element={<Cover />} />
+        <Route path="/cover" element={<Cover />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/route" element={<RoutePage />} />
         <Route path="/review1" element={<ReviewPage1 />} />

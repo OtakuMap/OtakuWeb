@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getSavedPlaces } from '../api/like/saved-places';
 import type { SavedPlace } from '../types/like/saved-places';
 import { deletePlaces } from '../api/like/delete-places';
-import spaceIcon from '../assets/space-icon.png'; // 우주 아이콘 경로
-import starIcon from '../assets/white-star.png'; // 별표 아이콘
-import starFilledIcon from '../assets/star-filled.png'; // 꽉찬 별표 아이콘
+import { togglePlaceFavorite } from '../api/like/favorite-places';
+import spaceIcon from '../assets/space-icon.png';
+import starIcon from '../assets/white-star.png';
+import starFilledIcon from '../assets/star-filled.png';
+import { tokenStorage } from '../utils/token';
 import * as S from '../styles/like/places.styles';
 
 const SavedPlaces: React.FC = () => {
+  const navigate = useNavigate();
   const [places, setPlaces] = useState<SavedPlace[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<number | null>(null);
+  const [selectedPlaces, setSelectedPlaces] = useState<number[]>([]);
   const [showOnlyStarred, setShowOnlyStarred] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastId, setLastId] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchSavedPlaces = async () => {
       try {
         setLoading(true);
-        const response = await getSavedPlaces({ lastId: 0 });
+        const response = await getSavedPlaces({ lastId: 0, isFavorite: showOnlyStarred });
         if (response.isSuccess) {
           setPlaces(response.result.placeLikes);
           setLastId(response.result.lastId);
@@ -34,13 +40,17 @@ const SavedPlaces: React.FC = () => {
     };
 
     fetchSavedPlaces();
-  }, []);
+  }, [showOnlyStarred]);
 
   const loadMore = async () => {
-    if (!hasMore || loading) return;
+    if (!hasMore || loading || isDeleting) return;
 
     try {
-      const response = await getSavedPlaces({ lastId });
+      const response = await getSavedPlaces({
+        lastId,
+        isFavorite: showOnlyStarred,
+      });
+
       if (response.isSuccess) {
         setPlaces((prev) => [...prev, ...response.result.placeLikes]);
         setLastId(response.result.lastId);
@@ -51,14 +61,21 @@ const SavedPlaces: React.FC = () => {
     }
   };
 
+  const handleSelect = (id: number) => {
+    setSelectedPlaces((prev) =>
+      prev.includes(id) ? prev.filter((placeId) => placeId !== id) : [...prev, id],
+    );
+  };
+
   const handleDelete = async () => {
-    if (!selectedPlace) {
+    if (selectedPlaces.length === 0) {
       alert('삭제할 장소를 선택해주세요.');
       return;
     }
 
+    if (isDeleting) return;
+
     try {
-      // 토큰 확인
       const token = tokenStorage.getAccessToken();
       if (!token) {
         alert('로그인이 필요합니다.');
@@ -66,12 +83,13 @@ const SavedPlaces: React.FC = () => {
         return;
       }
 
-      const response = await deletePlaces([selectedPlace]);
+      setIsDeleting(true);
+      const response = await deletePlaces(selectedPlaces);
 
       if (response.isSuccess) {
-        setPlaces(places.filter((place) => place.id !== selectedPlace));
-        setSelectedPlace(null);
-        alert(response.result);
+        setPlaces((prev) => prev.filter((place) => !selectedPlaces.includes(place.id)));
+        setSelectedPlaces([]);
+        alert(response.result || '선택한 장소가 삭제되었습니다.');
       } else {
         throw new Error(response.message);
       }
@@ -82,18 +100,44 @@ const SavedPlaces: React.FC = () => {
       if (errorMessage.includes('인증이 필요합니다')) {
         window.location.href = '/';
       }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const toggleStar = (id: number) => {
-    setPlaces(
-      places.map((place) =>
-        place.id === id ? { ...place, isFavorite: !place.isFavorite } : place,
-      ),
-    );
+  const toggleStar = async (id: number, currentFavorite: boolean) => {
+    if (isTogglingFavorite === id) return;
+
+    try {
+      setIsTogglingFavorite(id);
+      const response = await togglePlaceFavorite(id, !currentFavorite);
+
+      if (response.isSuccess) {
+        setPlaces(
+          places.map((place) =>
+            place.id === id ? { ...place, isFavorite: !place.isFavorite } : place,
+          ),
+        );
+
+        if (showOnlyStarred && currentFavorite) {
+          setPlaces((prevPlaces) => prevPlaces.filter((place) => place.id !== id));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      alert('즐겨찾기 상태 변경에 실패했습니다.');
+    } finally {
+      setIsTogglingFavorite(null);
+    }
   };
 
-  const filteredPlaces = showOnlyStarred ? places.filter((place) => place.isFavorite) : places;
+  const handleNavigateToRouteManagement = () => {
+    navigate('/route-management');
+  };
+
+  const handleNavigateToSavedEvents = () => {
+    navigate('/saved-events');
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -108,36 +152,58 @@ const SavedPlaces: React.FC = () => {
         <S.Title>나의 좋아요</S.Title>
 
         <S.TabContainer>
-          <S.Tab>저장한 루트</S.Tab>
+          <S.Tab onClick={handleNavigateToRouteManagement}>저장한 루트</S.Tab>
           <S.Tab active>저장한 장소</S.Tab>
-          <S.Tab>저장한 이벤트</S.Tab>
+          <S.Tab onClick={handleNavigateToSavedEvents}>저장한 이벤트</S.Tab>
         </S.TabContainer>
 
         <S.RouteListContainer>
           <S.ListHeader>
-            <S.ListTitle>저장한 장소 ({filteredPlaces.length})</S.ListTitle>
+            <S.ListTitle>저장한 장소 ({places.length})</S.ListTitle>
             <S.HeaderDivider />
             <S.ListActions>
-              <button onClick={handleDelete}>선택 삭제</button>
+              <button
+                onClick={handleDelete}
+                style={{
+                  color: selectedPlaces.length > 0 ? '#7B66FF' : 'inherit',
+                  cursor: selectedPlaces.length > 0 ? 'pointer' : 'default',
+                  opacity: isDeleting ? 0.5 : 1,
+                }}
+                disabled={isDeleting}
+              >
+                {isDeleting ? '삭제중...' : '선택 삭제'}
+              </button>
               <span>/</span>
-              <button onClick={() => setShowOnlyStarred(!showOnlyStarred)}>
+              <button
+                onClick={() => {
+                  setShowOnlyStarred(!showOnlyStarred);
+                  setSelectedPlaces([]);
+                }}
+                style={{
+                  color: showOnlyStarred ? '#7B66FF' : 'inherit',
+                }}
+              >
                 {showOnlyStarred ? '전체보기' : '즐겨찾기'}
               </button>
             </S.ListActions>
           </S.ListHeader>
 
-          {filteredPlaces.map((place) => (
+          {places.map((place) => (
             <S.RouteItem key={place.id}>
               <S.RouteDetails>
                 <S.RadioButton
-                  checked={selectedPlace === place.id}
-                  onClick={() => setSelectedPlace(place.id)}
+                  checked={selectedPlaces.includes(place.id)}
+                  onClick={() => handleSelect(place.id)}
                 />
                 <S.RouteTitle>{place.name}</S.RouteTitle>
                 <S.StarIcon
                   src={place.isFavorite ? starFilledIcon : starIcon}
                   alt={place.isFavorite ? 'Starred' : 'Not starred'}
-                  onClick={() => toggleStar(place.id)}
+                  onClick={() => toggleStar(place.id, place.isFavorite)}
+                  style={{
+                    opacity: isTogglingFavorite === place.id ? 0.5 : 1,
+                    cursor: isTogglingFavorite === place.id ? 'default' : 'pointer',
+                  }}
                 />
               </S.RouteDetails>
               <S.RouteAddress>{place.detail}</S.RouteAddress>
@@ -145,7 +211,7 @@ const SavedPlaces: React.FC = () => {
           ))}
 
           {hasMore && (
-            <S.LoadMoreButton onClick={loadMore} disabled={loading}>
+            <S.LoadMoreButton onClick={loadMore} disabled={loading || isDeleting}>
               더 보기
             </S.LoadMoreButton>
           )}

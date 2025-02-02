@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../styles/like/route.style';
-import { saveEventLike } from '../api/like/eventLike';
 import MapIcon from '../assets/map.png';
 import ReviewIcon from '../assets/review.png';
 import EventIcon from '../assets/event.png';
