@@ -8,6 +8,9 @@ import {
   CheckEmailDuplicationResponse,
   CheckIDDuplicationResponse,
   SearchIdResponse,
+  SearchPwResponse,
+  sendEmailVerifyCodeRequest,
+  sendEmailVerifyCodeResponse,
   EmailVerifyCodeRequest,
   EmailVerifyCodeResponse,
   LogoutResponse,
@@ -61,6 +64,7 @@ const handleError = <T>(error: unknown): T => {
 };
 
 export const authAPI = {
+  // 로그인
   // 일반 로그인
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     try {
@@ -85,14 +89,15 @@ export const authAPI = {
   ): Promise<LoginResponse> => {
     try {
       const url = `/auth/social/${provider}`;
-      console.log('Request URL:', url);
-      console.log('Request Data:', oauthData);
+      console.log('OAuth 요청 URL:', url);
+      console.log('OAuth 요청 데이터:', oauthData);
 
       const response = await instance.post<LoginResponse>(url, oauthData);
-      console.log('Response:', response);
+      console.log('OAuth 응답:', response.data);
+
       return response.data;
-    } catch (error: unknown) {
-      console.error('Error during OAuth login:', error);
+    } catch (error) {
+      console.error('OAuth 로그인 오류:', error);
       return handleError<LoginResponse>(error);
     }
   },
@@ -112,7 +117,7 @@ export const authAPI = {
     }
   },
 
-  // 아이디 중복 확인
+  // 회원가입 - 아이디 중복 확인
   checkIdDuplication: async (userId: string): Promise<CheckIDDuplicationResponse> => {
     try {
       console.log('Request URL:', '/auth/check-id');
@@ -129,7 +134,7 @@ export const authAPI = {
     }
   },
 
-  // 이메일 중복 확인
+  // 회원가입 - 이메일 중복 확인
   checkEmailDuplication: async (email: string): Promise<CheckEmailDuplicationResponse> => {
     try {
       console.log('Request URL:', '/auth/check-email');
@@ -146,6 +151,7 @@ export const authAPI = {
     }
   },
 
+  // 아이디 비밀번호 찾기
   // 아이디 찾기
   searchId: async (userId: string): Promise<SearchIdResponse> => {
     try {
@@ -163,7 +169,42 @@ export const authAPI = {
     }
   },
 
-  // 이메일 인증
+  // 비밀번호 찾기 (인증번호 요청)
+  searchPw: async (userId: string): Promise<SearchPwResponse> => {
+    try {
+      const response = await instance.post<SearchPwResponse>('/auth/reset-password', { userId });
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during password reset:', error);
+      return handleError<SearchPwResponse>(error);
+    }
+  },
+
+  // 비밀번호 찾기 코드 인증
+
+  // 비밀번호 변경
+
+  // 회원가입 - 이메일 인증 메일 전송
+  sendEmailVerifyCode: async (
+    email: sendEmailVerifyCodeRequest,
+  ): Promise<sendEmailVerifyCodeResponse> => {
+    try {
+      console.log('Request URL:', '/auth/verify-code');
+      console.log('Request Data:', email);
+
+      const response = await instance.post<sendEmailVerifyCodeResponse>(
+        '/auth/verify-email',
+        email,
+      );
+      console.log('Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during emailVerifyCode:', error);
+      return handleError<sendEmailVerifyCodeResponse>(error);
+    }
+  },
+
+  // 회원가입 - 이메일 코드 인증
   emailVerifyCode: async (email: EmailVerifyCodeRequest): Promise<EmailVerifyCodeResponse> => {
     try {
       console.log('Request URL:', '/auth/verify-code');

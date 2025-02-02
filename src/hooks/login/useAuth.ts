@@ -2,8 +2,17 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../api/login/authAPI';
-import { loginSuccess, loginFailure, logout as logoutAction } from '../../store/auth/authSlice';
+import {
+  loginSuccess,
+  loginFailure,
+  oauthLoginSuccess,
+  logout as logoutAction,
+} from '../../store/auth/authSlice';
 import { tokenStorage } from '@/utils/token';
+
+export interface OAuthLoginRequest {
+  code: string;
+}
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -17,11 +26,10 @@ export const useAuth = () => {
       console.log('Login response:', response);
 
       if (response.isSuccess && response.result) {
-        // userId도 함께 저장하도록 수정
         tokenStorage.setTokens(
           response.result.accessToken,
           response.result.refreshToken,
-          String(response.result.id), // userId 추가
+          String(response.result.id),
         );
         dispatch(loginSuccess(response.result));
         navigate('/main');
@@ -39,16 +47,60 @@ export const useAuth = () => {
     }
   };
 
+  const oauthLogin = async (provider: 'google' | 'kakao' | 'naver', code: string) => {
+    setLoading(true);
+    try {
+      // 🔥 `code`가 string인지 확인하기 위해 로그 추가
+      console.log('✅ OAuth Login 요청 시작');
+      console.log('👉 Provider:', provider);
+      console.log('👉 Raw Code:', code, 'Type:', typeof code);
+
+      const oauthData: OAuthLoginRequest = { code: String(code) }; // Ensure it's always a string
+
+      console.log('📡 OAuth 요청 데이터:', oauthData);
+
+      const response = await authAPI.oauthLogin(provider, oauthData);
+
+      console.log('🔄 OAuth 로그인 응답:', response);
+
+      if (response.isSuccess && response.result) {
+        tokenStorage.setTokens(
+          response.result.accessToken,
+          response.result.refreshToken,
+          String(response.result.id),
+        );
+        dispatch(
+          oauthLoginSuccess({
+            id: response.result.id,
+            accessToken: response.result.accessToken,
+            refreshToken: response.result.refreshToken,
+            provider,
+          }),
+        );
+        console.log('✅ OAuth 로그인 성공');
+        navigate('/main');
+      } else {
+        console.log('❌ OAuth 로그인 실패:', response.message);
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      console.error('🚨 OAuth 로그인 오류:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
-      await authAPI.logout(); // API 호출 시도
+      await authAPI.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // 성공/실패 여부와 관계없이 항상 실행
-      dispatch(logoutAction()); // 이 action에서 이미 tokenStorage.clearTokens()를 호출함
+      dispatch(logoutAction());
       navigate('/');
     }
   };
-  return { login, logout, loading };
+
+  return { login, oauthLogin, logout, loading };
 };
