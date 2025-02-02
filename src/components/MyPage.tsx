@@ -176,6 +176,7 @@ const MyPage = () => {
 
   return (
     <S.Container>
+      <S.Mypage>마이 페이지</S.Mypage>
       <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
 
       <S.ProfileContainer>
@@ -188,7 +189,7 @@ const MyPage = () => {
         <S.SectionTitle>내 정보 수정</S.SectionTitle>
 
         <S.FormRow>
-          <S.Label>닉네임</S.Label>
+          <S.Label>닉네임 수정</S.Label>
           <S.InputContainer>
             {isEditing.nickname ? (
               <S.InputField
@@ -199,15 +200,15 @@ const MyPage = () => {
             ) : (
               <S.Text>{formData.nickname}</S.Text>
             )}
-            <S.DuplicateCheckButton onClick={checkDuplicate}>중복확인</S.DuplicateCheckButton>
             <S.EditButton onClick={() => handleEdit('nickname')}>
               <S.EditIcon src={PencilIcon} alt="edit" />
             </S.EditButton>
+            <S.DuplicateCheckButton onClick={checkDuplicate}>중복확인</S.DuplicateCheckButton>
           </S.InputContainer>
         </S.FormRow>
 
         <S.FormRow>
-          <S.Label>이메일</S.Label>
+          <S.Label>이메일 수정</S.Label>
           <S.InputContainer>
             {isEditing.email ? (
               <S.InputField
@@ -218,14 +219,14 @@ const MyPage = () => {
             ) : (
               <S.Text>{formData.email}</S.Text>
             )}
-            <S.EditButton onClick={() => handleEdit('email')}>
+            <S.EmailEditButton onClick={() => handleEdit('email')}>
               <S.EditIcon src={PencilIcon} alt="edit" />
-            </S.EditButton>
+            </S.EmailEditButton>
           </S.InputContainer>
         </S.FormRow>
 
         <S.FormRow>
-          <S.Label>비밀번호</S.Label>
+          <S.Label>비밀번호 변경</S.Label>
           <S.InputContainer>
             {isEditing.password ? (
               <S.InputField
@@ -248,17 +249,15 @@ const MyPage = () => {
       <S.Section>
         <S.SectionTitle>내 후기 관리</S.SectionTitle>
         <S.ReviewSection>
+          <S.ReviewTitle>후기 관리</S.ReviewTitle>
           <S.ReviewRow>
-            <S.ReviewTitle>후기 관리</S.ReviewTitle>
             <S.ReviewButton onClick={handleReviewClick}>내 후기 전체보기</S.ReviewButton>
-          </S.ReviewRow>
-          <S.ReviewRow>
             <S.ReviewButton onClick={handleDeleteClick}>내 후기 전체 삭제하기</S.ReviewButton>
           </S.ReviewRow>
-          <S.ReviewAmount>후기 후원금 내역: 총 {userInfo?.donation || 0}원</S.ReviewAmount>
+          <S.AmountTitle>후기 수익 내역</S.AmountTitle>
+          <S.ReviewAmount>{userInfo?.donation || 0}P</S.ReviewAmount>
         </S.ReviewSection>
       </S.Section>
-
       {/* Modal 추가 */}
       {showDeleteModal && (
         <S.ModalOverlay>
@@ -279,8 +278,8 @@ const MyPage = () => {
       <S.Section>
         <S.SectionTitle>이벤트 제보하기</S.SectionTitle>
         <S.FormRow>
-          <S.Label>이벤트 이름</S.Label>
-          <S.InputField
+          <S.EventLabel>이벤트 이름</S.EventLabel>
+          <S.EventInputField
             type="text"
             placeholder="입력해주세요"
             value={eventForm.event_name}
@@ -288,8 +287,8 @@ const MyPage = () => {
           />
         </S.FormRow>
         <S.FormRow>
-          <S.Label>이벤트 애니명</S.Label>
-          <S.InputField
+          <S.EventLabel>이벤트 애니명</S.EventLabel>
+          <S.EventInputField
             type="text"
             placeholder="입력해주세요"
             value={eventForm.animation_name}
@@ -297,8 +296,8 @@ const MyPage = () => {
           />
         </S.FormRow>
         <S.FormRow>
-          <S.Label>추가사항</S.Label>
-          <S.InputField
+          <S.EventLabel>추가사항</S.EventLabel>
+          <S.EventInputField
             type="text"
             placeholder="입력해주세요"
             value={eventForm.additional_info}

@@ -1,34 +1,32 @@
 import { useState } from 'react';
 import { PlaceLike } from '@/types/map/favorite';
 import { getFavoritePlaces } from '@/api/map/favorite';
-import { Place } from '@/types/map/place';
+
+interface FetchParams {
+  lastId?: number;
+  limit?: number;
+}
 
 export const useFavoritePlaces = () => {
-  const [favoritePlaces, setFavoritePlaces] = useState<Place[]>([]);
+  const [favoritePlaces, setFavoritePlaces] = useState<PlaceLike[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [lastId, setLastId] = useState(0);
 
-  const fetchFavoritePlaces = async (userId: string) => {
+  const fetchFavoritePlaces = async (params: FetchParams) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await getFavoritePlaces(userId);
+      const response = await getFavoritePlaces(params);
 
-      // PlaceLike를 Place 타입으로 변환
-      const convertedPlaces: Place[] = response.result.placeLikes.slice(0, 3).map((place) => ({
-        id: place.id,
-        title: place.name,
-        name: place.name,
-        isSelected: false,
-        latitude: place.lat,
-        longitude: place.lng,
-        animeName: '', // API에서 제공하지 않는 정보는 기본값으로
-        address: place.detail,
-        hashtags: [], // API에서 제공하지 않는 정보는 빈 배열로
-        relatedPlaces: [], // API에서 제공하지 않는 정보는 빈 배열로
-      }));
-
-      setFavoritePlaces(convertedPlaces);
+      if (response.isSuccess) {
+        setFavoritePlaces(response.result.placeLikes);
+        setHasNext(response.result.hasNext);
+        setLastId(response.result.lastId);
+      } else {
+        throw new Error(response.message);
+      }
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -41,5 +39,7 @@ export const useFavoritePlaces = () => {
     isLoading,
     error,
     fetchFavoritePlaces,
+    hasNext,
+    lastId,
   };
 };

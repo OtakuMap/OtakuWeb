@@ -5,13 +5,12 @@ export interface PlaceLike {
   detail: string;
   lat: number;
   lng: number;
-  savedAt: string;
   isFavorite: boolean;
 }
 
 export interface PlaceLikesResponse {
   isSuccess: boolean;
-  code: number;
+  code: string;
   message: string;
   result: {
     placeLikes: PlaceLike[];

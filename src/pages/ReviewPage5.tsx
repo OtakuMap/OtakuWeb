@@ -1,273 +1,44 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import { saveRoute } from '@/api/review/route';
+// import { tokenStorage } from '@/utils/token'; // 토큰 스토리지 import
 import profileImage from '../assets/profile.png';
 import mapImage from '../assets/mapData.png';
-
-const Container = styled.div`
-  background-color: #0c004b;
-  width: 100vw;
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 60px;
-`;
-
-const BreadcrumbNav = styled.div`
-  width: 90%;
-  max-width: 1200px;
-  color: white;
-  font-size: 24px;
-  margin-bottom: 20px;
-`;
-
-const WhiteContainer = styled.div`
-  background-color: white;
-  width: 90%;
-  max-width: 1200px;
-  border-radius: 20px;
-  padding: 30px;
-  margin: 20px auto;
-  box-sizing: border-box;
-`;
-
-const HeaderContainer = styled.div`
-  margin-bottom: 32px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid #252660;
-`;
-
-const PostTitle = styled.h1`
-  font-size: 24px;
-  color: #000;
-  margin-bottom: 32px;
-`;
-
-const MetaInfo = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-  margin-right: 15px;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Username = styled.span`
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: black;
-`;
-
-const Date = styled.span`
-  color: #666;
-  font-size: 14px;
-`;
-
-const ContentContainer = styled.div`
-  display: flex;
-  gap: 32px;
-`;
-
-const MainContent = styled.div`
-  flex: 1;
-  max-width: 70%;
-`;
-
-const ReviewContent = styled.div`
-  font-size: 16px;
-  line-height: 1.6;
-  color: #333;
-`;
-
-const MapContainer = styled.div`
-  margin: 30px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-`;
-
-const MapImage = styled.img`
-  width: 80%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 10px;
-`;
-
-const LocationText = styled.p`
-  color: #666;
-  font-size: 14px;
-  margin-top: 8px;
-`;
-
-const SideContent = styled.div`
-  flex: 0.5;
-  width: 250px;
-  padding-left: 20px;
-  border-left: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const SaveRouteButton = styled.button`
-  width: 50%;
-  height: 60px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  color: black;
-  background-color: #bdaee5;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-weight: 700;
-`;
-
-const RouteList = styled.div`
-  max-height: calc(30px * 5 + 30px * 5);
-  overflow-y: auto;
-  width: 100%;
-  margin-top: 10px;
-  padding-right: 16px;
-  box-sizing: content-box;
-`;
-
-const RouteItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-  gap: 10px;
-`;
-
-const RouteNumber = styled.div`
-  width: 30px;
-  height: 30px;
-  background-color: #bdaee5;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: #252660;
-`;
-
-const RouteName = styled.div`
-  background-color: #f5f5f5;
-  padding: 8px 15px;
-  border-radius: 15px;
-  font-size: 14px;
-  flex: 1;
-  color: black;
-`;
-
-const RouteButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-  width: 100%;
-`;
-
-const Button = styled.button`
-  padding: 12px 24px;
-  border-radius: 20px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 100%;
-  background-color: #252660;
-  color: white;
-  border: none;
-  font-weight: 700;
-`;
-
-const SupportButton = styled(Button)`
-  background-color: #ffc50c;
-  color: #252660;
-`;
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 30px 40px;
-  border-radius: 20px;
-  width: 606px;
-  height: 152px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const ModalTitle = styled.div`
-  color: black;
-  font-size: 24px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #000;
-  text-align: center;
-  font-family: 'Gothic A1';
-  font-weight: 600;
-  word-wrap: break-word;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 150px;
-  margin-top: 15px;
-`;
-
-const ModalButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: black;
-  padding: 10px;
-  font-family: 'Gothic A1';
-  font-weight: 600;
-  word-wrap: break-word;
-`;
+import * as S from '../styles/review/ReviewPage.style';
+import { RouteData } from '@/types/review/route';
+// import axios from 'axios';
 
 const ReviewPage5 = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const isLoggedIn = false; // 실제로는 로그인 상태 관리 로직이 필요합니다
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveRoute = () => {
-    if (!isLoggedIn) {
-      setShowLoginModal(true);
-    } else {
-      // 루트 저장 로직
-      console.log('루트 저장');
+  // 토큰 스토리지로 로그인 상태 확인
+  // const isLoggedIn = !!tokenStorage.getAccessToken();
+
+  const handleSaveRoute = async () => {
+    try {
+      setIsSaving(true);
+      const currentReviewId = reviewData.id;
+
+      console.log('Attempting to save route:', {
+        reviewId: currentReviewId,
+        routeData,
+      });
+
+      const response = await saveRoute(currentReviewId, routeData);
+
+      if (response.isSuccess) {
+        alert('루트가 성공적으로 저장되었습니다.');
+      } else {
+        alert(response.message || '루트 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Full Error Object:', error);
+      alert('루트 저장 중 예상치 못한 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
+
   const reviewData = {
     id: 1,
     title: '유명한이 지금까지 코난한테 맞은 마취총 개수 아는 사람',
@@ -278,7 +49,7 @@ const ReviewPage5 = () => {
     location: 'Teramachi-202 Maehibocho, Konan, Aichi 483-8336 일본',
   };
 
-  const routeData = [
+  const routeData: RouteData[] = [
     { id: 1, order: 1, name: '루트루트루트이룰이룰이룰', description: '첫 번째 장소' },
     { id: 2, order: 2, name: '루트루트이룰이룰이룰', description: '두 번째 장소' },
     { id: 3, order: 3, name: '루트루트이룰이룰이룰이룰', description: '세 번째 장소' },
@@ -289,61 +60,63 @@ const ReviewPage5 = () => {
   const sortedRouteData = [...routeData].sort((a, b) => a.order - b.order);
 
   return (
-    <Container>
-      <BreadcrumbNav>후기 {'>'} 명탐정 코난</BreadcrumbNav>
+    <S.Container>
+      <S.BreadcrumbNav>후기 {'>'} 명탐정 코난</S.BreadcrumbNav>
 
-      <WhiteContainer>
-        <HeaderContainer>
-          <PostTitle>{reviewData.title}</PostTitle>
-          <MetaInfo>
-            <Avatar>
+      <S.WhiteContainer>
+        <S.HeaderContainer>
+          <S.PostTitle>{reviewData.title}</S.PostTitle>
+          <S.MetaInfo>
+            <S.Avatar>
               <img src={reviewData.profileImage} alt={`${reviewData.author}의 프로필`} />
-            </Avatar>
-            <UserInfo>
-              <Username>{reviewData.author}</Username>
-              <Date>{reviewData.date}</Date>
-            </UserInfo>
-          </MetaInfo>
-        </HeaderContainer>
+            </S.Avatar>
+            <S.UserInfo>
+              <S.Username>{reviewData.author}</S.Username>
+              <S.Date>{reviewData.date}</S.Date>
+            </S.UserInfo>
+          </S.MetaInfo>
+        </S.HeaderContainer>
 
-        <ContentContainer>
-          <MainContent>
-            <ReviewContent>{reviewData.content}</ReviewContent>
-            <MapContainer>
-              <MapImage src={mapImage} alt="위치 지도" />
-              <LocationText>{reviewData.location}</LocationText>
-            </MapContainer>
-          </MainContent>
+        <S.ContentContainer>
+          <S.MainContent>
+            <S.ReviewContext>{reviewData.content}</S.ReviewContext>
+            <S.MapContainer>
+              <S.MapImage src={mapImage} alt="위치 지도" />
+              <S.LocText>{reviewData.location}</S.LocText>
+            </S.MapContainer>
+          </S.MainContent>
 
-          <SideContent>
-            <SaveRouteButton onClick={handleSaveRoute}>루트 저장하기</SaveRouteButton>
-            <RouteList>
+          <S.SideContent>
+            <S.SaveRouteButton onClick={handleSaveRoute} disabled={isSaving}>
+              {isSaving ? '저장 중...' : '루트 저장하기'}
+            </S.SaveRouteButton>
+            <S.RouteList>
               {sortedRouteData.map((route) => (
-                <RouteItem key={route.id}>
-                  <RouteNumber>{route.order}</RouteNumber>
-                  <RouteName title={route.description}>{route.name}</RouteName>
-                </RouteItem>
+                <S.RouteItem key={route.id}>
+                  <S.RouteNumber>{route.order}</S.RouteNumber>
+                  <S.RouteName title={route.description}>{route.name}</S.RouteName>
+                </S.RouteItem>
               ))}
-            </RouteList>
-            <RouteButtonContainer>
-              <Button>루트 지도에서 보기</Button>
-              <SupportButton>후기 후원하기</SupportButton>
-            </RouteButtonContainer>
-          </SideContent>
-        </ContentContainer>
-      </WhiteContainer>
+            </S.RouteList>
+            <S.RouteButtonContainer>
+              <S.Button>루트 지도에서 보기</S.Button>
+              <S.SupportButton>후기 후원하기</S.SupportButton>
+            </S.RouteButtonContainer>
+          </S.SideContent>
+        </S.ContentContainer>
+      </S.WhiteContainer>
       {showLoginModal && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalTitle>로그인 후 이용해주세요</ModalTitle>
-            <ButtonGroup>
-              <ModalButton onClick={() => setShowLoginModal(false)}>뒤로가기</ModalButton>
-              <ModalButton>로그인</ModalButton>
-            </ButtonGroup>
-          </ModalContent>
-        </ModalOverlay>
+        <S.ModalOverlay>
+          <S.ModalContent>
+            <S.ModalTitle>로그인 후 이용해주세요</S.ModalTitle>
+            <S.ButtonGroup>
+              <S.ModalButton onClick={() => setShowLoginModal(false)}>뒤로가기</S.ModalButton>
+              <S.ModalButton>로그인</S.ModalButton>
+            </S.ButtonGroup>
+          </S.ModalContent>
+        </S.ModalOverlay>
       )}
-    </Container>
+    </S.Container>
   );
 };
 

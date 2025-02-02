@@ -1,8 +1,9 @@
-// newsetpw
+import {useState} from 'react';
 import { Container,NewsetpwBox, Title, DetailText, 
   FormGroup,Name,Input,Divider, ActionLink, Text} 
   from '../styles/login/newsetpw.style';
-  
+import {authAPI} from '../api/login/authAPI';
+
 const NewSetPWPage: React.FC = () => {
   return (
     <Container>

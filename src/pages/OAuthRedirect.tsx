@@ -1,55 +1,44 @@
-/*import {useDispatch} from 'react-redux';
-import {actionCreators as userActions} from  'react-loader-spinner';
-import {useNavigate} from 'react-router-dom';
-import AuthenticationService from '../api/AuthenticationService';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/login/useAuth';
 
-const OAuthRedirectHandler = (props) => {
-    const code = new URL(window.location.href).searchParams.get("code");
-    const navigate = useNavigate(); 
+const OAuthRedirectHandler = () => {
+  const { oauthLogin } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-        useEffect(async() => {
-            // 성공 시 일반 로그인과 마찬가지로 http로 응답받은
-            // JWT token을 로컬 스토리지에 저장하고 로그인 처리되며 메인으로 이동동
-            await AuthenticationService.kakaoLogin(code)
-            .then((response) => {
-                console.log('kakaoLogin');
-                console.log(response.data.data.token);
-                console.log(response.data.data.userEmail);
-                AuthenticationService.registerSuccessfulLoginForJwt(response.data.data.userEmail, response.data.data.token);
-            })
-            .catch(error) => {
-                console.log('kakaoLogin Failed');
-            });
-            Navigate('/main');
-            },[]);
-            await AuthenticationService.naverLogin(code)
-            .then((response) => {
-                console.log('naverLogin');
-                console.log(response.data.data.token);
-                console.log(response.data.data.userEmail);
-                AuthenticationService.registerSuccessfulLoginForJwt(response.data.data.userEmail, response.data.data.token);
-            })
-            .catch(error) => {
-                console.log('naverLogin Failed');
-            });
-            Navigate('/main');
-            },[]);
-            await AuthenticationService.googleLogin(code)
-            .then((response) => {
-                console.log('googleLogin');
-                console.log(response.data.data.token);
-                console.log(response.data.data.userEmail);
-                AuthenticationService.registerSuccessfulLoginForJwt(response.data.data.userEmail, response.data.data.token);
-            })
-            .catch(error) => {
-                console.log('googleLogin Failed');
-            });
-            Navigate('/main');
-            },[]);
-return (
-    <div>
-        잠시만 기다려주세요 ! 로그인 중입니다.
-    </div>
-);
+  const code: string | null = new URL(window.location.href).searchParams.get('code');
+
+  useEffect(() => {
+    const handleLogin = async () => {
+      if (!code) {
+        console.error('Authorization code not found.');
+        alert('잘못된 접근입니다. 다시 시도해주세요.');
+        navigate('/');
+        return;
+      }
+
+      let provider: 'google' | 'kakao' | 'naver' | null = null;
+      if (location.pathname.includes('kakao')) provider = 'kakao';
+      else if (location.pathname.includes('naver')) provider = 'naver';
+      else if (location.pathname.includes('google')) provider = 'google';
+
+      if (provider) {
+        try {
+          await oauthLogin(provider, code); // ⬅ 객체가 아닌 문자열 전달
+          navigate('/main');
+        } catch (error) {
+          console.error('OAuth Login failed:', error);
+          alert('로그인에 실패했습니다. 다시 시도해주세요.');
+          navigate('/');
+        }
+      }
+    };
+
+    handleLogin();
+  }, [code, navigate, oauthLogin]);
+
+  return <div>로그인 중입니다. 잠시만 기다려 주세요...</div>;
 };
-export default OAuthRedirectHandler;*/
+
+export default OAuthRedirectHandler;

@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import { MapPin } from 'lucide-react';
 import profile from '../assets/profile.png';
 import profile2 from '../assets/profile2.png';
@@ -9,6 +8,11 @@ import NextPage from '../assets/NextPage.png';
 import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
+import * as S from '../styles/review/ReviewPage.style';
+import { createShortReview } from '@/api/review/short-review';
+import { ShortReviewRequest } from '@/types/review/short-review';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface Review {
   id: number;
@@ -112,383 +116,6 @@ const reviewData = [
   },
 ];
 
-const Container = styled.div`
-  background-color: #0c004b;
-  width: 100vw;
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  margin-top: 60px;
-`;
-
-const ContentWrapper = styled.div`
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const LocationBar = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: white;
-  border-radius: 20px;
-  height: 50px;
-  margin-bottom: 10px;
-  padding: 0 20px;
-  width: 400px;
-  position: relative;
-`;
-
-const LocationInput = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const LocationText = styled.input`
-  border: none;
-  padding: 10px;
-  width: 100%;
-  font-size: 14px;
-  outline: none;
-`;
-
-const SaveLocationButton = styled.button`
-  background-color: #e6e0ff;
-  color: #000;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  position: absolute;
-  right: -130px;
-  top: 50%;
-  transform: translateY(-50%);
-`;
-
-const DropdownButton = styled.div`
-  background-color: #0c004b;
-  color: white;
-  border: 1px solid white;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  display: inline-block;
-`;
-
-const TagContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-`;
-
-const Tag = styled.div`
-  background-color: #e6e0ff;
-  color: #000;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-`;
-
-const WhiteContainer = styled.div`
-  background-color: #0c004b;
-  width: 100%;
-  border-radius: 20px;
-  padding: 30px;
-  box-sizing: border-box;
-  color: white;
-`;
-
-const ReviewGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 60px;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const ProfileContainer = styled.div`
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-left: 20px;
-`;
-
-const ProfileImage = styled.img`
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background-color: gray;
-  margin-bottom: 10px;
-  object-fit: cover;
-`;
-
-const ProfileInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ProfileName = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-`;
-
-const ReviewProfileContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  margin-left: 20px;
-`;
-
-const ReviewProfileImage = styled.img`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: gray;
-  margin-bottom: 0px;
-  object-fit: cover;
-`;
-
-const ReviewProfileInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const ReviewProfileName = styled.div`
-  font-size: 15px;
-  margin-left: 5px;
-  color: black; /* 이름 색을 검정색으로 설정 */
-  text-align: left;
-`;
-
-const FeedbackSection = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 100px;
-`;
-
-const FeedbackInput = styled.textarea`
-  width: 800px;
-  height: 150px;
-  border-radius: 10px;
-  border: none;
-  padding: 10px;
-  font-size: 14px;
-  resize: none;
-  box-sizing: border-box;
-  outline: none;
-`;
-
-const Header = styled.h1`
-  margin-top: 50px;
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: white;
-  position: relative;
-  padding-bottom: 20px;
-  padding-left: 10px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 95%;
-    height: 0.5px;
-    background-color: white;
-  }
-`;
-
-const IconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const FeedbackButtonsWrapper = styled.div`
-  display: flex;
-  gap: 15px; /* 버튼들 사이의 간격 설정 */
-  justify-content: center; /* 버튼들을 가운데 정렬 */
-  margin-top: 20px; /* 버튼들과 콘텐츠 사이에 간격 추가 */
-  bottom: 10px;
-  right: 10px;
-  justify-content: flex-end;
-  position: absolute;
-`;
-
-const ReviewContent = styled.p`
-  font-size: 18px; /* 글씨 크기 증가 */
-  font-weight: bold; /* 글자 두껍게 */
-  margin: 10px 0; /* 여백 추가 (필요에 따라 조정) */
-  color: black; /* 글자 색상 */
-  text-align: left;
-  white-space: pre-line;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  font-family: 'Gothic A1';
-  font-weight: '600';
-  word-wrap: 'break-word';
-`;
-const SubmitButton = styled.button`
-  background-color: white;
-  color: #0c004b;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-
-  &:hover {
-    background-color: #f0f0f0;
-  }
-`;
-const EditDeleteButtons = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  display: flex;
-  gap: 0px;
-  outline: none;
-  margin-left: 5px;
-`;
-
-const ActionButton = styled.button`
-  background: white;
-  color: black;
-  border: none;
-  border-radius: 4px;
-  padding: 1px 1px;
-  font-size: 12px;
-  cursor: pointer;
-  outline: none;
-  color: '#464654';
-
-  font-family: 'Gothic A1';
-  font-weight: '500';
-  word-wrap: 'break-word';
-  &:focus {
-    outline: none;
-    border: none;
-  }
-
-  &:hover {
-    background: #f5f5f5;
-  }
-`;
-
-const ReviewItem = styled.div`
-  background-color: white;
-  color: #000;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  font-size: 14px;
-  width: 250px;
-  min-height: 250px;
-  position: relative;
-`;
-
-// FeedbackButton 하나로 통합
-const FeedbackButton = styled.div`
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  gap: 10px;
-  &:hover {
-    opacity: 0.8;
-  }
-  outline: none;
-`;
-
-// InlineEditTextArea 추가
-const InlineEditTextArea = styled.textarea`
-  width: 100%;
-  height: 120px;
-  outline: none;
-  border-radius: 8px;
-  font-size: 18px;
-  margin-top: 20px;
-  line-height: 1.5;
-  color: black;
-  font-weight: bold;
-  resize: none;
-  margin: 10px 0;
-  font-family: inherit;
-  overflow-y: auto;
-`;
-const StarRatingInput = styled.div`
-  display: flex;
-  gap: 4px;
-  height: 32px;
-
-  span {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-  }
-`;
-
-const ReviewStarRating = styled.div`
-  display: flex;
-  gap: 4px;
-  height: 32px;
-
-  span {
-    display: flex;
-    align-items: center;
-  }
-`;
-
-const ButtonDivider = styled.img`
-  height: 17px; // 필요한 높이로 조절
-  margin: 5px;
-`;
-const Pagination = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-  color: white;
-`;
-
-const PaginationButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-
-  img {
-    width: 8px;
-    height: 15px;
-  }
-`;
-
 const ReviewPage4 = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 6;
@@ -502,6 +129,18 @@ const ReviewPage4 = () => {
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const { placeId } = useParams<{ placeId: string }>();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!placeId) {
+      console.error('No placeId available');
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      navigate('/places'); // 또는 적절한 페이지로 이동
+      return;
+    }
+  }, [placeId, navigate]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -518,7 +157,12 @@ const ReviewPage4 = () => {
   const [editRating, setEditRating] = useState(0);
 
   // 리뷰 추가 핸들러
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
+    if (!placeId) {
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      return;
+    }
+
     if (reviewText.trim() === '') {
       window.confirm('후기를 등록해주세요!');
       return;
@@ -527,21 +171,46 @@ const ReviewPage4 = () => {
       window.confirm('별점을 등록해주세요!');
       return;
     }
-    const newReview: Review = {
-      id: reviews.length + 1,
-      profileImage: profileData.profileImage,
-      username: profileData.name,
-      rating: inputRating, // profileData.rating 대신 inputRating 사용
-      maxRating: 4, // 최대 별점을 4로 고정
-      likes: 0,
-      dislikes: 0,
-      content: reviewText,
-      userVote: null,
-    };
 
-    setReviews([newReview, ...reviews]);
-    setReviewText('');
-    setInputRating(0); // 입력 후 별점 초기화
+    setIsSubmitting(true);
+    try {
+      console.log('Submitting review for placeId:', placeId);
+
+      const reviewData: ShortReviewRequest = {
+        placeAnimationId: 2, // 애니메이션 ID는 실제 데이터로 교체 필요
+        rating: inputRating,
+        content: reviewText.trim(),
+      };
+
+      const response = await createShortReview(Number(placeId), reviewData);
+      console.log('Review submission response:', response);
+
+      if (response.isSuccess) {
+        const newReview: Review = {
+          id: response.result.reviewId,
+          profileImage: profileData.profileImage,
+          username: profileData.name,
+          rating: inputRating,
+          maxRating: 4,
+          likes: 0,
+          dislikes: 0,
+          content: reviewText,
+          userVote: null,
+        };
+
+        setReviews([newReview, ...reviews]);
+        setReviewText('');
+        setInputRating(0);
+        window.confirm('리뷰가 등록되었습니다!');
+      } else {
+        window.confirm('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Error creating review:', error);
+      window.confirm('리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEditStart = (review: Review) => {
@@ -617,33 +286,35 @@ const ReviewPage4 = () => {
   };
 
   return (
-    <Container>
-      <ContentWrapper>
-        <LocationBar>
-          <LocationInput>
+    <S.Container>
+      <S.ContentWrapper>
+        <S.LocationBar>
+          <S.LocationInput>
             <MapPin size={20} color="#0c004b" />
-            <LocationText value="Hanshin Koshien Stadium" readOnly />
-          </LocationInput>
-          <SaveLocationButton>명소 저장하기</SaveLocationButton>
-        </LocationBar>
+            <S.LocationText value="Hanshin Koshien Stadium" readOnly />
+          </S.LocationInput>
+          <S.SaveLocationButton onClick={() => navigate('/saved-places')}>
+            명소 저장하기
+          </S.SaveLocationButton>
+        </S.LocationBar>
 
-        <DropdownButton>다이아몬드 에이스 ▼</DropdownButton>
-        <TagContainer>
-          <Tag>#다이에이</Tag>
-          <Tag>#고시엔</Tag>
-          <Tag>#아구에니</Tag>
-        </TagContainer>
-        <Header>후기 &gt; 한줄 후기</Header>
+        <S.DropdownButton>다이아몬드 에이스 ▼</S.DropdownButton>
+        <S.TagContainer>
+          <S.Tag>#다이에이</S.Tag>
+          <S.Tag>#고시엔</S.Tag>
+          <S.Tag>#아구에니</S.Tag>
+        </S.TagContainer>
+        <S.Header>후기 &gt; 한줄 후기</S.Header>
 
-        <WhiteContainer>
-          <FeedbackSection>
-            <ProfileContainer>
-              <ProfileImage src={profileData.profileImage} alt="프로필 이미지" />
-              <ProfileInfo>
-                <ProfileName>{profileData.name}</ProfileName>
+        <S.WhiteContainer4>
+          <S.FeedbackSection>
+            <S.ProfileContainer>
+              <S.ProfileImage src={profileData.profileImage} alt="프로필 이미지" />
+              <S.ProfileInfo>
+                <S.ProfileName>{profileData.name}</S.ProfileName>
 
                 <div style={{ marginBottom: '10px' }}>
-                  <StarRatingInput>
+                  <S.StarRatingInput>
                     {[1, 2, 3, 4].map((star) => (
                       <span key={star} onClick={() => setInputRating(star)}>
                         <img
@@ -654,32 +325,34 @@ const ReviewPage4 = () => {
                         />
                       </span>
                     ))}
-                  </StarRatingInput>
+                  </S.StarRatingInput>
                 </div>
-              </ProfileInfo>
-            </ProfileContainer>
+              </S.ProfileInfo>
+            </S.ProfileContainer>
             <div style={{ position: 'relative', width: '800px' }}>
-              <FeedbackInput
+              <S.FeedbackInput
                 placeholder="한 줄 후기를 남겨주세요 !"
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
               />
-              <SubmitButton onClick={handleReviewSubmit}>등록하기</SubmitButton>
+              <S.SubmitButton onClick={handleReviewSubmit} disabled={isSubmitting}>
+                {isSubmitting ? '등록 중...' : '등록하기'}
+              </S.SubmitButton>
             </div>
-          </FeedbackSection>
+          </S.FeedbackSection>
 
-          <ReviewGrid>
+          <S.ReviewGrid4>
             {currentReviews.map(
               (
                 review, // reviewData를 reviews로 변경
               ) => (
-                <ReviewItem key={review.id}>
-                  <ReviewProfileContainer>
-                    <ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
-                    <ReviewProfileInfo>
-                      <ReviewProfileName>{review.username}</ReviewProfileName>
+                <S.ReviewItem4 key={review.id}>
+                  <S.ReviewProfileContainer>
+                    <S.ReviewProfileImage src={review.profileImage} alt="프로필 이미지" />
+                    <S.ReviewProfileInfo>
+                      <S.ReviewProfileName>{review.username}</S.ReviewProfileName>
                       {editingId === review.id ? (
-                        <StarRatingInput>
+                        <S.StarRatingInput>
                           {[1, 2, 3, 4].map((star) => (
                             <span key={star} onClick={() => setEditRating(star)}>
                               <img
@@ -690,9 +363,9 @@ const ReviewPage4 = () => {
                               />
                             </span>
                           ))}
-                        </StarRatingInput>
+                        </S.StarRatingInput>
                       ) : (
-                        <ReviewStarRating>
+                        <S.ReviewStarRating>
                           {[1, 2, 3, 4].map((star) => (
                             <span key={star}>
                               <img
@@ -703,77 +376,81 @@ const ReviewPage4 = () => {
                               />
                             </span>
                           ))}
-                        </ReviewStarRating>
+                        </S.ReviewStarRating>
                       )}
-                    </ReviewProfileInfo>
-                  </ReviewProfileContainer>
+                    </S.ReviewProfileInfo>
+                  </S.ReviewProfileContainer>
 
                   {editingId === review.id ? (
-                    <InlineEditTextArea
+                    <S.InlineEditTextArea
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
                       autoFocus
                     />
                   ) : (
-                    <ReviewContent>{review.content}</ReviewContent>
+                    <S.ReviewContent4>{review.content}</S.ReviewContent4>
                   )}
 
                   {review.username === profileData.name && (
-                    <EditDeleteButtons>
+                    <S.EditDeleteButtons>
                       {editingId === review.id ? (
                         <>
-                          <ActionButton onClick={() => handleEditComplete(review.id)}>
+                          <S.ActionButton onClick={() => handleEditComplete(review.id)}>
                             완료
-                          </ActionButton>
-                          <ButtonDivider src={dividerLine} alt="divider" />
-                          <ActionButton onClick={handleEditCancel}>취소</ActionButton>
+                          </S.ActionButton>
+                          <S.ButtonDivider src={dividerLine} alt="divider" />
+                          <S.ActionButton onClick={handleEditCancel}>취소</S.ActionButton>
                         </>
                       ) : (
                         <>
-                          <ActionButton onClick={() => handleEditStart(review)}>수정</ActionButton>
-                          <ButtonDivider src={dividerLine} alt="divider" />
-                          <ActionButton onClick={() => handleDelete(review.id)}>삭제</ActionButton>
+                          <S.ActionButton onClick={() => handleEditStart(review)}>
+                            수정
+                          </S.ActionButton>
+                          <S.ButtonDivider src={dividerLine} alt="divider" />
+                          <S.ActionButton onClick={() => handleDelete(review.id)}>
+                            삭제
+                          </S.ActionButton>
                         </>
                       )}
-                    </EditDeleteButtons>
+                    </S.EditDeleteButtons>
                   )}
 
-                  <FeedbackButtonsWrapper>
-                    <FeedbackButton onClick={() => handleLike(review.id)}>
-                      <IconContainer>
+                  <S.FeedbackButtonsWrapper>
+                    <S.FeedbackButton onClick={() => handleLike(review.id)}>
+                      <S.IconContainer>
                         <ThumbsUp
                           size={20}
                           color={review.userVote === 'like' ? '#ffd700' : '#0c004b'} // 활성화시 파란색, 기본은 회색
                         />
                         <span>{review.likes}</span>
-                      </IconContainer>
-                    </FeedbackButton>
-                    <FeedbackButton onClick={() => handleDislike(review.id)}>
-                      <IconContainer>
+                      </S.IconContainer>
+                    </S.FeedbackButton>
+                    <S.FeedbackButton onClick={() => handleDislike(review.id)}>
+                      <S.IconContainer>
                         <ThumbsDown
                           size={20}
                           color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
                         />
                         <span>{review.dislikes}</span>
-                      </IconContainer>
-                    </FeedbackButton>
-                  </FeedbackButtonsWrapper>
-                </ReviewItem>
+                      </S.IconContainer>
+                    </S.FeedbackButton>
+                  </S.FeedbackButtonsWrapper>
+                </S.ReviewItem4>
               ),
             )}
-          </ReviewGrid>
-        </WhiteContainer>
-        <Pagination>
-          <PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
+          </S.ReviewGrid4>
+        </S.WhiteContainer4>
+        <S.Pagination>
+          <S.PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
             <img src={BackPage} alt="이전 페이지" />
-          </PaginationButton>
+          </S.PaginationButton>
           {currentPage}/{totalPages}
-          <PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+          <S.PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages}>
             <img src={NextPage} alt="다음 페이지" />
-          </PaginationButton>
-        </Pagination>
-      </ContentWrapper>
-    </Container>
+          </S.PaginationButton>
+        </S.Pagination>
+      </S.ContentWrapper>
+    </S.Container>
   );
 };
 

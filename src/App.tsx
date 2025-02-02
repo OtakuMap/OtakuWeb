@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
 import { useAppSelector } from './hooks/reduxHooks';
 
 import styled from 'styled-components';
@@ -25,8 +26,7 @@ import ReviewPage2 from './pages/ReviewPage2';
 import ReviewPage3 from './pages/ReviewPage3';
 import ReviewPage4 from './pages/ReviewPage4';
 import ReviewPage5 from './pages/ReviewPage5';
-import ReviewPage6 from './pages/ReviewPage6';
-import ReviewPage7 from './pages/ReviewPage7';
+import Main from './components/Main';
 
 const AppContainer = styled.div`
   position: relative;
@@ -81,9 +81,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/route" element={<RoutePage />} />
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
-        <Route path="/review3" element={<ReviewPage3 />} />
-        <Route path="/review4" element={<ReviewPage4 />} />
+        <Route path="/places/:placeId/review" element={<ReviewPage3 />} />
+        <Route path="/places/:placeId/short-review" element={<ReviewPage4 />} />
         <Route path="/review5" element={<ReviewPage5 />} />
+        <Route path="/review6" element={<ReviewPage6 />} />
+        <Route path="/review7" element={<ReviewPage7 />} />
+        <Route path="/event/:eventId" element={<EventPage />} />
         <Route path="/route-management" element={<RouteManagement />} />
         <Route path="/saved-places" element={<SavedPlaces />} />
         <Route path="/saved-events" element={<SavedEvents />} />
@@ -98,9 +101,11 @@ const AppRoutes: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   );
 };
