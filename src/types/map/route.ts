@@ -5,7 +5,7 @@ export interface RouteLocation {
   latitude: number;
   longitude: number;
   animeName: string;
-  address: string;
+  // address: string;
   hashtags: string[];
 }
 

@@ -32,7 +32,7 @@ export const useAuth = () => {
           String(response.result.id),
         );
         dispatch(loginSuccess(response.result));
-        navigate('/main');
+        navigate('/');
         console.log('Login successful');
       } else {
         dispatch(loginFailure(response.message));

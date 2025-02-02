@@ -5,6 +5,9 @@ import Search from '../common/Search';
 import BackButton from '../common/BackButton';
 import { Place } from '@/types/map/place';
 import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
@@ -28,6 +31,8 @@ const savedRoutesData = [
 
 const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
@@ -87,12 +92,19 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
     );
   };
 
+  // 저장한 루트 보기 클릭 핸들러
+  const handleSavedRoutesClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    setActiveView(activeView === 'savedRoutes' ? 'none' : 'savedRoutes');
+  };
+
   // favoritePlaces 버튼 클릭 핸들러
   const handleFavoritePlacesClick = () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert('로그인이 필요한 서비스입니다.');
-      navigate('/login');
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
       return;
     }
 
@@ -158,7 +170,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
       <S.ButtonContainer>
         <S.SavedRoutesButton
           isActive={activeView === 'savedRoutes'}
-          onClick={() => setActiveView(activeView === 'savedRoutes' ? 'none' : 'savedRoutes')}
+          onClick={handleSavedRoutesClick}
         >
           저장한 루트 보기
         </S.SavedRoutesButton>

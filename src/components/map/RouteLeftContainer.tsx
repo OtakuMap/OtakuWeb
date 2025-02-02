@@ -20,6 +20,9 @@ import * as S from '../../styles/map/RouteLeftContainer.styles';
 import BackButton from '../common/BackButton';
 import { RouteLocation, RouteData } from '../../types/map/route';
 import RouteDescriptionEditor from './RouteDescriptionEditor';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface RouteLeftContainerProps {
   initialLocations: RouteLocation[];
@@ -70,6 +73,8 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   initialLocations,
   onLocationsChange,
 }) => {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
   const [routeData, setRouteData] = useState<RouteData>({
     title: '다이아몬드 에이스',
@@ -149,8 +154,14 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   }, [selectedId, onLocationsChange]);
 
   const handleSaveRoute = useCallback(() => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    // 로그인된 상태일 때만 저장 로직 실행
     console.log('저장된 루트:', routeData.locations);
-  }, [routeData.locations]);
+  }, [isLoggedIn, routeData.locations, dispatch]);
 
   const handleBack = useCallback(() => {
     window.history.back();

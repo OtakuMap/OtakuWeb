@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 import { saveRoute } from '@/api/review/route';
 // import { tokenStorage } from '@/utils/token'; // 토큰 스토리지 import
 import profileImage from '../assets/profile.png';
@@ -8,6 +11,13 @@ import { RouteData } from '@/types/review/route';
 // import axios from 'axios';
 
 const ReviewPage5 = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
+
+  const handleSaveRoute = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -37,6 +47,8 @@ const ReviewPage5 = () => {
     } finally {
       setIsSaving(false);
     }
+    // 루트 저장 로직
+    console.log('루트 저장');
   };
 
   const reviewData = {
@@ -105,17 +117,6 @@ const ReviewPage5 = () => {
           </S.SideContent>
         </S.ContentContainer>
       </S.WhiteContainer>
-      {showLoginModal && (
-        <S.ModalOverlay>
-          <S.ModalContent>
-            <S.ModalTitle>로그인 후 이용해주세요</S.ModalTitle>
-            <S.ButtonGroup>
-              <S.ModalButton onClick={() => setShowLoginModal(false)}>뒤로가기</S.ModalButton>
-              <S.ModalButton>로그인</S.ModalButton>
-            </S.ButtonGroup>
-          </S.ModalContent>
-        </S.ModalOverlay>
-      )}
     </S.Container>
   );
 };
