@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 import { useAppSelector } from './hooks/reduxHooks';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import styled from 'styled-components';
 import './App.css';
@@ -26,7 +27,10 @@ import ReviewPage2 from './pages/ReviewPage2';
 import ReviewPage3 from './pages/ReviewPage3';
 import ReviewPage4 from './pages/ReviewPage4';
 import ReviewPage5 from './pages/ReviewPage5';
-import Main from './components/Main';
+import ReviewPage6 from './pages/ReviewPage6';
+import ReviewPage7 from './pages/ReviewPage7';
+import EventPage from './pages/EventPage2';
+import LoginModal from './components/common/LoginModal';
 
 const AppContainer = styled.div`
   position: relative;
@@ -34,52 +38,41 @@ const AppContainer = styled.div`
   background-color: #0c004b;
 `;
 
-// Navbar를 조건부로 렌더링하는 컴포넌트
-// const NavigationWrapper = () => {
-//   const location = useLocation();
-//   const hideNavbarPaths = ['/map', '/route'];
+const queryClient = new QueryClient();
 
-//   return hideNavbarPaths.includes(location.pathname) ? null : <Navbar />;
-// };
-
-// 라우팅을 담당할 새로운 컴포넌트
-const AppRoutes: React.FC = () => {
+// 보호된 라우트를 위한 wrapper 컴포넌트
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  const hideNavbarPaths = ['/map', '/route'];
 
   if (!isLoggedIn) {
-    return (
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/search-id-pw" element={<SearchIdPWPage />} />
-        <Route path="/newsetpw" element={<NewSetPWPage />} />
-        <Route path="/my-page" element={<MyPage />} />
-        <Route path="/category" element={<Category />} />
-        <Route path="/route-management" element={<RouteManagement />} />
-        <Route path="/saved-places" element={<SavedPlaces />} />
-        <Route path="/saved-events" element={<SavedEvents />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/cover" element={<Cover />} />
-        <Route path="/review1" element={<ReviewPage1 />} />
-        <Route path="/review2" element={<ReviewPage2 />} />
-        <Route path="/review3" element={<ReviewPage3 />} />
-        <Route path="/review4" element={<ReviewPage4 />} />
-        <Route path="/review5" element={<ReviewPage5 />} />
-        <Route path="/review6" element={<ReviewPage6 />} />
-        <Route path="/review7" element={<ReviewPage7 />} />
-      </Routes>
-    );
+    // 로그인 페이지로 리다이렉트하면서 이전 위치 저장
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  return <>{children}</>;
+};
+
+const AppRoutes: React.FC = () => {
+  const location = useLocation();
+  //navbar를 넣고 싶지 않은 페이지
+  const hideNavbarPaths = ['/login', '/map', '/route', '/signup', '/search-id-pw', '/newsetpw'];
 
   return (
     <AppContainer>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
       <Routes>
+        {/* 공통 라우트 - 로그인 여부와 관계없이 접근 가능 */}
+        <Route path="/" element={<Main />} />
         <Route path="/cover" element={<Cover />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/search-id-pw" element={<SearchIdPWPage />} />
+        <Route path="/newsetpw" element={<NewSetPWPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/route" element={<RoutePage />} />
+        <Route path="/category" element={<Category />} />
+        {/* <Route path="/main" element={<Main />} /> */}
         <Route path="/review1" element={<ReviewPage1 />} />
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/places/:placeId/review" element={<ReviewPage3 />} />
@@ -87,27 +80,71 @@ const AppRoutes: React.FC = () => {
         <Route path="/review5" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
+        <Route path="/event" element={<EventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />
-        <Route path="/route-management" element={<RouteManagement />} />
-        <Route path="/saved-places" element={<SavedPlaces />} />
-        <Route path="/saved-events" element={<SavedEvents />} />
-        <Route path="/my-page" element={<MyPage />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/category" element={<Category />} />
+
+        {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
+        <Route
+          path="/route-management"
+          element={
+            <ProtectedRoute>
+              <RouteManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-places"
+          element={
+            <ProtectedRoute>
+              <SavedPlaces />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-events"
+          element={
+            <ProtectedRoute>
+              <SavedEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-page"
+          element={
+            <ProtectedRoute>
+              <MyPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AppContainer>
   );
 };
 
+// Provider 내부에서 사용될 컴포넌트
+const AppContent: React.FC = () => {
+  const { isLoginModalOpen } = useAppSelector((state) => state.modal);
+
+  return (
+    <>
+      <AppRoutes />
+      {isLoginModalOpen && <LoginModal />}
+    </>
+  );
+};
+
+// 최상위 App 컴포넌트
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </PersistGate>
+      </Provider>
+    </QueryClientProvider>
   );
 };
 
