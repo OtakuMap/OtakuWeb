@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
 import MapContainer from '../../components/map/MapContainer';
 import LocationDetail from '@/components/map/LocationDetail';
 import { RouteLocation } from '@/types/map/route';
+import { PlaceDetails } from '../../utils/mapUtils';
 
 const PageContainer = styled.div`
   display: flex;
-  width: 100vw; // 100vw로 변경
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   margin: 0;
@@ -31,7 +32,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.6245,
     longitude: 139.7755,
     animeName: '기동전사 건담',
-    address: '도쿄도 미나토구 오다이바 1-7-1 다이버시티 도쿄 플라자 7F',
     hashtags: ['건담', '오다이바', '다이버시티도쿄'],
   },
   {
@@ -41,7 +41,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.6985,
     longitude: 139.7715,
     animeName: '스테인즈 게이트',
-    address: '도쿄도 치요다구 소토칸다 1-15-16',
     hashtags: ['아키하바라', '오타쿠', '전자상가'],
   },
   {
@@ -51,7 +50,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.6962,
     longitude: 139.5704,
     animeName: '지브리 작품들',
-    address: '도쿄도 미타카시 시모렌자쿠 1-1-83',
     hashtags: ['지브리', '미야자키하야오', '토토로'],
   },
   {
@@ -61,7 +59,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.708,
     longitude: 139.665,
     animeName: '여러 작품',
-    address: '도쿄도 나카노구 나카노 5-52-15',
     hashtags: ['중고피규어', '레트로게임', '만화'],
   },
   {
@@ -71,7 +68,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.729,
     longitude: 139.7177,
     animeName: '포케몬',
-    address: '도쿄도 도시마구 히가시이케부쿠로 3-1-2 선샤인시티 알파도메 3F',
     hashtags: ['포케몬', '이케부쿠로', '선샤인시티'],
   },
   {
@@ -81,7 +77,6 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.7294,
     longitude: 139.7137,
     animeName: '여러 작품',
-    address: '도쿄도 도시마구 히가시이케부쿠로 1-20-7',
     hashtags: ['애니메이트', '이케부쿠로', '굿즈'],
   },
   {
@@ -91,14 +86,38 @@ const sampleLocations: RouteLocation[] = [
     latitude: 35.7016,
     longitude: 139.7741,
     animeName: '여러 작품',
-    address: '도쿄도 치요다구 소토칸다 6-27-9',
     hashtags: ['니코니코', '아키하바라', '동영상'],
   },
 ];
 
 const RoutePage = () => {
+  const mapInstance = useRef<google.maps.Map | null>(null); // 추가
   const [locations, setLocations] = useState<RouteLocation[]>(sampleLocations);
   const [selectedLocation, setSelectedLocation] = useState<RouteLocation | null>(null);
+  const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<PlaceDetails | undefined>(
+    undefined,
+  );
+
+  const handleMarkerClick = (location: RouteLocation, placeDetails?: PlaceDetails) => {
+    console.log('Location selected:', location);
+    console.log('Place details:', placeDetails);
+    setSelectedLocation(location);
+    setSelectedPlaceDetails(placeDetails);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedLocation(null);
+    setSelectedPlaceDetails(undefined);
+    // mapSettings의 zoom level로 되돌리기
+    if (window.google?.maps && mapInstance.current) {
+      mapInstance.current.setZoom(mapSettings.zoom);
+      mapInstance.current.panTo(mapSettings.center);
+    }
+  };
+
+  const handleLocationsChange = (newLocations: RouteLocation[]) => {
+    setLocations(newLocations);
+  };
 
   // 중심점과 줌 레벨 계산
   const mapSettings = useMemo(() => {
@@ -138,30 +157,16 @@ const RoutePage = () => {
     const lngDiff = bounds.maxLng - bounds.minLng;
     const maxDiff = Math.max(latDiff, lngDiff);
 
-    // 거리에 따른 줌 레벨 조정
-    let zoom = 13; // 기본값
+    let zoom = 13;
     if (maxDiff > 0.2) zoom = 12;
     if (maxDiff > 0.5) zoom = 11;
     if (maxDiff > 1) zoom = 10;
 
-    // 마진을 조금 주기 위해 약간의 패딩 효과
-    const padding = 0.02; // 약간의 여백
+    const padding = 0.02;
     center.lat += padding;
 
     return { center, zoom };
   }, [locations]);
-
-  const handleMarkerClick = (location: RouteLocation) => {
-    setSelectedLocation(location);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedLocation(null);
-  };
-
-  const handleLocationsChange = (newLocations: RouteLocation[]) => {
-    setLocations(newLocations);
-  };
 
   return (
     <PageContainer>
@@ -172,10 +177,16 @@ const RoutePage = () => {
           center={mapSettings.center}
           zoom={mapSettings.zoom}
           locations={locations}
+          selectedLocation={selectedLocation}
           onMarkerClick={handleMarkerClick}
+          ref={mapInstance}
         />
         {selectedLocation && (
-          <LocationDetail location={selectedLocation} onClose={handleCloseDetail} />
+          <LocationDetail
+            location={selectedLocation}
+            placeDetails={selectedPlaceDetails}
+            onClose={handleCloseDetail}
+          />
         )}
       </MapWrapper>
     </PageContainer>

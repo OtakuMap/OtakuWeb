@@ -8,9 +8,14 @@ import { useNavigate } from 'react-router-dom';
 import BackPage from '../assets/BackPage.png';
 import NextPage from '../assets/NextPage.png';
 import * as S from '../styles/review/ReviewPage.style';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 const ReviewPage6 = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 3;
   const profileData = {
@@ -98,6 +103,14 @@ const ReviewPage6 = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
+  const handleWriteReviewClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    navigate('/review7');
+  };
+
   return (
     <S.Container>
       <S.ProfileSection>
@@ -110,7 +123,7 @@ const ReviewPage6 = () => {
         </S.ProfileImage6>
         <S.DiamondRight src={diamondRight} alt="Right Diamond" />
         <S.Username6>{profileData.name}</S.Username6>
-        <S.WriteReviewButton onClick={() => navigate('/review7')}>후기 쓰기</S.WriteReviewButton>
+        <S.WriteReviewButton onClick={handleWriteReviewClick}>후기 쓰기</S.WriteReviewButton>
       </S.ProfileSection>
 
       <S.WhiteContainer>

@@ -20,6 +20,22 @@ import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
 import product from '../assets/product.png';
 import eventImage from '../assets/eventImg.png';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
+
+interface Review {
+  id: number;
+  profileImage: string;
+  username: string;
+  rating: number;
+  maxRating: number;
+  likes: number;
+  dislikes: number;
+  content: string;
+  userVote: 'like' | 'dislike' | null;
+}
+
 
 // 임시 데이터는 API 연동 전까지 유지
 const tempEventData = {
@@ -126,6 +142,8 @@ const postData = [
 
 const EventPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const { eventId: urlEventId } = useParams<{ eventId: string }>();
   const eventId = Number(urlEventId) || 1;
   const [activeTab, setActiveTab] = useState('기본정보');
@@ -147,7 +165,7 @@ const EventPage = () => {
     handleLike,
     handleDislike,
   } = useReviews(reviewData.map((review) => ({ ...review, userVote: null })));
-
+    
   const {
     reviewText,
     setReviewText,
@@ -156,6 +174,23 @@ const EventPage = () => {
     submitError,
     handleReviewSubmit,
   } = useReviewSubmission(eventId, reviews, setReviews, profileData);
+
+  const handleTextAreaClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      e.stopPropagation();
+      dispatch(openLoginModal());
+    }
+  };
+
+  const handleReviewButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    handleReviewSubmit();
+  };
 
   if (loading) {
     return <div>로딩 중...</div>;
@@ -286,11 +321,15 @@ const EventPage = () => {
                 </S.ProfileSection>
                 <S.InputSection>
                   <S.TextArea
-                    placeholder="한 줄 후기를 남겨주세요!"
+                    placeholder={isLoggedIn ? '한 줄 후기를 남겨주세요!' : '로그인이 필요합니다.'}
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
+                    onClick={handleTextAreaClick}
+                    isNotLoggedIn={!isLoggedIn}
                   />
-                  <S.ReviewButton onClick={handleReviewSubmit}>등록하기</S.ReviewButton>
+                  <S.ReviewButton onClick={handleReviewButtonClick} isNotLoggedIn={!isLoggedIn}>
+                    등록하기
+                  </S.ReviewButton>
                   {submitError && <S.ErrorMessage>{submitError}</S.ErrorMessage>}
                 </S.InputSection>
               </S.InputHeader>
