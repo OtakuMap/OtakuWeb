@@ -117,12 +117,13 @@ export const Input2 = styled.input`
   position: relative;
   bottom: -20px;
   padding: 10px;
-  font-size: 16px;
   background-color: transparent;
   color: #ffffff;
   border: none;
   outline: none;
+  font-size: 18px;
   width: 90%;
+
   &:focus {
     background-color: transparent;
     color: #ffffff;
@@ -133,6 +134,12 @@ export const Input2 = styled.input`
     -webkit-text-fill-color: #ffffff !important; /* 자동 완성된 텍스트 색상 */
     -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
     color: #ffffff !important;
+  }
+
+  &::placeholder {
+    color: #999797; /* Placeholder 색상 */
+    font-size: 18px; /* Placeholder 글꼴 크기 */
+    line-height: 22.5px;
   }
 `;
 
@@ -183,12 +190,11 @@ export const ActionLink = styled.a`
   cursor: pointer;
 `;
 
-export const ActionLink2 = styled.a`
+export const ActionLink2 = styled.div`
   font-family: 'Gothic A1';
   font-weight: 600;
   font-size: 15px;
   color: #cccccc;
-  cursor: pointer;
 `;
 
 export const ShortDivider = styled.hr`
@@ -210,4 +216,21 @@ export const SocialIcon = styled.img`
   height: 68px;
   cursor: pointer;
   border-radius: 50%;
+`;
+
+export const RecentLoginWrapper = styled.img`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 71px;
+  height: 33px;
+`;
+
+export const RecentLoginText = styled.img`
+  position: absolute;
+  color: #101148;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12.5px;
 `;
