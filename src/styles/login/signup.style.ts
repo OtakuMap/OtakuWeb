@@ -220,4 +220,15 @@ export const ActionLink = styled.a`
   margin-bottom: 82px;
 `;
 
+export const CheckIcon1 = styled.img`
+position: absolute;
+margin-left: 423px;
+`;
+
+
+export const CheckIcon2 = styled.img`
+position: absolute;
+margin-right: 17px;
+margin-top: 22px;
+`;
 
