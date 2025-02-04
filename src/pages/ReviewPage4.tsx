@@ -362,15 +362,15 @@ const ReviewPage4 = () => {
                 style={{
                   backgroundColor: !isLoggedIn ? '#f5f5f5' : 'white',
                   cursor: !isLoggedIn ? 'pointer' : 'text',
-                  color: !isLoggedIn ? '#666' : 'inherit',
+                  color: !isLoggedIn ? '#666' : '#000',
                 }}
               />
-              <S.SubmitButton 
-                onClick={handleSubmitButtonClick} 
+              <S.SubmitButton
+                onClick={handleSubmitButtonClick}
                 disabled={!isLoggedIn || isSubmitting}
                 style={{
-                  opacity: (!isLoggedIn || isSubmitting) ? 0.5 : 1,
-                  cursor: (!isLoggedIn || isSubmitting) ? 'not-allowed' : 'pointer',
+                  opacity: !isLoggedIn || isSubmitting ? 0.5 : 1,
+                  cursor: !isLoggedIn || isSubmitting ? 'not-allowed' : 'pointer',
                 }}
               >
                 {isSubmitting ? '등록 중...' : '등록하기'}

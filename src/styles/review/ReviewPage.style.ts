@@ -497,6 +497,7 @@ export const FeedbackInput = styled.textarea`
   resize: none;
   box-sizing: border-box;
   outline: none;
+  color: #000000;
 `;
 
 export const ProfileContainer = styled.div`

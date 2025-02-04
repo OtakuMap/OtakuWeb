@@ -11,6 +11,7 @@ import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
+  onFavoritePlaceClick?: (placeId: number) => void;
 }
 
 // 임시 데이터들 - savedRoutes만 남기고 favoritePlaces는 제거
@@ -29,7 +30,7 @@ const savedRoutesData = [
   },
 ];
 
-const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
+const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
@@ -76,9 +77,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
 
   // placeId를 처리하는 함수
   const handleFavoritePlaceClick = (placeId: number) => {
-    console.log('Fetching details for place:', placeId);
-    // TODO: placeId를 사용하여 장소 상세 정보를 가져오는 API 호출
-    // 예: navigate(`/place/${placeId}`);
+    if (onFavoritePlaceClick) {
+      onFavoritePlaceClick(placeId);
+    }
   };
 
   const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
@@ -150,7 +151,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
               favoritePlaces.map((place) => (
                 <S.RecommendationItem
                   key={place.id}
-                  onClick={() => handleFavoritePlaceClick(place.placeId)}
+                  onClick={() => handleFavoritePlaceClick(place.id)}
                 >
                   <S.RecommendationText>{place.name}</S.RecommendationText>
                 </S.RecommendationItem>

@@ -16,7 +16,7 @@ import RouteManagement from './components/RouteManagement';
 import SavedPlaces from './components/SavedPlaces';
 import SavedEvents from './components/SavedEvents';
 import Navbar from './components/common/Navbar';
-import Main from './components/Main';
+import Main from './components/main/Main';
 import MyPage from './components/MyPage';
 import Cover from './components/Cover';
 import Category from './components/Category';

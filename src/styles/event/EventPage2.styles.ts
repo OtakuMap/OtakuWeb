@@ -219,7 +219,7 @@ export const TextArea = styled.textarea<{ isNotLoggedIn?: boolean }>`
 
   background-color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#f5f5f5' : 'white')};
   cursor: ${({ isNotLoggedIn }) => (isNotLoggedIn ? 'pointer' : 'text')};
-  color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#666' : 'inherit')};
+  color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#666' : '#000')};
 `;
 
 export const ReviewButton = styled.button<{ isNotLoggedIn?: boolean }>`
