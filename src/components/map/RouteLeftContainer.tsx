@@ -23,6 +23,8 @@ import RouteDescriptionEditor from './RouteDescriptionEditor';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { saveCustomRoute } from '@/api/map/routeSave';
+import { toast } from 'react-toastify';
 
 interface RouteLeftContainerProps {
   initialLocations: RouteLocation[];
@@ -76,6 +78,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [routeData, setRouteData] = useState<RouteData>({
     title: '다이아몬드 에이스',
     description: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
@@ -153,15 +156,38 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
     setSelectedId(null);
   }, [selectedId, onLocationsChange]);
 
-  const handleSaveRoute = useCallback(() => {
+  const handleSaveRoute = useCallback(async () => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());
       return;
     }
 
-    // 로그인된 상태일 때만 저장 로직 실행
-    console.log('저장된 루트:', routeData.locations);
-  }, [isLoggedIn, routeData.locations, dispatch]);
+    if (isSaving) return;
+
+    try {
+      setIsSaving(true);
+
+      const routeItems = routeData.locations.map((location, index) => ({
+        name: location.name,
+        placeId: location.id, // 실제 placeId가 있다면 그것을 사용
+        itemOrder: index,
+      }));
+
+      const requestData = {
+        name: routeData.title,
+        routeItems,
+      };
+
+      const response = await saveCustomRoute(requestData);
+      toast.success('루트가 성공적으로 저장되었습니다!');
+      console.log('저장된 루트:', response);
+    } catch (error) {
+      console.error('루트 저장 실패:', error);
+      toast.error('루트 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [isLoggedIn, routeData, dispatch, isSaving]);
 
   const handleBack = useCallback(() => {
     window.history.back();

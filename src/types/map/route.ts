@@ -27,3 +27,23 @@ export interface PlaceLikeDetailResponse {
   isFavorite: boolean;
   hashtags: HashTag[];
 }
+
+export interface RouteItemRequest {
+  name: string;
+  placeId: number;
+  itemOrder: number;
+}
+
+export interface CustomRouteRequest {
+  routeId?: number;
+  name: string;
+  routeItems: RouteItemRequest[];
+}
+
+export interface SaveRouteResponse {
+  id: number;
+  name: string;
+  routeItems: RouteItemRequest[];
+  createdAt: string;
+  updatedAt: string;
+}
