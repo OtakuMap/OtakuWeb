@@ -55,7 +55,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   };
 
   const handleReviewClick = () => {
-    navigate('/review3');
+    // placeLikeDetail이 있으면 placeLikeId를, 없으면 location의 id를 사용
+    const placeId = placeLikeDetail?.placeLikeId || location.id;
+    navigate(`/places/${placeId}/review`);
   };
 
   const handleFavClick = () => {
