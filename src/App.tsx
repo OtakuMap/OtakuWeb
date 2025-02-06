@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate, matchPath } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
@@ -56,11 +56,22 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes: React.FC = () => {
   const location = useLocation();
   //navbar를 넣고 싶지 않은 페이지
-  const hideNavbarPaths = ['/login', '/map', '/route', '/signup', '/search-id-pw', '/newsetpw'];
+  const hideNavbarPaths = [
+    '/login',
+    '/map',
+    '/route',
+    '/route/:routeId',
+    '/signup',
+    '/search-id-pw',
+    '/newsetpw',
+  ];
+
+  // 현재 경로가 hideNavbarPaths 중 하나와 매칭되는지 확인
+  const shouldHideNavbar = hideNavbarPaths.some((path) => matchPath(path, location.pathname));
 
   return (
     <AppContainer>
-      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
+      {!shouldHideNavbar && <Navbar />}
       <Routes>
         {/* 공통 라우트 - 로그인 여부와 관계없이 접근 가능 */}
         <Route path="/" element={<Main />} />
@@ -71,6 +82,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/newsetpw" element={<NewSetPWPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/route" element={<RoutePage />} />
+        <Route path="/route/:routeId" element={<RoutePage />} />
         <Route path="/category" element={<Category />} />
         {/* <Route path="/main" element={<Main />} /> */}
         <Route path="/review1" element={<ReviewPage1 />} />

@@ -7,7 +7,7 @@ export const saveCustomRoute = async (
   try {
     // 요청 데이터 로깅
     console.log('=== 루트 저장 요청 데이터 ===');
-    console.log('Route ID:', routeData);
+    console.log('Route:', routeData);
 
     const response = await instance.post<{
       isSuccess: boolean;

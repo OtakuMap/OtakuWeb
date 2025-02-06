@@ -8,6 +8,7 @@ import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { RouteSource } from '@/types/map/routeSource';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
@@ -132,7 +133,16 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
         return (
           <S.RecommendationsContainer>
             {savedRoutesData.map((route) => (
-              <S.RecommendationItem key={route.id} onClick={() => navigate('/route')}>
+              <S.RecommendationItem
+                key={route.id}
+                onClick={() =>
+                  navigate(`/route/${route.id}`, {
+                    state: {
+                      routeSource: RouteSource.SAVED_ROUTE,
+                    },
+                  })
+                }
+              >
                 <S.RecommendationText>{route.title}</S.RecommendationText>
               </S.RecommendationItem>
             ))}

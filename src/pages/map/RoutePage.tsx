@@ -1,10 +1,12 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
 import MapContainer from '../../components/map/MapContainer';
 import LocationDetail from '@/components/map/LocationDetail';
 import { RouteLocation } from '@/types/map/route';
 import { PlaceDetails } from '../../utils/mapUtils';
+import { RouteSource } from '@/types/map/routeSource';
 
 const PageContainer = styled.div`
   display: flex;
@@ -90,9 +92,26 @@ const sampleLocations: RouteLocation[] = [
   },
 ];
 
+interface RouteState {
+  routeSource: RouteSource;
+  initialLocations?: RouteLocation[]; // 후기에서 넘어올 때 사용
+}
+
 const RoutePage = () => {
-  const mapInstance = useRef<google.maps.Map | null>(null); // 추가
-  const [locations, setLocations] = useState<RouteLocation[]>(sampleLocations);
+  const { routeId } = useParams<{ routeId: string }>();
+  const location = useLocation();
+  const state = location.state as RouteState;
+
+  const routeSource = state?.routeSource || RouteSource.SAVED_ROUTE;
+  const initialLocations = state?.initialLocations || sampleLocations;
+
+  // routeId가 URL에 있으면 그것을 사용하고, 없으면 state에서 가져옴
+  const currentRouteId = routeId ? parseInt(routeId) : undefined;
+
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const [locations, setLocations] = useState<RouteLocation[]>(
+    state?.initialLocations || sampleLocations,
+  );
   const [selectedLocation, setSelectedLocation] = useState<RouteLocation | null>(null);
   const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<PlaceDetails | undefined>(
     undefined,
@@ -170,7 +189,12 @@ const RoutePage = () => {
 
   return (
     <PageContainer>
-      <RouteLeftContainer initialLocations={locations} onLocationsChange={handleLocationsChange} />
+      <RouteLeftContainer
+        initialLocations={initialLocations}
+        onLocationsChange={handleLocationsChange}
+        routeSource={routeSource}
+        routeId={currentRouteId}
+      />
       <MapWrapper>
         <MapContainer
           apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}

@@ -9,8 +9,14 @@ export interface RouteLocation {
   isSelected: boolean;
   latitude: number;
   longitude: number;
-  animeName: string;
-  hashtags: HashTag[]; // HashTag 타입으로 변경
+  animeName?: string;
+  hashtags?: string[];
+}
+
+export interface RouteData {
+  title: string;
+  description: string;
+  locations: RouteLocation[];
 }
 
 export interface LocationDetail extends RouteLocation {
@@ -35,15 +41,34 @@ export interface RouteItemRequest {
 }
 
 export interface CustomRouteRequest {
-  routeId?: number;
   name: string;
-  routeItems: RouteItemRequest[];
+  routeItems: {
+    name: string;
+    placeId: number;
+    itemOrder: number;
+  }[];
+}
+
+export interface UpdateRouteRequest {
+  name: string;
+  routeId: number;
+  routeItems: {
+    placeId: number;
+    itemOrder: number;
+  }[];
 }
 
 export interface SaveRouteResponse {
-  id: number;
-  name: string;
-  routeItems: RouteItemRequest[];
-  createdAt: string;
+  routeId: number;
   updatedAt: string;
+}
+
+export interface RouteResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    routeId: number;
+    updatedAt: string;
+  };
 }
