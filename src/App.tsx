@@ -76,6 +76,7 @@ const AppRoutes: React.FC = () => {
         {/* 공통 라우트 - 로그인 여부와 관계없이 접근 가능 */}
         <Route path="/" element={<Main />} />
         <Route path="/cover" element={<Cover />} />
+        <Route path="/my-page" element={<MyPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/search-id-pw" element={<SearchIdPWPage />} />
@@ -89,7 +90,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/review2" element={<ReviewPage2 />} />
         <Route path="/places/:placeId/review" element={<ReviewPage3 />} />
         <Route path="/places/:placeId/short-review" element={<ReviewPage4 />} />
-        <Route path="/review5" element={<ReviewPage5 />} />
+        <Route path="/review/:reviewId" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
         <Route path="/event" element={<EventPage />} />

@@ -497,7 +497,7 @@ export const FeedbackInput = styled.textarea`
   resize: none;
   box-sizing: border-box;
   outline: none;
-  color: #000000;
+  color: black;
 `;
 
 export const ProfileContainer = styled.div`
@@ -1164,4 +1164,73 @@ export const Button7 = styled.button`
   font-weight: 700;
   margin-top: 10px;
   align-self: center;
+`;
+
+export const SelectText = styled.span`
+  color: #0c004b;
+`;
+
+export const ArrowIcon = styled.span`
+  color: #0c004b;
+`;
+export const SelectBoxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+`;
+
+export const SelectBox = styled.div`
+  position: relative;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  color: #0c004b;
+`;
+
+export const DropdownList = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  z-index: 1;
+`;
+
+export const DropdownItem = styled.div`
+  padding: 10px;
+  cursor: pointer;
+  color: #0c004b;
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+export const SeInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  &:focus {
+    outline: none;
+  }
+`;
+export const ReviewFormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* SelectBoxContainer와 RouteSection 사이 간격 조절 */
+`;
+export const NoResults = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
 `;

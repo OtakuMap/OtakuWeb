@@ -99,7 +99,7 @@ export const IconWrapper = styled.div<{
   }
 `;
 
-export const Overlay = styled.div<{ isVisible: boolean }>`
+export const Overlay = styled.div<{ $isVisible: boolean }>`
   position: fixed;
   top: 71px; // 89px * 0.8
   left: 0;
@@ -107,7 +107,7 @@ export const Overlay = styled.div<{ isVisible: boolean }>`
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: ${(props) => (props.isVisible ? 'block' : 'none')};
+  display: ${(props) => (props.$isVisible ? 'block' : 'none')};
 `;
 
 export const AlarmPopup = styled.div`

@@ -147,6 +147,21 @@ const ReviewPage4 = () => {
     }
   }, [placeId, navigate]);
 
+  useEffect(() => {
+    const savedReviews = localStorage.getItem(`reviews_${placeId}`);
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews));
+    } else {
+      setReviews(reviewData.map((review) => ({ ...review, userVote: null })));
+    }
+  }, [placeId]);
+
+  useEffect(() => {
+    if (placeId) {
+      localStorage.setItem(`reviews_${placeId}`, JSON.stringify(reviews));
+    }
+  }, [reviews, placeId]);
+
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
@@ -163,36 +178,18 @@ const ReviewPage4 = () => {
 
   // 리뷰 추가 핸들러
   const handleReviewSubmit = async () => {
-    if (!placeId) {
-      window.confirm('장소 정보를 찾을 수 없습니다.');
-      return;
-    }
-
-    if (reviewText.trim() === '') {
-      window.confirm('후기를 등록해주세요!');
-      return;
-    }
-    if (inputRating === 0) {
-      window.confirm('별점을 등록해주세요!');
-      return;
-    }
-
-    setIsSubmitting(true);
     try {
-      console.log('Submitting review for placeId:', placeId);
-
-      const reviewData: ShortReviewRequest = {
-        placeAnimationId: 2, // 애니메이션 ID는 실제 데이터로 교체 필요
+      const requestData: ShortReviewRequest = {
+        placeAnimationId: 2,
         rating: inputRating,
         content: reviewText.trim(),
       };
 
-      const response = await createShortReview(Number(placeId), reviewData);
-      console.log('Review submission response:', response);
+      const result = await createShortReview(Number(placeId), requestData);
 
-      if (response.isSuccess) {
+      if (result.isSuccess) {
         const newReview: Review = {
-          id: response.result.reviewId,
+          id: result.result.reviewId,
           profileImage: profileData.profileImage,
           username: profileData.name,
           rating: inputRating,
@@ -203,16 +200,21 @@ const ReviewPage4 = () => {
           userVote: null,
         };
 
-        setReviews([newReview, ...reviews]);
+        setReviews((prevReviews) => {
+          const uniqueReviews = [newReview, ...prevReviews].filter(
+            (review, index, self) => index === self.findIndex((r) => r.id === review.id),
+          );
+          return uniqueReviews;
+        });
+
         setReviewText('');
         setInputRating(0);
+        setCurrentPage(1);
         window.confirm('리뷰가 등록되었습니다!');
-      } else {
-        window.confirm('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('Error creating review:', error);
-      window.confirm('리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('Error:', error);
+      window.confirm('리뷰 등록 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
