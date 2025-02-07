@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { tokenStorage } from '../utils/token';
 
-const API_BASE = window.location.hostname === 'localhost' ? import.meta.env.VITE_API_URL : '/api';
+const API_BASE =
+  window.location.hostname === 'localhost'
+    ? '/api' // 로컬에서는 프록시 사용
+    : '/api'; // 배포 환경에서도 동일하게
 
 const instance = axios.create({
   baseURL: API_BASE,
