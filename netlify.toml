@@ -4,7 +4,10 @@
   to = "${VITE_API_URL}/api/:splat"
   status = 200
   force = true
-
+  headers = {
+    X-Redirect-Info = "Redirected by Netlify"
+  }
+  
 # SPA 라우팅을 위한 리다이렉트
 [[redirects]]
   from = "/*"

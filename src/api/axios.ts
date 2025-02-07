@@ -19,7 +19,10 @@ instance.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getAccessToken();
     console.log('Request interceptor token:', token); // 토큰 확인 로그
-    console.log('Request Config:', config); // 전체 설정 확인
+    console.log('Base URL:', config.baseURL);
+    console.log('Path:', config.url);
+    console.log('Method:', config.method);
+    console.log('Headers:', config.headers);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
