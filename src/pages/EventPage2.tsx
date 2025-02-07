@@ -24,19 +24,6 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 
-interface Review {
-  id: number;
-  profileImage: string;
-  username: string;
-  rating: number;
-  maxRating: number;
-  likes: number;
-  dislikes: number;
-  content: string;
-  userVote: 'like' | 'dislike' | null;
-}
-
-
 // 임시 데이터는 API 연동 전까지 유지
 const tempEventData = {
   title: '다이아몬드 에이스 ACT2 팝업스토어',
@@ -165,7 +152,7 @@ const EventPage = () => {
     handleLike,
     handleDislike,
   } = useReviews(reviewData.map((review) => ({ ...review, userVote: null })));
-    
+
   const {
     reviewText,
     setReviewText,

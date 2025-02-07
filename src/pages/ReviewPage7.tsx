@@ -1,8 +1,9 @@
-import { useState } from 'react';
 import profile from '../assets/profile.png';
 import picture from '../assets/picture.png';
 import mapIcon from '../assets/mapIcon.png';
 import * as S from '../styles/review/ReviewPage.style';
+import { useReviewPage } from '@/hooks/review/useReviewPage7';
+
 const profileData = {
   profileImage: profile,
   name: 'Otkkk011',
@@ -10,38 +11,44 @@ const profileData = {
 };
 
 const ReviewPage7 = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [routes, setRoutes] = useState([
-    { id: 1, value: '' },
-    { id: 2, value: '' },
-    { id: 3, value: '' },
-    { id: 4, value: '' },
-    { id: 5, value: '' },
-  ]);
+  const {
+    // Form State
+    title,
+    setTitle,
+    content,
+    setContent,
+    selectedReviewType,
+    selectedAnimation,
+    selectedVisibility,
 
-  const handleRouteChange = (id: number, value: string) => {
-    setRoutes(routes.map((route) => (route.id === id ? { ...route, value } : route)));
-  };
+    // Dropdown States
+    isReviewTypeOpen,
+    isAnimationOpen,
+    isVisibilityOpen,
 
-  const deleteRoute = (idToDelete: number) => {
-    setRoutes(
-      routes
-        .filter((route) => route.id !== idToDelete)
-        .map((route, index) => ({
-          ...route,
-          id: index + 1,
-        })),
-    );
-  };
+    // Custom Animation States
+    customAnimation,
+    isTypingCustom,
+    inputRef,
 
-  const handleSubmit = () => {
-    console.log({
-      title,
-      content,
-      routes: routes.filter((route) => route.value).map((route) => route.value),
-    });
-  };
+    // Routes
+    routes,
+
+    // Handlers
+    toggleReviewType,
+    handleReviewTypeSelect,
+    toggleAnimation,
+    handleAnimationSelect,
+    handleCustomAnimationInput,
+    handleCustomAnimationKeyDown,
+    handleCustomAnimationBlur,
+    handleInputClick,
+    toggleVisibility,
+    handleVisibilitySelect,
+    handleRouteChange,
+    deleteRoute,
+    handleSubmit,
+  } = useReviewPage({ initialProfileData: profileData });
 
   return (
     <S.Container>
@@ -71,25 +78,96 @@ const ReviewPage7 = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
+          <S.ReviewFormContainer>
+            <S.SelectBoxContainer>
+              <S.SelectBox onClick={toggleReviewType}>
+                <span>{selectedReviewType}</span>
+                <span>▼</span>
+                {isReviewTypeOpen && (
+                  <S.DropdownList>
+                    <S.DropdownItem onClick={() => handleReviewTypeSelect('이벤트 후기')}>
+                      이벤트 후기
+                    </S.DropdownItem>
+                    <S.DropdownItem onClick={() => handleReviewTypeSelect('명소 후기')}>
+                      명소 후기
+                    </S.DropdownItem>
+                  </S.DropdownList>
+                )}
+              </S.SelectBox>
+              <S.SelectBox onClick={toggleAnimation}>
+                <span>{selectedAnimation}</span>
+                <span>▼</span>
+                {isAnimationOpen && (
+                  <S.DropdownList>
+                    {isTypingCustom ? (
+                      <S.SeInput
+                        ref={inputRef}
+                        value={customAnimation}
+                        onChange={handleCustomAnimationInput}
+                        onKeyDown={handleCustomAnimationKeyDown}
+                        onBlur={handleCustomAnimationBlur}
+                        onClick={handleInputClick}
+                        autoFocus
+                      />
+                    ) : (
+                      <S.DropdownItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAnimationSelect('custom');
+                        }}
+                      >
+                        직접 입력하기
+                      </S.DropdownItem>
+                    )}
 
-          <S.RouteSection>
-            {routes.map((route) => (
-              <S.RouteItem7 key={route.id}>
-                <S.RouteNumber>{route.id}</S.RouteNumber>
-                <S.RouteInput
-                  placeholder={`${route.id}번째 장소`}
-                  value={route.value}
-                  onChange={(e) => handleRouteChange(route.id, e.target.value)}
-                />
-                <S.DeleteButton7 onClick={() => deleteRoute(route.id)}>×</S.DeleteButton7>
-              </S.RouteItem7>
-            ))}
-            <S.AddSection>
-              <S.AddPic src={picture} alt="사진 추가" />
-              <S.AddMap src={mapIcon} alt="지도 추가" />
-            </S.AddSection>
-            <S.Button7 onClick={handleSubmit}>업로드 하기</S.Button7>
-          </S.RouteSection>
+                    {/* 일반 애니메이션 목록 */}
+                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 1')}>
+                      애니메이션 1
+                    </S.DropdownItem>
+                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 2')}>
+                      애니메이션 2
+                    </S.DropdownItem>
+                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 3')}>
+                      애니메이션 3
+                    </S.DropdownItem>
+                  </S.DropdownList>
+                )}
+              </S.SelectBox>
+
+              <S.SelectBox onClick={toggleVisibility}>
+                <span>{selectedVisibility}</span>
+                <span>▼</span>
+                {isVisibilityOpen && (
+                  <S.DropdownList>
+                    <S.DropdownItem onClick={() => handleVisibilitySelect('전체 열람가능')}>
+                      전체 열람가능
+                    </S.DropdownItem>
+                    <S.DropdownItem onClick={() => handleVisibilitySelect('구매자만 열람가능')}>
+                      구매자만 열람가능
+                    </S.DropdownItem>
+                  </S.DropdownList>
+                )}
+              </S.SelectBox>
+            </S.SelectBoxContainer>
+            <S.RouteSection>
+              {routes.map((route) => (
+                <S.RouteItem7 key={route.id}>
+                  <S.RouteNumber>{route.id}</S.RouteNumber>
+                  <S.RouteInput
+                    placeholder={`${route.id}번째 장소`}
+                    value={route.value}
+                    onChange={(e) => handleRouteChange(route.id, e.target.value)}
+                  />
+                  <S.DeleteButton7 onClick={() => deleteRoute(route.id)}>×</S.DeleteButton7>
+                </S.RouteItem7>
+              ))}
+              <S.AddSection>
+                <S.AddPic src={picture} alt="사진 추가" />
+                <S.AddMap src={mapIcon} alt="지도 추가" />
+              </S.AddSection>
+              <S.Button7 onClick={handleSubmit}>업로드 하기</S.Button7>
+            </S.RouteSection>
+          </S.ReviewFormContainer>
         </S.ContentContainer7>
       </S.WhiteContainer>
     </S.Container>
