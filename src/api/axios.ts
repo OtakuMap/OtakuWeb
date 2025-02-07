@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { tokenStorage } from '../utils/token';
 
+const PROXY = window.location.hostname === 'localhost' ? '' : '/proxy';
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: window.location.hostname === 'localhost' ? BASE_URL : PROXY,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,7 +41,7 @@ instance.interceptors.response.use(
           window.location.href = '/';
           return Promise.reject(new Error('No refresh token available'));
         }
-        
+
         // 토큰 재발급 요청
         const response = await axios.post('/api/auth/reissue', null, {
           headers: {
@@ -47,13 +50,8 @@ instance.interceptors.response.use(
         });
 
         // 응답에서 새 토큰들 저장 (userId와 role 모두 저장)
-        const { 
-          accessToken, 
-          refreshToken: newRefreshToken, 
-          userId,
-          role 
-        } = response.data.result;
-        
+        const { accessToken, refreshToken: newRefreshToken, userId, role } = response.data.result;
+
         tokenStorage.setTokens(accessToken, newRefreshToken, userId, role);
 
         // 원래 요청 재시도
