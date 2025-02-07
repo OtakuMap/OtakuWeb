@@ -1,7 +1,7 @@
 # API 리다이렉트
 [[redirects]]
   from = "/api/*"
-  to = "http://otakuserver.shop/:splat"
+  to = "https://otakuserver.shop/:splat"
   status = 200
   force = true
 
