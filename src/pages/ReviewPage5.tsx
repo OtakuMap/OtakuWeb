@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { saveRoute } from '@/api/review/route';
@@ -21,7 +20,6 @@ const ReviewPage5 = () => {
   const [reviewData, setReviewData] = useState<ReviewDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   const { reviewId } = useParams();
   const [searchParams] = useSearchParams();
   const type = (searchParams.get('type') as ReviewType) || 'PLACE';
