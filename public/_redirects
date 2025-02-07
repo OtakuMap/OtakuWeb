@@ -1,2 +1,8 @@
-/api/* http://3.39.72.211:8080/api/:splat 200!
+/api/*  http://3.39.72.211:8080/api/:splat  200!  {
+  Access-Control-Allow-Origin = "*"
+  Access-Control-Allow-Methods = "GET,POST,PUT,DELETE,OPTIONS"
+  Access-Control-Allow-Headers = "*"
+  Access-Control-Allow-Credentials = "true"
+}
+
 /* /index.html 200
