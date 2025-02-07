@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { saveRoute } from '@/api/review/route';
@@ -8,9 +9,12 @@ import defaultProfileImage from '../assets/profile.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { ReviewDetail, ReviewType } from '@/types/review/review';
 import { RouteData } from '@/types/review/route';
+import { RouteSource } from '@/types/map/routeSource';
+// import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const ReviewPage5 = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [isSaving, setIsSaving] = useState(false);
@@ -132,7 +136,17 @@ const ReviewPage5 = () => {
               ))}
             </S.RouteList>
             <S.RouteButtonContainer>
-              <S.Button onClick={() => navigate('/map')}>루트 지도에서 보기</S.Button>
+              <S.Button
+                onClick={() =>
+                  navigate(`/route/${reviewData.id}`, {
+                    state: {
+                      routeSource: RouteSource.REVIEW,
+                    },
+                  })
+                }
+              >
+                루트 지도에서 보기
+              </S.Button>
               <S.SupportButton>후기 구매하기</S.SupportButton>
             </S.RouteButtonContainer>
           </S.SideContent>

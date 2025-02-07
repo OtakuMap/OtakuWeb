@@ -1,17 +1,11 @@
-import instance from '@/api/axios';
+// api/main/review.ts
+import publicInstance from '@/api/publicInstance';
 import { TopReviewsResponse } from '@/types/main/review';
 import { AxiosError } from 'axios';
-import { tokenStorage } from '@/utils/token';
 
 export const getTopReviews = async () => {
   try {
-    // 토큰 체크
-    const token = tokenStorage.getAccessToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
-    const response = await instance.get<TopReviewsResponse>('/reviews/top7');
+    const response = await publicInstance.get<TopReviewsResponse>('/reviews/top7');
     console.log('Top Reviews API Response:', {
       status: response.status,
       headers: response.headers,

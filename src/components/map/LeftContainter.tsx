@@ -8,9 +8,11 @@ import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { RouteSource } from '@/types/map/routeSource';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
+  onFavoritePlaceClick?: (placeId: number) => void;
 }
 
 // 임시 데이터들 - savedRoutes만 남기고 favoritePlaces는 제거
@@ -29,7 +31,7 @@ const savedRoutesData = [
   },
 ];
 
-const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
+const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
@@ -76,9 +78,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
 
   // placeId를 처리하는 함수
   const handleFavoritePlaceClick = (placeId: number) => {
-    console.log('Fetching details for place:', placeId);
-    // TODO: placeId를 사용하여 장소 상세 정보를 가져오는 API 호출
-    // 예: navigate(`/place/${placeId}`);
+    if (onFavoritePlaceClick) {
+      onFavoritePlaceClick(placeId);
+    }
   };
 
   const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
@@ -131,7 +133,16 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
         return (
           <S.RecommendationsContainer>
             {savedRoutesData.map((route) => (
-              <S.RecommendationItem key={route.id} onClick={() => navigate('/route')}>
+              <S.RecommendationItem
+                key={route.id}
+                onClick={() =>
+                  navigate(`/route/${route.id}`, {
+                    state: {
+                      routeSource: RouteSource.SAVED_ROUTE,
+                    },
+                  })
+                }
+              >
                 <S.RecommendationText>{route.title}</S.RecommendationText>
               </S.RecommendationItem>
             ))}
@@ -150,7 +161,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
               favoritePlaces.map((place) => (
                 <S.RecommendationItem
                   key={place.id}
-                  onClick={() => handleFavoritePlaceClick(place.placeId)}
+                  onClick={() => handleFavoritePlaceClick(place.id)}
                 >
                   <S.RecommendationText>{place.name}</S.RecommendationText>
                 </S.RecommendationItem>

@@ -4,6 +4,7 @@ import * as S from '@/styles/like/routes.styles';
 import starFilledIcon from '../assets/star-filled.png';
 import starEmptyIcon from '../assets/white-star.png';
 import spaceIcon from '../assets/space-icon.png';
+import { RouteSource } from '@/types/map/routeSource';
 
 interface RouteItem {
   id: number;
@@ -96,7 +97,15 @@ const RouteManagement: React.FC = () => {
                   onClick={() => handleRouteSelect(route.id)}
                 />
                 <S.RouteTitle>{route.title}</S.RouteTitle>
-                <S.ViewButton>
+                <S.ViewButton
+                  onClick={() =>
+                    navigate(`/route/${route.id}`, {
+                      state: {
+                        routeSource: RouteSource.LIKED_ROUTE,
+                      },
+                    })
+                  }
+                >
                   <span>지도에서 보기</span>
                 </S.ViewButton>
                 <span>|</span>

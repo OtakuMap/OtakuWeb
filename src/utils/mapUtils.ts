@@ -56,38 +56,25 @@ export const getPlaceDetails = async (
     let placeId: string | undefined;
     let photoUrl: string | undefined;
 
+    console.log('Places API search results:', places);
+
     if (places && places.length > 0) {
       name = places[0].name;
       placeId = places[0].place_id;
 
       if (places[0].photos && places[0].photos.length > 0) {
-        photoUrl = places[0].photos[0].getUrl({
-          maxWidth: 800,
-          maxHeight: 600,
-        });
-      } else if (placeId) {
-        const detailsRequest = {
-          placeId: placeId,
-          fields: ['photos', 'formatted_address', 'name'],
-        };
-
-        const placeDetails = await new Promise<google.maps.places.PlaceResult>(
-          (resolve, reject) => {
-            service.getDetails(detailsRequest, (result, status) => {
-              if (status === 'OK' && result) {
-                resolve(result);
-              } else {
-                reject(new Error(`Place Details failed: ${status}`));
-              }
-            });
-          },
-        );
-
-        if (placeDetails.photos && placeDetails.photos.length > 0) {
-          photoUrl = placeDetails.photos[0].getUrl({
-            maxWidth: 800,
-            maxHeight: 600,
-          });
+        try {
+          const tempUrl = places[0].photos[0].getUrl();
+          // URL에서 photo reference 추출
+          const photoReference = tempUrl.split('1s')[1].split('&')[0];
+          if (photoReference) {
+            // Places Photo API URL 직접 구성
+            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photoReference}&key=${apiKey}`;
+            console.log('Final photo URL:', photoUrl);
+          }
+        } catch (error) {
+          console.error('Error getting photo URL:', error);
+          photoUrl = '/src/assets/logorepeat.png';
         }
       }
     }

@@ -1,17 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTopReviews } from '../../api/main/review';
 import { Review } from '../../types/main/review';
-import { useAppSelector } from '../reduxHooks';
 
-export const useTopReviews = () => {
-  const { isLoggedIn } = useAppSelector((state) => state.auth);
-
+export const useTopReviews = (options?: { enabled?: boolean }) => {
   return useQuery<Review[]>({
     queryKey: ['topReviews'],
     queryFn: async () => {
-      if (!isLoggedIn) {
-        return [];
-      }
       const response = await getTopReviews();
 
       if (response.isSuccess && response.result?.reviews) {
@@ -19,11 +13,11 @@ export const useTopReviews = () => {
       }
       return [];
     },
-    // 불필요한 리패칭 방지
-    refetchOnWindowFocus: false, // 윈도우 포커스시 리패칭 방지
-    refetchOnReconnect: false, // 재연결시 리패칭 방지
-    staleTime: Infinity, // 데이터를 항상 신선한 것으로 간주
-    retry: 0, // 실패시 재시도 횟수
-    enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+    gcTime: Infinity, // 캐시 계속 유지
+    retry: 1,
+    enabled: options?.enabled ?? true,
   });
 };

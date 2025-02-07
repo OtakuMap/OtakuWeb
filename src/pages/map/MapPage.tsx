@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import LeftContainer from '../../components/map/LeftContainter';
 import MapContainer from '../../components/map/MapContainer';
 import FilterButton from '@/components/map/FilterButton';
 import LocationDetail from '@/components/map/LocationDetail';
 import { Place } from '@/types/map/place';
+import { RouteLocation, LocationDetail as LocationDetailType } from '@/types/map/route';
+import { getPlaceDetails, PlaceDetails } from '../../utils/mapUtils';
+import { usePlaceLikeDetail } from '@/hooks/map/usePlaceLikeDetail';
 
 const PageContainer = styled.div`
   display: flex;
-  width: 100vw; // 100vw로 변경
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   margin: 0;
@@ -25,7 +28,66 @@ const MapWrapper = styled.div`
 
 const MapPage = () => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [selectedPlaceLikeId, setSelectedPlaceLikeId] = useState<number | null>(null);
   const [showLocationDetail, setShowLocationDetail] = useState(false);
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | undefined>();
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const { placeLikeDetail, fetchPlaceLikeDetail } = usePlaceLikeDetail();
+
+  const defaultLocation: LocationDetailType = {
+    id: 0,
+    name: '',
+    isSelected: false,
+    latitude: 34.72145462036133,
+    longitude: 135.3616485595703,
+    animeName: '',
+    address: '',
+    hashtags: [], // 빈 HashTag 배열
+  };
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (selectedPlaceLikeId) {
+        try {
+          await fetchPlaceLikeDetail(selectedPlaceLikeId);
+        } catch (error) {
+          console.error('Failed to fetch place like detail:', error);
+        }
+      }
+    };
+
+    fetchDetails();
+  }, [selectedPlaceLikeId]);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!window.google?.maps || !mapInstance.current) return;
+
+      try {
+        if (placeLikeDetail) {
+          const details = await getPlaceDetails(
+            placeLikeDetail.lat,
+            placeLikeDetail.lng,
+            import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+            mapInstance.current,
+          );
+          setPlaceDetails(details);
+        } else if (selectedPlace) {
+          const details = await getPlaceDetails(
+            selectedPlace.latitude,
+            selectedPlace.longitude,
+            import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+            mapInstance.current,
+          );
+          setPlaceDetails(details);
+        }
+      } catch (error) {
+        console.error('Failed to fetch place details:', error);
+      }
+    };
+
+    fetchDetails();
+  }, [selectedPlace, placeLikeDetail]);
 
   const handleFilterChange = (filter: 'spot' | 'event') => {
     console.log('Filter state:', filter);
@@ -33,37 +95,126 @@ const MapPage = () => {
 
   const handlePlaceSelect = (place: Place) => {
     setSelectedPlace(place);
+    setSelectedPlaceLikeId(null);
+    setShowLocationDetail(true);
+  };
+
+  const handleFavoritePlaceClick = (placeId: number) => {
+    setSelectedPlaceLikeId(placeId);
+    setSelectedPlace(null);
     setShowLocationDetail(true);
   };
 
   const handleCloseDetail = () => {
     setShowLocationDetail(false);
+    setSelectedPlace(null);
+    setSelectedPlaceLikeId(null);
+  };
+
+  const currentLocation = React.useMemo(() => {
+    if (selectedPlace) {
+      return {
+        latitude: selectedPlace.latitude,
+        longitude: selectedPlace.longitude,
+      };
+    }
+    if (placeLikeDetail) {
+      return {
+        latitude: placeLikeDetail.lat,
+        longitude: placeLikeDetail.lng,
+      };
+    }
+    return {
+      latitude: 34.72145462036133,
+      longitude: 135.3616485595703,
+    };
+  }, [selectedPlace, placeLikeDetail]);
+
+  const mapLocations = React.useMemo((): RouteLocation[] => {
+    if (selectedPlace) {
+      return [
+        {
+          id: selectedPlace.id,
+          name: selectedPlace.name,
+          isSelected: true,
+          latitude: selectedPlace.latitude,
+          longitude: selectedPlace.longitude,
+          animeName: selectedPlace.animeName,
+          hashtags: selectedPlace.hashtags.map((tag) => ({ hashTagId: 0, name: tag })), // HashTag 형식으로 변환
+        },
+      ];
+    }
+    if (placeLikeDetail) {
+      return [
+        {
+          id: placeLikeDetail.placeLikeId,
+          name: placeLikeDetail.placeName,
+          isSelected: true,
+          latitude: placeLikeDetail.lat,
+          longitude: placeLikeDetail.lng,
+          animeName: placeLikeDetail.animationName,
+          hashtags: placeLikeDetail.hashtags, // 이미 HashTag[] 형식
+        },
+      ];
+    }
+    return [];
+  }, [selectedPlace, placeLikeDetail]);
+
+  const getLocationDetailData = (): LocationDetailType => {
+    if (selectedPlace) {
+      return {
+        id: selectedPlace.id,
+        name: selectedPlace.name,
+        isSelected: true,
+        latitude: selectedPlace.latitude,
+        longitude: selectedPlace.longitude,
+        animeName: selectedPlace.animeName,
+        address: placeDetails?.address || '',
+        hashtags: selectedPlace.hashtags.map((tag) => ({ hashTagId: 0, name: tag })), // HashTag 형식으로 변환
+      };
+    }
+    if (placeLikeDetail) {
+      return {
+        id: placeLikeDetail.placeLikeId,
+        name: placeLikeDetail.placeName,
+        isSelected: true,
+        latitude: placeLikeDetail.lat,
+        longitude: placeLikeDetail.lng,
+        animeName: placeLikeDetail.animationName,
+        address: placeDetails?.address || '',
+        hashtags: placeLikeDetail.hashtags, // 이미 HashTag[] 형식
+      };
+    }
+    return defaultLocation;
   };
 
   return (
     <PageContainer>
-      <LeftContainer onPlaceSelect={handlePlaceSelect} />
+      <LeftContainer
+        onPlaceSelect={handlePlaceSelect}
+        onFavoritePlaceClick={handleFavoritePlaceClick}
+      />
       <MapWrapper>
         <MapContainer
+          ref={mapInstance}
           apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-          center={
-            selectedPlace
-              ? {
-                  lat: selectedPlace.latitude,
-                  lng: selectedPlace.longitude,
-                }
-              : {
-                  lat: 34.72145462036133,
-                  lng: 135.3616485595703,
-                }
-          }
-          zoom={selectedPlace ? 17 : 16}
-          locations={selectedPlace ? [selectedPlace] : []}
+          center={{
+            lat: currentLocation.latitude,
+            lng: currentLocation.longitude,
+          }}
+          zoom={selectedPlace || placeLikeDetail ? 17 : 16}
+          locations={mapLocations}
+          selectedLocation={mapLocations[0] || null}
           onMarkerClick={() => setShowLocationDetail(true)}
         />
         <FilterButton onFilterChange={handleFilterChange} />
-        {showLocationDetail && selectedPlace && (
-          <LocationDetail location={selectedPlace} onClose={handleCloseDetail} />
+        {showLocationDetail && (
+          <LocationDetail
+            location={getLocationDetailData()}
+            placeDetails={placeDetails}
+            onClose={handleCloseDetail}
+            placeLikeId={selectedPlaceLikeId || undefined}
+          />
         )}
       </MapWrapper>
     </PageContainer>
