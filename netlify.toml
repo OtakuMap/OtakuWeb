@@ -1,5 +1,12 @@
+# API 리다이렉트
 [[redirects]]
-  from = "/proxy/*"
-  to = "/:splat"
+  from = "/api/*"
+  to = "http://otakuserver.shop/:splat"
   status = 200
   force = true
+
+# SPA 라우팅을 위한 리다이렉트
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

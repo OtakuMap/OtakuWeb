@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { tokenStorage } from '../utils/token';
 
-const PROXY = window.location.hostname === 'localhost' ? '' : '/proxy';
-const BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE = window.location.hostname === 'localhost' ? import.meta.env.VITE_API_URL : '/api';
 
 const instance = axios.create({
-  baseURL: window.location.hostname === 'localhost' ? BASE_URL : PROXY,
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
