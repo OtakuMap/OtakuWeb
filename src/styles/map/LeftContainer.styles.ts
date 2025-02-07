@@ -137,7 +137,6 @@ export const DeleteButton = styled.button`
   border: none;
   outline: none;
   cursor: pointer;
-  background: url('/src/assets/search_delete.png') no-repeat center / contain;
   padding: 0;
   display: flex;
   align-items: center;
