@@ -60,7 +60,7 @@ const ReviewPage1: React.FC = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
 
-  const { topReviews, loading, error } = useTopReviews(fakeTopReviews);
+  // const { topReviews, loading, error } = useTopReviews(fakeTopReviews);
   const { recentSearches, handleSearch, handleDelete } = useRecentSearches([
     { text: '검색어검색어', date: '2024.12.04' },
     { text: '검색어검색어', date: '2024.11.14' },
@@ -107,9 +107,9 @@ const ReviewPage1: React.FC = () => {
           <S.Image src={sectionImage} alt="Section Icon" />
           조회수 TOP 7 여행 후기
         </S.SectionTitle>
-        {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+        {/* {error && <S.ErrorMessage>{error}</S.ErrorMessage>} */}
         <S.ReviewGrid>
-          {loading ? (
+          {/* {loading ? (
             <div>로딩 중...</div>
           ) : (
             topReviews.map((review, index) => (
@@ -120,7 +120,7 @@ const ReviewPage1: React.FC = () => {
                 <S.Description>{review.title}</S.Description>
               </S.ReviewCard>
             ))
-          )}
+          )} */}
         </S.ReviewGrid>
       </S.TopReviews>
     </S.Container>

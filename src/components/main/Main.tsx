@@ -28,13 +28,13 @@ const Main = () => {
   // const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
 
   // 기존 useTopReviews를 수정하는 대신, enabled 옵션을 hook에 전달
-  const {
-    data: reviews,
-    isLoading,
-    error,
-  } = useTopReviews({
-    //enabled: !!events, // events가 로드된 후에만 실행
-  });
+  // const {
+  //   data: reviews,
+  //   isLoading,
+  //   error,
+  // } = useTopReviews({
+  //   //enabled: !!events, // events가 로드된 후에만 실행
+  // });
 
   // 마지막으로 banner 로드
   // const { data: banner } = useQuery(['banner'], getBanner, {
@@ -162,13 +162,13 @@ const Main = () => {
             <S.Image src={sectionImage} alt="Section Icon" />
             조회수 TOP 7 여행 후기
           </S.SectionTitle>
-          {isLoading ? (
+          {/* {isLoading ? (
             <div>Loading...</div>
           ) : error ? (
             <div>Error loading reviews</div>
           ) : (
             <ReviewSlider reviews={reviews} onReviewClick={handleReviewItemClick} />
-          )}
+          )} */}
         </S.TopReviews>
 
         <S.Divider />
