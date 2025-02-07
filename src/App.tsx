@@ -65,6 +65,7 @@ const AppRoutes: React.FC = () => {
         {/* 공통 라우트 - 로그인 여부와 관계없이 접근 가능 */}
         <Route path="/" element={<Main />} />
         <Route path="/cover" element={<Cover />} />
+        <Route path="/my-page" element={<MyPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/search-id-pw" element={<SearchIdPWPage />} />

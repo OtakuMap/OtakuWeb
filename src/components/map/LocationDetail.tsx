@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import * as S from '../../styles/map/LocationDetail.styles';
 import { LocationDetail as LocationDetailType } from '../../types/map/route';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
+import { PlaceDetails } from '../../utils/mapUtils';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 interface LocationDetailProps {
   location: LocationDetailType;
+  placeDetails?: PlaceDetails;
   onClose?: () => void;
 }
 
-const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) => {
+const DEFAULT_IMAGE =
+  'https://images.unsplash.com/photo-1581790064141-de9de7145e93?q=80&w=1000&auto=format&fit=crop';
+
+const LocationDetail: React.FC<LocationDetailProps> = ({ location, placeDetails, onClose }) => {
   const navigate = useNavigate();
-  // 현재 장소와 관련 장소들을 하나의 배열로 합침
   const allPlaces = [location, ...(location.relatedPlaces || [])];
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const currentPlace = allPlaces[currentIndex];
 
   const handleNextLocation = () => {
@@ -22,12 +32,17 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
   };
 
   const handleReviewClick = () => {
-    navigate('/review3'); // review3 페이지로 이동
+    navigate('/review3');
   };
 
   const handleFavClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    // 로그인된 상태일 때만 좋아요 기능 실행
     setIsFavorited(!isFavorited);
-    // Log the current location data
     console.log('Favorited Location Data:', {
       id: currentPlace.id,
       name: currentPlace.name,
@@ -37,21 +52,35 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
     });
   };
 
+  const imageSource = useMemo(() => {
+    if (imageLoadFailed || !placeDetails?.photoUrl) {
+      return DEFAULT_IMAGE;
+    }
+    return placeDetails.photoUrl;
+  }, [placeDetails?.photoUrl, imageLoadFailed]);
+
+  const handleImageError = useCallback(() => {
+    console.log('Image load failed, switching to default image');
+    setImageLoadFailed(true);
+  }, []);
+
   return (
     <S.Container>
       {onClose && (
         <S.CloseButton onClick={onClose}>
           <X
-            size={20} // 32에서 20으로 줄임
+            size={20}
             color="#FFFFFF"
-            style={{ width: '20px', height: '20px' }} // 32px에서 20px로 줄임
+            style={{ width: '20px', height: '20px' }}
             absoluteStrokeWidth
           />
         </S.CloseButton>
       )}
       <S.LocationImage
-        src={`/src/assets/locations/${currentPlace.id}.jpg`}
+        src={imageSource}
         alt={currentPlace.name}
+        onError={handleImageError}
+        key={imageSource}
       />
       {allPlaces.length > 1 && (
         <>
@@ -60,9 +89,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({ location, onClose }) =>
           </S.PaginationButton>
         </>
       )}
-      <S.Title>{currentPlace.name}</S.Title>
+      <S.Title>{placeDetails?.name || currentPlace.name}</S.Title>
       <S.Subtitle>{currentPlace.animeName}</S.Subtitle>
-      <S.Address>{currentPlace.address}</S.Address>
+      <S.Address>{placeDetails?.address || currentPlace.address}</S.Address>
 
       <S.TagContainer>
         {currentPlace.hashtags.map((tag, index) => (

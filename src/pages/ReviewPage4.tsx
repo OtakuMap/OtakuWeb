@@ -8,6 +8,9 @@ import NextPage from '../assets/NextPage.png';
 import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 import * as S from '../styles/review/ReviewPage.style';
 import { createShortReview } from '@/api/review/short-review';
 import { ShortReviewRequest } from '@/types/review/short-review';
@@ -117,6 +120,8 @@ const reviewData = [
 ];
 
 const ReviewPage4 = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 6;
   const [reviews, setReviews] = useState<Review[]>(
@@ -245,16 +250,18 @@ const ReviewPage4 = () => {
   };
 
   const handleLike = (reviewId: number) => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     setReviews(
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'like') {
-            // 이미 좋아요를 눌렀다면 취소
             return { ...review, likes: review.likes - 1, userVote: null };
           } else {
-            // 처음 좋아요를 누르는 경우
             const newLikes = review.likes + 1;
-            // 싫어요를 눌렀던 상태라면 싫어요도 취소
             const newDislikes =
               review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
@@ -266,16 +273,18 @@ const ReviewPage4 = () => {
   };
 
   const handleDislike = (reviewId: number) => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     setReviews(
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'dislike') {
-            // 이미 싫어요를 눌렀다면 취소
             return { ...review, dislikes: review.dislikes - 1, userVote: null };
           } else {
-            // 처음 싫어요를 누르는 경우
             const newDislikes = review.dislikes + 1;
-            // 좋아요를 눌렀던 상태라면 좋아요도 취소
             const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
           }
@@ -283,6 +292,20 @@ const ReviewPage4 = () => {
         return review;
       }),
     );
+  };
+
+  const handleTextAreaClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+    }
+  };
+
+  const handleSubmitButtonClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    handleReviewSubmit();
   };
 
   return (
@@ -331,11 +354,25 @@ const ReviewPage4 = () => {
             </S.ProfileContainer>
             <div style={{ position: 'relative', width: '800px' }}>
               <S.FeedbackInput
-                placeholder="한 줄 후기를 남겨주세요 !"
+                placeholder={isLoggedIn ? '한 줄 후기를 남겨주세요 !' : '로그인이 필요합니다.'}
                 value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
+                onChange={(e) => isLoggedIn && setReviewText(e.target.value)}
+                onClick={handleTextAreaClick}
+                readOnly={!isLoggedIn}
+                style={{
+                  backgroundColor: !isLoggedIn ? '#f5f5f5' : 'white',
+                  cursor: !isLoggedIn ? 'pointer' : 'text',
+                  color: !isLoggedIn ? '#666' : 'inherit',
+                }}
               />
-              <S.SubmitButton onClick={handleReviewSubmit} disabled={isSubmitting}>
+              <S.SubmitButton 
+                onClick={handleSubmitButtonClick} 
+                disabled={!isLoggedIn || isSubmitting}
+                style={{
+                  opacity: (!isLoggedIn || isSubmitting) ? 0.5 : 1,
+                  cursor: (!isLoggedIn || isSubmitting) ? 'not-allowed' : 'pointer',
+                }}
+              >
                 {isSubmitting ? '등록 중...' : '등록하기'}
               </S.SubmitButton>
             </div>
