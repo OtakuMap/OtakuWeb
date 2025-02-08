@@ -28,6 +28,7 @@ import { openLoginModal } from '@/store/slices/modalSlice';
 import { updateRoute } from '@/api/map/routeUpdate';
 import { saveCustomRoute } from '@/api/map/routeSave';
 import { toast } from 'react-toastify';
+import edit from '../../assets/edit.png';
 
 interface RouteLeftContainerProps {
   initialLocations: RouteLocation[];
@@ -245,7 +246,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       ) : (
         <S.Description>
           <TruncatedDescription text={routeData.description} />
-          <S.EditButton src="/src/assets/edit.png" alt="edit" onClick={() => setIsEditing(true)} />
+          <S.EditButton src={edit} alt="edit" onClick={() => setIsEditing(true)} />
         </S.Description>
       )}
       <S.Divider />

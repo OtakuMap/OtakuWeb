@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { RouteSource } from '@/types/map/routeSource';
+import searchDeleteIcon from '../../assets/search_delete.png';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
@@ -88,7 +89,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     const displayText = search.length > MAX_LENGTH ? `${search.slice(0, MAX_LENGTH)}...` : search;
     return (
       <S.RecentSearchItem>
-        <S.DeleteButton onClick={onDelete} />
+        <S.DeleteButton onClick={onDelete}>
+          <img src={searchDeleteIcon} alt="Delete" />
+        </S.DeleteButton>
         <S.SearchText>{displayText}</S.SearchText>
       </S.RecentSearchItem>
     );

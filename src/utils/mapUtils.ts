@@ -1,3 +1,5 @@
+import logoRepeat from '../assets/logorepeat.png';
+
 export interface PlaceDetails {
   address: string;
   photoUrl?: string;
@@ -58,30 +60,58 @@ export const getPlaceDetails = async (
 
     console.log('Places API search results:', places);
 
+    // if (places && places.length > 0) {
+    //   name = places[0].name;
+    //   placeId = places[0].place_id;
+
+    //   if (places[0].photos && places[0].photos.length > 0) {
+    //     try {
+    //       const tempUrl = places[0].photos[0].getUrl();
+    //       // URL에서 photo reference 추출
+    //       const photoReference = tempUrl.split('1s')[1].split('&')[0];
+    //       if (photoReference) {
+    //         // Places Photo API URL 직접 구성
+    //         photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photoReference}&key=${apiKey}`;
+    //         console.log('Final photo URL:', photoUrl);
+    //       }
+    //     } catch (error) {
+    //       console.error('Error getting photo URL:', error);
+    //       photoUrl = logoRepeat;
+    //     }
+    //   }
+    // }
+
     if (places && places.length > 0) {
       name = places[0].name;
       placeId = places[0].place_id;
 
       if (places[0].photos && places[0].photos.length > 0) {
         try {
-          const tempUrl = places[0].photos[0].getUrl();
-          // URL에서 photo reference 추출
-          const photoReference = tempUrl.split('1s')[1].split('&')[0];
-          if (photoReference) {
-            // Places Photo API URL 직접 구성
-            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photoReference}&key=${apiKey}`;
-            console.log('Final photo URL:', photoUrl);
+          // Google Maps JavaScript API의 Place Photo URL을 직접 구성
+          const photo = places[0].photos[0];
+          // 중요: 아래와 같이 rawReference 형식의 url 생성
+          const rawReference = photo
+            .getUrl({ maxWidth: 800, maxHeight: 800 })
+            .split('1s')[1]
+            .split('&')[0];
+
+          if (rawReference) {
+            // Places Photo API URL 형식으로 변경
+            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${rawReference}&key=${apiKey}`;
+            console.log('Final constructed photo URL:', photoUrl);
+          } else {
+            photoUrl = logoRepeat;
           }
         } catch (error) {
           console.error('Error getting photo URL:', error);
-          photoUrl = '/src/assets/logorepeat.png';
+          photoUrl = logoRepeat;
         }
       }
     }
 
     // 이미지가 없는 경우 기본 이미지 사용
     if (!photoUrl) {
-      photoUrl = '/src/assets/logorepeat.png';
+      photoUrl = logoRepeat;
     }
 
     return {
@@ -94,7 +124,7 @@ export const getPlaceDetails = async (
     console.error('Error fetching place details:', error);
     return {
       address: '',
-      photoUrl: '/src/assets/logorepeat.png',
+      photoUrl: logoRepeat,
       name: undefined,
       placeId: undefined,
     };
