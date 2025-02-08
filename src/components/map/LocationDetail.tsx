@@ -78,7 +78,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     console.log('PlaceDetails in LocationDetail:', placeDetails);
     console.log('Current photoUrl:', placeDetails?.photoUrl);
 
-    // 1. 먼저 이미지 로드 실패한 경우
+    // 1. 이미지 로드 실패한 경우
     if (imageLoadFailed) {
       console.log('Image load failed, using default');
       return logoRepeat;
@@ -87,12 +87,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     // 2. placeDetails가 있고 photoUrl이 있는 경우
     if (placeDetails?.photoUrl) {
       console.log('Using placeDetails photoUrl');
-      // Google Places API의 특수 URL인 경우 기본 이미지 사용
-      if (placeDetails.photoUrl.includes('PhotoService.GetPhoto')) {
-        return logoRepeat;
-      }
       return placeDetails.photoUrl;
     }
+
     console.log('No valid photo URL found, using default');
     // 3. 그 외의 경우 기본 이미지 사용
     return logoRepeat;
