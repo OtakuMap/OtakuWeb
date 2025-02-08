@@ -1,0 +1,28 @@
+[[redirects]]
+  from = "/api/*"
+  to = "http://3.39.72.211:8080/api/:splat"
+  status = 200
+  force = true
+  
+  [redirects.headers]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "*"
+    Access-Control-Allow-Headers = "*"
+    Access-Control-Allow-Credentials = "true"
+    Access-Control-Max-Age = "1728000"
+    Access-Control-Expose-Headers = "*"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "*"
+    Access-Control-Allow-Headers = "*"
+    Access-Control-Allow-Credentials = "true"
+    Access-Control-Max-Age = "1728000"
+    Access-Control-Expose-Headers = "*"
