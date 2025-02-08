@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import * as S from '../../styles/common/Search.styles';
 import { Place } from '@/types/map/place';
 import { koreanMatch } from '@/utils/searchUtils';
+import searchIcon from '../../assets/search.png';
 
 interface SearchProps {
   placeholder?: string;
@@ -119,7 +120,7 @@ const Search: React.FC<SearchProps> = ({
 
   return (
     <S.SearchContainer className="search-container">
-      <S.SearchIcon onClick={handleSubmit} />
+      <S.SearchIcon src={searchIcon} alt="Search" onClick={handleSubmit} />
       <S.SearchInput
         type="text"
         placeholder={placeholder}

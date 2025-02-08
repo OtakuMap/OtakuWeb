@@ -26,13 +26,12 @@ export const SearchInput = styled.input`
   }
 `;
 
-export const SearchIcon = styled.div`
+export const SearchIcon = styled.img`
   position: absolute;
   left: 8px;
   top: 20px;
   width: 20px;
   height: 20px;
-  background: url('/src/assets/search.png') no-repeat center / contain;
   cursor: pointer;
 `;
 
