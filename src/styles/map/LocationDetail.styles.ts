@@ -110,16 +110,21 @@ export const TagContainer = styled.div`
   bottom: 22px; // 24 * 0.9
   display: flex;
   gap: 7px; // 8 * 0.9
+  max-width: 276px; // (78px * 3) + (7px * 2) = 최대 3개 태그 + 간격
+  overflow: hidden; // 넘치는 태그 숨김
 `;
 
 export const Tag = styled.div`
-  width: 78px; // 87 * 0.9
+  min-width: 78px; // 87 * 0.9
+  max-width: 87px; // 최대 너비 제한
   height: 23px; // 26 * 0.9
+  padding: 0 12px;
   background: #bdaee5;
   border-radius: 23px; // 25 * 0.9
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   font-family: 'Gothic A1';
   font-style: normal;
@@ -127,6 +132,27 @@ export const Tag = styled.div`
   font-size: 11px; // 12 * 0.9
   line-height: 14px; // 15 * 0.9
   color: #000000;
+
+  // 긴 텍스트 처리
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // 호버 시 툴팁
+  &:hover::after {
+    content: attr(data-full-text);
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(37, 38, 96, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+    z-index: 1000;
+  }
 `;
 
 export const FavButton = styled.button`

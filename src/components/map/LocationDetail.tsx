@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import * as S from '../../styles/map/LocationDetail.styles';
-import { LocationDetail as LocationDetailType } from '../../types/map/route';
+import { LocationDetail as LocationDetailType, HashTag } from '../../types/map/route';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { PlaceDetails, getPlaceDetails } from '../../utils/mapUtils';
+import { PlaceDetails } from '../../utils/mapUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
@@ -20,7 +20,7 @@ interface LocationDetailProps {
   placeLikeId?: number;
 }
 
-const DEFAULT_IMAGE = logoRepeat;
+// const DEFAULT_IMAGE = logoRepeat;
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
   location,
@@ -40,6 +40,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
 
   // placeLikeDetail hook 사용
   const { placeLikeDetail, isLoading, error, fetchPlaceLikeDetail } = usePlaceLikeDetail();
+
+  const tags = placeLikeDetail?.hashtags || currentPlace.hashtags;
+  const MAX_TAGS = 3; // 최대 3개 태그만 표시
 
   // placeLikeId가 있을 경우 상세 정보 조회
   useEffect(() => {
@@ -108,6 +111,26 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     return <S.Container>Error: {error.message}</S.Container>;
   }
 
+  // tags 처리 로직 수정
+  const getTags = () => {
+    if (placeLikeDetail?.hashtags) {
+      return placeLikeDetail.hashtags;
+    }
+    if (currentPlace.hashtags) {
+      return currentPlace.hashtags;
+    }
+    return [];
+  };
+
+  const renderTag = (tag: HashTag | string, index: number) => {
+    const tagName = typeof tag === 'string' ? tag : tag.name;
+    return (
+      <S.Tag key={index} data-full-text={`#${tagName}`}>
+        #{tagName}
+      </S.Tag>
+    );
+  };
+
   return (
     <S.Container>
       {onClose && (
@@ -139,9 +162,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       </S.Subtitle>
       <S.Address>{placeDetails?.address || currentPlace.address}</S.Address>
       <S.TagContainer>
-        {(placeLikeDetail?.hashtags || currentPlace.hashtags).map((tag, index) => (
-          <S.Tag key={index}>#{typeof tag === 'string' ? tag : tag.name}</S.Tag>
-        ))}
+        {getTags()
+          .slice(0, MAX_TAGS)
+          .map((tag, index) => renderTag(tag, index))}
       </S.TagContainer>
 
       <S.FavButton onClick={handleFavClick}>
