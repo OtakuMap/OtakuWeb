@@ -9,28 +9,13 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { RouteSource } from '@/types/map/routeSource';
+import { useSavedRoutes } from '@/hooks/map/useSavedRoutes';
 import searchDeleteIcon from '../../assets/search_delete.png';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
   onFavoritePlaceClick?: (placeId: number) => void;
 }
-
-// 임시 데이터들 - savedRoutes만 남기고 favoritePlaces는 제거
-const savedRoutesData = [
-  {
-    id: 1,
-    title: '도쿄 애니메이션 성지순례 코스',
-  },
-  {
-    id: 2,
-    title: '오사카 하이큐 성지순례',
-  },
-  {
-    id: 3,
-    title: '요코하마 원피스 투어',
-  },
-];
 
 const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
   const navigate = useNavigate();
@@ -40,6 +25,12 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
+  const {
+    savedRoutes,
+    isLoading: savedRoutesLoading,
+    error: savedRoutesError,
+    fetchSavedRoutes,
+  } = useSavedRoutes();
 
   // 데이터 로깅
   useEffect(() => {
@@ -103,7 +94,21 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
       dispatch(openLoginModal());
       return;
     }
-    setActiveView(activeView === 'savedRoutes' ? 'none' : 'savedRoutes');
+
+    const newView = activeView === 'savedRoutes' ? 'none' : 'savedRoutes';
+    setActiveView(newView);
+
+    if (newView === 'savedRoutes') {
+      fetchSavedRoutes({
+        lastId: 0,
+        limit: 10,
+      }).catch((error) => {
+        if (error.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          navigate('/login');
+        }
+      });
+    }
   };
 
   // favoritePlaces 버튼 클릭 핸들러
@@ -135,20 +140,29 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
       case 'savedRoutes':
         return (
           <S.RecommendationsContainer>
-            {savedRoutesData.map((route) => (
-              <S.RecommendationItem
-                key={route.id}
-                onClick={() =>
-                  navigate(`/route/${route.id}`, {
-                    state: {
-                      routeSource: RouteSource.SAVED_ROUTE,
-                    },
-                  })
-                }
-              >
-                <S.RecommendationText>{route.title}</S.RecommendationText>
-              </S.RecommendationItem>
-            ))}
+            {savedRoutesLoading ? (
+              <div>로딩 중...</div>
+            ) : savedRoutesError ? (
+              <div>에러가 발생했습니다: {savedRoutesError.message}</div>
+            ) : savedRoutes.length === 0 ? (
+              <div>저장된 루트가 없습니다.</div>
+            ) : (
+              savedRoutes.map((route) => (
+                <S.RecommendationItem
+                  key={route.id}
+                  data-full-text={route.name} // 툴팁용 전체 텍스트
+                  onClick={() =>
+                    navigate(`/route/${route.routeId}`, {
+                      state: {
+                        routeSource: RouteSource.SAVED_ROUTE,
+                      },
+                    })
+                  }
+                >
+                  <S.RecommendationText>{route.name}</S.RecommendationText>
+                </S.RecommendationItem>
+              ))
+            )}
           </S.RecommendationsContainer>
         );
       case 'favoritePlaces':
