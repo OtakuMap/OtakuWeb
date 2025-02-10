@@ -16,6 +16,8 @@ import { createShortReview } from '@/api/review/short-review';
 import { ShortReviewRequest } from '@/types/review/short-review';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
+import { savePlace } from '@/api/review/SavePlace';
+import { SavePlaceRequest } from '@/types/review/SavePlace';
 
 interface Review {
   id: number;
@@ -310,6 +312,32 @@ const ReviewPage4 = () => {
     handleReviewSubmit();
   };
 
+  const handleSavePlace = async () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    if (!placeId) {
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      const saveData: SavePlaceRequest = {
+        animationId: 2, // 현재 선택된 애니메이션 ID
+      };
+
+      const response = await savePlace(Number(placeId), saveData);
+
+      if (response.isSuccess) {
+        window.confirm('명소가 저장되었습니다!');
+      }
+    } catch (error) {
+      console.error('Error saving place:', error);
+      window.confirm('명소 저장에 실패했습니다.');
+    }
+  };
   return (
     <S.Container>
       <S.ContentWrapper>
@@ -318,9 +346,7 @@ const ReviewPage4 = () => {
             <MapPin size={20} color="#0c004b" />
             <S.LocationText value="Hanshin Koshien Stadium" readOnly />
           </S.LocationInput>
-          <S.SaveLocationButton onClick={() => navigate('/saved-places')}>
-            명소 저장하기
-          </S.SaveLocationButton>
+          <S.SaveLocationButton onClick={handleSavePlace}>명소 저장하기</S.SaveLocationButton>
         </S.LocationBar>
 
         <S.DropdownButton>다이아몬드 에이스 ▼</S.DropdownButton>

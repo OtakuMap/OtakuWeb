@@ -80,7 +80,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/review/:reviewId" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
-        <Route path="/event" element={<EventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />
 
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
