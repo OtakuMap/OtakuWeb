@@ -59,30 +59,38 @@ const MapPage = () => {
     fetchDetails();
   }, [selectedPlaceLikeId]);
 
+  // MapPage.tsx의 useEffect 부분 수정
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!window.google?.maps || !mapInstance.current) return;
+      if (!window.google?.maps || !mapInstance.current) {
+        console.log('MapPage - Google Maps not initialized');
+        return;
+      }
 
       try {
         if (placeLikeDetail) {
+          console.log('MapPage - Fetching details for placeLikeDetail:', placeLikeDetail);
           const details = await getPlaceDetails(
             placeLikeDetail.lat,
             placeLikeDetail.lng,
             import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
             mapInstance.current,
           );
+          console.log('MapPage - Fetched place details:', details);
           setPlaceDetails(details);
         } else if (selectedPlace) {
+          console.log('MapPage - Fetching details for selectedPlace:', selectedPlace);
           const details = await getPlaceDetails(
             selectedPlace.latitude,
             selectedPlace.longitude,
             import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
             mapInstance.current,
           );
+          console.log('MapPage - Fetched place details:', details);
           setPlaceDetails(details);
         }
       } catch (error) {
-        console.error('Failed to fetch place details:', error);
+        console.error('MapPage - Failed to fetch place details:', error);
       }
     };
 
@@ -205,7 +213,10 @@ const MapPage = () => {
           zoom={selectedPlace || placeLikeDetail ? 17 : 16}
           locations={mapLocations}
           selectedLocation={mapLocations[0] || null}
-          onMarkerClick={() => setShowLocationDetail(true)}
+          onMarkerClick={(location, details) => {
+            setPlaceDetails(details);
+            setShowLocationDetail(true);
+          }}
         />
         <FilterButton onFilterChange={handleFilterChange} />
         {showLocationDetail && (
