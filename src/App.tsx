@@ -29,6 +29,10 @@ import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
 import EventPage from './pages/EventPage2';
 import Main from './components/Main';
+import PurchaseIncomeCheck from './pages/point/PurchaseIncomeCheck';
+import PointCharge from './pages/point/pointCharge';
+import MyPoint from './pages/point/myPoint';
+import OAuthRedirectHandler from './pages/OAuthRedirect';
 
 const AppContainer = styled.div`
   position: relative;
@@ -57,6 +61,9 @@ const AppRoutes: React.FC = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/search-id-pw" element={<SearchIdPWPage />} />
         <Route path="/newsetpw" element={<NewSetPWPage />} />
+        <Route path="/oauth/callback/kakao" element={<OAuthRedirectHandler />} />
+        <Route path="/oauth/callback/naver" element={<OAuthRedirectHandler />} />
+        <Route path="/oauth/callback/google" element={<OAuthRedirectHandler />} />
       </Routes>
     );
   }
@@ -82,6 +89,9 @@ const AppRoutes: React.FC = () => {
         <Route path="/my-page" element={<MyPage />} />
         <Route path="/main" element={<Main />} />
         <Route path="/category" element={<Category />} />
+        <Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
+        <Route path="/point-charge" element={<PointCharge />} />
+        <Route path="/my-point" element={<MyPoint />} />
       </Routes>
     </AppContainer>
   );
