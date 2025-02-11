@@ -2,23 +2,29 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   position: absolute;
-  width: 628px; // 698 * 0.9
-  height: 202px; // 224 * 0.9
+  width: 628px;
+  height: 202px;
   left: 50%;
-  bottom: 36px; // 40 * 0.9
+  bottom: 36px;
   transform: translateX(-50%);
   background: #252660;
-  box-shadow: 0px 9px 7px 3px rgba(0, 0, 0, 0.25); // 10 * 0.9, 8 * 0.9
-  border-radius: 23px; // 25 * 0.9
+  box-shadow: 0px 9px 7px 3px rgba(0, 0, 0, 0.25);
+  border-radius: 23px;
   z-index: 1000;
+
+  @media (max-width: 768px) {
+    width: calc(100% - 32px);
+    min-height: 202px;
+    height: auto;
+  }
 `;
 
 export const PaginationButton = styled.button`
   position: absolute;
-  top: 81px; // 90 * 0.9
-  right: 12px; // 13 * 0.9
-  width: 25px; // 28 * 0.9
-  height: 16px; // 18 * 0.9
+  top: 81px;
+  right: 12px;
+  width: 25px;
+  height: 16px;
   background: transparent;
   border: none;
   border-radius: 50%;
@@ -28,6 +34,7 @@ export const PaginationButton = styled.button`
   justify-content: center;
   z-index: 1001;
   padding: 0;
+  transition: transform 0.2s ease;
 
   img {
     width: 100%;
@@ -42,99 +49,275 @@ export const PaginationButton = styled.button`
   &:focus {
     outline: none;
   }
-`;
 
-export const LocationImageWrapper = styled.div`
-  position: relative;
-  width: 143px; // 159 * 0.9
-  height: 158px; // 175 * 0.9
-  left: 25px; // 28 * 0.9
-  top: 22px; // 24 * 0.9
-  overflow: hidden;
-  border-radius: 7px; // 8 * 0.9
+  @media (max-width: 768px) {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 8px;
+  }
 `;
 
 export const LocationImage = styled.img`
   position: absolute;
-  width: 143px; // 159 * 0.9
-  height: 158px; // 175 * 0.9
-  left: 25px; // 28 * 0.9
-  top: 22px; // 24 * 0.9
+  width: 143px;
+  height: 158px;
+  left: 25px;
+  top: 22px;
   object-fit: cover;
-  border-radius: 7px; // 8 * 0.9
+  border-radius: 7px;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 16px;
+    width: 120px;
+    height: 120px;
+  }
 `;
 
-export const Title = styled.h1`
-  position: absolute;
-  left: 188px; // 209 * 0.9
-  top: 15px; // 17 * 0.9
+const BaseText = styled.div`
+  position: relative;
   font-family: 'Gothic A1';
-  font-style: normal;
-  font-weight: 600;
-  font-size: 27px; // 30 * 0.9
-  line-height: 34px; // 38 * 0.9
   color: #ffffff;
   margin: 0;
 `;
 
-export const Subtitle = styled.h2`
+export const Title = styled(BaseText)`
   position: absolute;
-  left: 188px; // 209 * 0.9
-  top: 50px; // 56 * 0.9
-  font-family: 'Gothic A1';
-  font-style: normal;
+  left: 188px;
+  top: 15px;
   font-weight: 600;
-  font-size: 27px; // 30 * 0.9
-  line-height: 34px; // 38 * 0.9
-  color: #ffffff;
-  margin: 0;
+  font-size: 27px;
+  line-height: 34px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+
+  &[data-overflow='true'] {
+    position: relative;
+
+    &::after {
+      content: attr(title);
+      position: fixed; // absolute 대신 fixed 사용
+      left: 50%;
+      transform: translateX(-50%);
+      top: auto;
+      bottom: 100%;
+      margin-bottom: 8px;
+      background: rgba(37, 38, 96, 0.95);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: normal;
+      max-width: 300px;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.2s,
+        visibility 0.2s;
+      pointer-events: none;
+    }
+
+    &:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 24px;
+    max-width: calc(100% - 32px);
+  }
 `;
 
-export const Address = styled.p`
+export const Subtitle = styled(BaseText)`
   position: absolute;
-  left: 188px; // 209 * 0.9
-  top: 85px; // 94 * 0.9
-  font-family: 'Gothic A1';
-  font-style: normal;
+  left: 188px;
+  top: 50px;
+  font-weight: 600;
+  font-size: 27px;
+  line-height: 34px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+
+  &[data-overflow='true'] {
+    position: relative;
+
+    &::after {
+      content: attr(title);
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: auto;
+      bottom: 100%;
+      margin-bottom: 8px;
+      background: rgba(37, 38, 96, 0.95);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: normal;
+      max-width: 300px;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.2s,
+        visibility 0.2s;
+      pointer-events: none;
+    }
+
+    &:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 32px;
+    max-width: calc(100% - 32px);
+  }
+`;
+
+export const Address = styled(BaseText)`
+  position: absolute;
+  left: 188px;
+  top: 85px;
   font-weight: 400;
-  font-size: 18px; // 20 * 0.9
-  line-height: 27px; // 30 * 0.9
-  color: #ffffff;
-  margin: 0;
-  max-width: 405px; // 450 * 0.9
+  font-size: 18px;
+  line-height: 27px;
+  max-width: 405px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &[data-overflow='true'] {
+    position: relative;
+
+    &::after {
+      content: attr(title);
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: auto;
+      bottom: 100%;
+      margin-bottom: 8px;
+      background: rgba(37, 38, 96, 0.95);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: normal;
+      max-width: 300px;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.2s,
+        visibility 0.2s;
+      pointer-events: none;
+    }
+
+    &:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 40px;
+    max-width: calc(100% - 32px);
+  }
 `;
 
 export const TagContainer = styled.div`
   position: absolute;
-  left: 184px; // 204 * 0.9
-  bottom: 22px; // 24 * 0.9
+  left: 184px;
+  bottom: 22px;
   display: flex;
-  gap: 7px; // 8 * 0.9
+  gap: 7px;
+  max-width: 276px;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    bottom: -48px;
+    max-width: calc(100% - 180px);
+  }
 `;
 
 export const Tag = styled.div`
-  width: 78px; // 87 * 0.9
-  height: 23px; // 26 * 0.9
+  min-width: 78px;
+  max-width: 87px;
+  height: 23px;
+  padding: 0 12px;
   background: #bdaee5;
-  border-radius: 23px; // 25 * 0.9
+  border-radius: 23px;
   display: flex;
   align-items: center;
   justify-content: center;
-
+  position: relative;
   font-family: 'Gothic A1';
-  font-style: normal;
   font-weight: 600;
-  font-size: 11px; // 12 * 0.9
-  line-height: 14px; // 15 * 0.9
+  font-size: 11px;
+  line-height: 14px;
   color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &[data-overflow='true'] {
+    position: relative;
+
+    &::after {
+      content: attr(data-full-text);
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: auto;
+      bottom: 100%;
+      margin-bottom: 8px;
+      background: rgba(37, 38, 96, 0.95);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.2s,
+        visibility 0.2s;
+      pointer-events: none;
+    }
+
+    &:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 `;
 
 export const FavButton = styled.button`
   position: absolute;
-  width: 28px; // 31 * 0.9
-  height: 25px; // 28 * 0.9
-  right: 144px; // 160 * 0.9
-  bottom: 22px; // 24 * 0.9
+  width: 28px;
+  height: 25px;
+  right: 144px;
+  bottom: 22px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -142,6 +325,7 @@ export const FavButton = styled.button`
   align-items: center;
   justify-content: center;
   padding: 0;
+  transition: transform 0.2s ease;
 
   img {
     width: 100%;
@@ -149,46 +333,57 @@ export const FavButton = styled.button`
     object-fit: contain;
   }
 
+  &:hover {
+    transform: scale(1.1);
+  }
+
   &:focus {
     outline: none;
-    box-shadow: none;
+  }
+
+  @media (max-width: 768px) {
+    right: 120px;
   }
 `;
 
 export const ReviewButton = styled.button`
   position: absolute;
-  width: 112px; // 124 * 0.9
-  height: 38px; // 42 * 0.9
-  right: 22px; // 24 * 0.9
-  bottom: 22px; // 24 * 0.9
+  width: 112px;
+  height: 38px;
+  right: 22px;
+  bottom: 22px;
   background: #fff5d5;
-  border-radius: 23px; // 25 * 0.9
+  border-radius: 23px;
   border: none;
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 600;
-  font-size: 14px; // 16 * 0.9
-  line-height: 27px; // 30 * 0.9
+  font-size: 14px;
+  line-height: 27px;
   color: #101148;
+  transition: all 0.2s ease;
 
   &:hover {
     background: #ffe9b3;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    right: 16px;
   }
 `;
 
 export const CloseButton = styled.button`
   position: absolute;
-  top: 9px; // 10 * 0.9
-  right: 12px; // 13 * 0.9
+  top: 9px;
+  right: 12px;
   padding: 4px;
-  width: 25px; // 28 * 0.9
-  height: 25px; // 28 * 0.9
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background: transparent;
   border: none;
@@ -198,22 +393,27 @@ export const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  transition: transform 0.2s ease;
 
   svg {
-    min-width: 18px; // 20 * 0.9
-    min-height: 18px; // 20 * 0.9
-    width: 18px; // 20 * 0.9
-    height: 18px; // 20 * 0.9
+    min-width: 18px;
+    min-height: 18px;
+    width: 18px;
+    height: 18px;
     color: #ffffff;
     stroke: currentColor;
   }
 
   &:hover {
-    background: transparent;
+    transform: scale(1.1);
   }
 
   &:focus {
     outline: none;
-    box-shadow: none;
+  }
+
+  @media (max-width: 768px) {
+    top: 8px;
+    right: 8px;
   }
 `;

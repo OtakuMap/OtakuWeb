@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
 import Search from '../common/Search';
@@ -134,6 +134,46 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     }
   };
 
+  const useCheckOverflow = (text: string) => {
+    const textRef = useRef<HTMLSpanElement>(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+
+    useEffect(() => {
+      const checkOverflow = () => {
+        if (textRef.current) {
+          const isTextOverflowing = textRef.current.scrollHeight > textRef.current.clientHeight;
+          setIsOverflowing(isTextOverflowing);
+        }
+      };
+
+      checkOverflow();
+      window.addEventListener('resize', checkOverflow);
+      return () => window.removeEventListener('resize', checkOverflow);
+    }, [text]);
+
+    return { textRef, isOverflowing };
+  };
+
+  const RecommendationItemWithOverflow = ({
+    text,
+    onClick,
+  }: {
+    text: string;
+    onClick: () => void;
+  }) => {
+    const { textRef, isOverflowing } = useCheckOverflow(text);
+
+    return (
+      <S.RecommendationItem
+        onClick={onClick}
+        data-full-text={text}
+        data-show-tooltip={isOverflowing}
+      >
+        <S.RecommendationText ref={textRef}>{text}</S.RecommendationText>
+      </S.RecommendationItem>
+    );
+  };
+
   // 메인 콘텐츠 렌더링
   const renderMainContent = () => {
     switch (activeView) {
@@ -148,9 +188,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
               <div>저장된 루트가 없습니다.</div>
             ) : (
               savedRoutes.map((route) => (
-                <S.RecommendationItem
+                <RecommendationItemWithOverflow
                   key={route.id}
-                  data-full-text={route.name} // 툴팁용 전체 텍스트
+                  text={route.name}
                   onClick={() =>
                     navigate(`/route/${route.routeId}`, {
                       state: {
@@ -158,9 +198,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
                       },
                     })
                   }
-                >
-                  <S.RecommendationText>{route.name}</S.RecommendationText>
-                </S.RecommendationItem>
+                />
               ))
             )}
           </S.RecommendationsContainer>
@@ -176,12 +214,11 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
               <div>저장된 장소가 없습니다.</div>
             ) : (
               favoritePlaces.map((place) => (
-                <S.RecommendationItem
+                <RecommendationItemWithOverflow
                   key={place.id}
+                  text={place.name}
                   onClick={() => handleFavoritePlaceClick(place.id)}
-                >
-                  <S.RecommendationText>{place.name}</S.RecommendationText>
-                </S.RecommendationItem>
+                />
               ))
             )}
           </S.RecommendationsContainer>
