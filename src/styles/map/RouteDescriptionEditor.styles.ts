@@ -78,3 +78,13 @@ export const EditButton = styled.button`
   cursor: pointer;
   z-index: 3;
 `;
+
+export const CharCount = styled.span`
+  position: absolute;
+  right: 0;
+  top: -20px;
+  font-family: 'Gothic A1';
+  font-size: 12px;
+  color: #999797;
+  z-index: 1;
+`;

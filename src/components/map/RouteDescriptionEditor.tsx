@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as S from '../../styles/map/RouteDescriptionEditor.styles';
 import { toast } from 'react-toastify';
 
@@ -7,8 +7,24 @@ interface RouteDescriptionEditorProps {
   onSave: (description: string) => void;
 }
 
+const MAX_LENGTH = 25;
+
 const RouteDescriptionEditor = ({ description, onSave }: RouteDescriptionEditorProps) => {
   const [currentDescription, setCurrentDescription] = useState(description);
+  const [charCount, setCharCount] = useState(description.length);
+
+  useEffect(() => {
+    setCharCount(currentDescription.length);
+  }, [currentDescription]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_LENGTH) {
+      setCurrentDescription(newValue);
+    } else {
+      toast.warning('최대 25자까지 입력 가능합니다.');
+    }
+  };
 
   const handleSave = () => {
     if (!currentDescription.trim()) {
@@ -23,10 +39,12 @@ const RouteDescriptionEditor = ({ description, onSave }: RouteDescriptionEditorP
     <S.Container>
       <S.InputArea>
         <S.TextArea
-          placeholder="루트명을 입력하세요"
+          placeholder="루트명을 입력하세요 (최대 25자)"
           value={currentDescription}
-          onChange={(e) => setCurrentDescription(e.target.value)}
+          onChange={handleChange}
+          maxLength={MAX_LENGTH}
         />
+        <S.CharCount>{`${charCount}/${MAX_LENGTH}`}</S.CharCount>
       </S.InputArea>
       <S.DashedLine top={42} />
       <S.DashedLine top={84} />

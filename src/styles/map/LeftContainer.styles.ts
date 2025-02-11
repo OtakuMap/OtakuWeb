@@ -170,37 +170,49 @@ export const RecommendationsContainer = styled.div`
 
 export const RecommendationItem = styled.div<RecommendationItemProps>`
   box-sizing: border-box;
-  width: 237px; // 296 * 0.8
-  min-height: 25px; // 31 * 0.8
+  width: 237px;
+  min-height: 25px;
   border: 1px solid #d1c1ff;
-  border-radius: 16px; // 20 * 0.8
-  padding: 8px 16px; // 수정: 상하 패딩 증가
+  border-radius: 16px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  position: relative; // 툴팁을 위한 position 설정
+  position: relative;
 
   &:hover {
     background-color: rgba(209, 193, 255, 0.1);
   }
 
-  // 호버 시 전체 텍스트를 보여주는 툴팁
-  &:hover::after {
+  &[data-show-tooltip='true']:hover::after {
     content: attr(data-full-text);
-    position: absolute;
+    position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    top: -40px;
-    background: rgba(37, 38, 96, 0.9);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    white-space: nowrap;
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 8px;
+    background: rgba(37, 38, 96, 0.95);
     color: white;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: normal;
+    max-width: 300px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s,
+      visibility 0.2s;
+    pointer-events: none;
+  }
+
+  &[data-show-tooltip='true']:hover::after {
+    opacity: 1;
+    visibility: visible;
   }
 `;
 
@@ -212,13 +224,11 @@ export const RecommendationText = styled.span`
   line-height: 16px;
   color: #ffffff;
   text-align: center;
-
-  // 2줄까지 표시하고 말줄임표 처리
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
-  max-height: 32px; // line-height * 2
+  max-height: 32px;
 `;

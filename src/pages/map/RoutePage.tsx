@@ -51,7 +51,8 @@ const sampleLocations: RouteLocation[] = [
     isSelected: false,
     latitude: 35.6962,
     longitude: 139.5704,
-    animeName: '지브리 작품들',
+    animeName:
+      '마루 밑 아리에티, 토토로, 포뇨, 하울의 움직이는 성, 마녀배달부 키키zmzmzmzdkdkdkdkdkdkdkdkfjlakjfldf아ㅓㅁ니ㅏ러이ㅏㅓ라민m',
     hashtags: ['지브리', '미야자키하야오', '토토로'],
   },
   {
