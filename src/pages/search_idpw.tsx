@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, SearchIdPwBox, Section, Title, DetailText, 
-  FormGroup, Name, Input, InputShort, Divider, ActionButton, ActionButtonShort } 
-  from '../styles/login/search_idpw.style';
+import {
+  Container,
+  SearchIdPwBox,
+  Section,
+  Title,
+  DetailText,
+  FormGroup,
+  Name,
+  Input,
+  InputShort,
+  Divider,
+  ActionButton,
+  ActionButtonShort,
+} from '../styles/login/search_idpw.style';
 import { authAPI } from '../api/login/authAPI';
 
 const SearchIdPWPage: React.FC = () => {
@@ -24,10 +35,11 @@ const SearchIdPWPage: React.FC = () => {
     }
 
     try {
-      const response = await authAPI.searchId({ name: idName, email: idEmail }); // 필드명 확인 후 수정
-      if (response.isSuccess) {
-        setFoundUserId(response.result.userId); // 찾은 아이디 저장
-        alert('아이디가 조회되었습니다.');
+      const response = await authAPI.searchId({ name: idName, email: idEmail });
+
+      if (response.isSuccess && response.result?.userId) {
+        setFoundUserId(response.result.userId); // ✅ userId가 존재하는지 확인 후 저장
+        alert(`아이디: ${response.result.userId}`);
       } else {
         alert(response.message || '아이디 조회에 실패했습니다.');
       }
@@ -106,9 +118,9 @@ const SearchIdPWPage: React.FC = () => {
           <ActionButton onClick={handleSearchId}>조회하기</ActionButton>
           {foundUserId && <DetailText>찾은 아이디: {foundUserId}</DetailText>}
         </Section>
-        
+
         <Divider />
-        
+
         {/* 비밀번호 찾기 */}
         <Section>
           <Title>비밀번호 찾기</Title>

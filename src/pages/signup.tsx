@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   SignupBox,
@@ -31,7 +32,10 @@ import O from '../assets/img/O.png';
 import X from '../assets/img/X.png';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const [userId, setUserId] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
@@ -56,23 +60,33 @@ const SignupPage: React.FC = () => {
       alert('이메일을 입력해주세요.');
       return;
     }
+
     try {
+      // 이메일 중복 체크
       const emailCheckResponse = await authAPI.checkEmailDuplication(email);
-      setIsEmailAvailable(emailCheckResponse.isSuccess);
-      if (!emailCheckResponse.isSuccess) {
-        alert('이메일이 중복되었습니다. 다른 이메일을 입력해주세요.');
-        return;
-      }
-      const verificationResponse = await authAPI.sendEmailVerifyCode({ email });
-      if (verificationResponse.isSuccess) {
-        alert('인증번호가 이메일로 전송되었습니다.');
+
+      if (emailCheckResponse.isSuccess) {
+        alert('이메일이 사용 가능합니다. 인증번호를 전송합니다.');
+
+        // 인증번호 요청 API 호출
+        const verificationResponse = await authAPI.sendEmailVerifyCode({ email });
+        if (verificationResponse.isSuccess) {
+          alert('인증번호가 이메일로 전송되었습니다.');
+          setIsEmailAvailable(true); // 이메일 인증 전송 성공 시
+        } else {
+          alert(verificationResponse.message);
+          setIsEmailAvailable(false); // 인증번호 전송 실패 시
+        }
       } else {
-        alert(verificationResponse.message);
+        alert('이 이메일은 이미 사용 중입니다.');
+        setIsEmailAvailable(false); // 이메일 중복 시 X 표시
       }
     } catch (error) {
       console.error('이메일 인증 코드 전송 실패:', error);
+      setIsEmailAvailable(false); // 에러 발생 시 X 표시
     }
   };
+
   const handleVerificationCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVerificationCode(e.target.value);
   };
@@ -93,6 +107,51 @@ const SignupPage: React.FC = () => {
     }
   };
 
+  const handleSignup = async () => {
+    if (!name || !userId || !email || !password || !passwordCheck || !verificationCode) {
+      alert('모든 필드를 올바르게 입력해주세요.');
+      return;
+    }
+
+    if (password !== passwordCheck) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      // 이메일 중복 체크 (회원가입 전에 이메일이 이미 등록된 경우 X 아이콘 표시)
+      const emailCheckResponse = await authAPI.checkEmailDuplication(email);
+
+      if (!emailCheckResponse.isSuccess) {
+        alert('이 이메일은 이미 사용 중입니다.');
+        setIsEmailAvailable(false); // 이메일이 중복되면 X 표시
+        return;
+      }
+
+      const signupData = {
+        userId,
+        email,
+        password,
+        passwordCheck,
+        name,
+        role: 'USER',
+        status: 'ACTIVE',
+      };
+      console.log('Signup data:', signupData);
+      const response = await authAPI.register(signupData);
+
+      if (response.isSuccess) {
+        alert('회원가입이 완료되었습니다!');
+        navigate('/login');
+      } else {
+        alert(response.message);
+      }
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+      alert('회원가입 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <Container>
       <SignupBox>
@@ -100,7 +159,12 @@ const SignupPage: React.FC = () => {
         <InputBox>
           <FormGroup>
             <Name>이름</Name>
-            <Input type="text" placeholder="이름을 입력해주세요" />
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="이름을 입력해주세요"
+            />
           </FormGroup>
           <FormGroup>
             <Name>ID</Name>
@@ -130,7 +194,7 @@ const SignupPage: React.FC = () => {
               placeholder="otaku@gmail.com"
             />
             <CheckIcon1
-              src={isEmailAvailable ? X : O}
+              src={isEmailAvailable ? O : X} // 이메일이 사용 가능한지 여부에 따라 O 또는 X 표시
               alt={isEmailAvailable ? 'Available' : 'Unavailable'}
             />
             <VerifyButtonShort onClick={handleEmailVerificationCodeRequest}>
@@ -194,7 +258,7 @@ const SignupPage: React.FC = () => {
         </CheckboxGroup>
 
         <Divider />
-        <ActionLink onClick={() => alert('가입하기 버튼 클릭됨')}>가입하기</ActionLink>
+        <ActionLink onClick={handleSignup}>가입하기</ActionLink>
       </SignupBox>
     </Container>
   );
