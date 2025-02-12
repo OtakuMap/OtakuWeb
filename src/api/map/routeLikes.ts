@@ -22,6 +22,10 @@ export const getSavedRoutes = async ({ lastId = 0, limit = 10 }: GetSavedRoutesP
       },
     });
 
+    // 응답 데이터 로깅
+    console.log('API Response:', response.data);
+    console.log('Route Likes:', response.data.result.routeLikes);
+
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<{

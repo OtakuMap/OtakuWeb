@@ -208,6 +208,12 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       console.log('저장된 루트:', response);
 
       // 성공 후 적절한 페이지로 리다이렉트
+      // if (routeSource === RouteSource.REVIEW) {
+      //   navigate('/route-management');
+      // } else {
+      //   navigate(-1);
+      // }
+      // 테스트를 위해 임시로 수정
       if (routeSource === RouteSource.REVIEW) {
         navigate('/route-management');
       } else {

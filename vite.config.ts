@@ -23,7 +23,7 @@ export default defineConfig(({ mode }): UserConfig => {
         '/api': {
           target: env.VITE_API_URL,
           changeOrigin: true,
-          secure: false,
+          secure: true,
           headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
