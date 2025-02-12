@@ -29,7 +29,7 @@ import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
 import EventPage from './pages/EventPage2';
 import Main from './components/Main';
-import PurchaseIncomeCheck from './pages/point/PurchaseIncomeCheck';
+import PurchaseIncomeCheck from './pages/point/purchaseIncomeCheck';
 import PointCharge from './pages/point/pointCharge';
 import MyPoint from './pages/point/myPoint';
 import OAuthRedirectHandler from './pages/OAuthRedirect';
