@@ -108,7 +108,7 @@ export const authAPI = {
       console.log('Request URL:', '/auth/signup');
       console.log('Request Data:', userData);
 
-      const response = await instance.post<RegisterResponse>('/auth/register', userData);
+      const response = await instance.post<RegisterResponse>('/auth/signup', userData);
       console.log('Response:', response);
       return response.data;
     } catch (error: unknown) {
@@ -153,14 +153,15 @@ export const authAPI = {
 
   // 아이디 비밀번호 찾기
   // 아이디 찾기
-  searchId: async (userId: string): Promise<SearchIdResponse> => {
+  searchId: async (params: SearchIdRequest): Promise<SearchIdResponse> => {
     try {
       console.log('Request URL:', '/auth/find-id');
-      console.log('Request Data:', { userId });
+      console.log('Request Params:', params);
 
       const response = await instance.get<SearchIdResponse>('/auth/find-id', {
-        params: { userId },
+        params, // GET 요청에서는 params 사용
       });
+
       console.log('Response:', response);
       return response.data;
     } catch (error: unknown) {
