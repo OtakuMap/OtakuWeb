@@ -8,7 +8,14 @@ import NextPage from '../assets/NextPage.png';
 import dividerLine from '../assets/dividerLine.png';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 import * as S from '../styles/review/ReviewPage.style';
+import { createShortReview } from '@/api/review/short-review';
+import { ShortReviewRequest } from '@/types/review/short-review';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface Review {
   id: number;
@@ -113,6 +120,8 @@ const reviewData = [
 ];
 
 const ReviewPage4 = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 6;
   const [reviews, setReviews] = useState<Review[]>(
@@ -125,6 +134,33 @@ const ReviewPage4 = () => {
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const { placeId } = useParams<{ placeId: string }>();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!placeId) {
+      console.error('No placeId available');
+      window.confirm('장소 정보를 찾을 수 없습니다.');
+      navigate('/places'); // 또는 적절한 페이지로 이동
+      return;
+    }
+  }, [placeId, navigate]);
+
+  useEffect(() => {
+    const savedReviews = localStorage.getItem(`reviews_${placeId}`);
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews));
+    } else {
+      setReviews(reviewData.map((review) => ({ ...review, userVote: null })));
+    }
+  }, [placeId]);
+
+  useEffect(() => {
+    if (placeId) {
+      localStorage.setItem(`reviews_${placeId}`, JSON.stringify(reviews));
+    }
+  }, [reviews, placeId]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -141,30 +177,47 @@ const ReviewPage4 = () => {
   const [editRating, setEditRating] = useState(0);
 
   // 리뷰 추가 핸들러
-  const handleReviewSubmit = () => {
-    if (reviewText.trim() === '') {
-      window.confirm('후기를 등록해주세요!');
-      return;
-    }
-    if (inputRating === 0) {
-      window.confirm('별점을 등록해주세요!');
-      return;
-    }
-    const newReview: Review = {
-      id: reviews.length + 1,
-      profileImage: profileData.profileImage,
-      username: profileData.name,
-      rating: inputRating, // profileData.rating 대신 inputRating 사용
-      maxRating: 4, // 최대 별점을 4로 고정
-      likes: 0,
-      dislikes: 0,
-      content: reviewText,
-      userVote: null,
-    };
+  const handleReviewSubmit = async () => {
+    try {
+      const requestData: ShortReviewRequest = {
+        placeAnimationId: 2,
+        rating: inputRating,
+        content: reviewText.trim(),
+      };
 
-    setReviews([newReview, ...reviews]);
-    setReviewText('');
-    setInputRating(0); // 입력 후 별점 초기화
+      const result = await createShortReview(Number(placeId), requestData);
+
+      if (result.isSuccess) {
+        const newReview: Review = {
+          id: result.result.reviewId,
+          profileImage: profileData.profileImage,
+          username: profileData.name,
+          rating: inputRating,
+          maxRating: 4,
+          likes: 0,
+          dislikes: 0,
+          content: reviewText,
+          userVote: null,
+        };
+
+        setReviews((prevReviews) => {
+          const uniqueReviews = [newReview, ...prevReviews].filter(
+            (review, index, self) => index === self.findIndex((r) => r.id === review.id),
+          );
+          return uniqueReviews;
+        });
+
+        setReviewText('');
+        setInputRating(0);
+        setCurrentPage(1);
+        window.confirm('리뷰가 등록되었습니다!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      window.confirm('리뷰 등록 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEditStart = (review: Review) => {
@@ -199,16 +252,18 @@ const ReviewPage4 = () => {
   };
 
   const handleLike = (reviewId: number) => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     setReviews(
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'like') {
-            // 이미 좋아요를 눌렀다면 취소
             return { ...review, likes: review.likes - 1, userVote: null };
           } else {
-            // 처음 좋아요를 누르는 경우
             const newLikes = review.likes + 1;
-            // 싫어요를 눌렀던 상태라면 싫어요도 취소
             const newDislikes =
               review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
@@ -220,16 +275,18 @@ const ReviewPage4 = () => {
   };
 
   const handleDislike = (reviewId: number) => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     setReviews(
       reviews.map((review) => {
         if (review.id === reviewId) {
           if (review.userVote === 'dislike') {
-            // 이미 싫어요를 눌렀다면 취소
             return { ...review, dislikes: review.dislikes - 1, userVote: null };
           } else {
-            // 처음 싫어요를 누르는 경우
             const newDislikes = review.dislikes + 1;
-            // 좋아요를 눌렀던 상태라면 좋아요도 취소
             const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
             return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
           }
@@ -237,6 +294,20 @@ const ReviewPage4 = () => {
         return review;
       }),
     );
+  };
+
+  const handleTextAreaClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+    }
+  };
+
+  const handleSubmitButtonClick = () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+    handleReviewSubmit();
   };
 
   return (
@@ -247,7 +318,9 @@ const ReviewPage4 = () => {
             <MapPin size={20} color="#0c004b" />
             <S.LocationText value="Hanshin Koshien Stadium" readOnly />
           </S.LocationInput>
-          <S.SaveLocationButton>명소 저장하기</S.SaveLocationButton>
+          <S.SaveLocationButton onClick={() => navigate('/saved-places')}>
+            명소 저장하기
+          </S.SaveLocationButton>
         </S.LocationBar>
 
         <S.DropdownButton>다이아몬드 에이스 ▼</S.DropdownButton>
@@ -283,11 +356,27 @@ const ReviewPage4 = () => {
             </S.ProfileContainer>
             <div style={{ position: 'relative', width: '800px' }}>
               <S.FeedbackInput
-                placeholder="한 줄 후기를 남겨주세요 !"
+                placeholder={isLoggedIn ? '한 줄 후기를 남겨주세요 !' : '로그인이 필요합니다.'}
                 value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
+                onChange={(e) => isLoggedIn && setReviewText(e.target.value)}
+                onClick={handleTextAreaClick}
+                readOnly={!isLoggedIn}
+                style={{
+                  backgroundColor: !isLoggedIn ? '#f5f5f5' : 'white',
+                  cursor: !isLoggedIn ? 'pointer' : 'text',
+                  color: !isLoggedIn ? '#666' : '#000',
+                }}
               />
-              <S.SubmitButton onClick={handleReviewSubmit}>등록하기</S.SubmitButton>
+              <S.SubmitButton
+                onClick={handleSubmitButtonClick}
+                disabled={!isLoggedIn || isSubmitting}
+                style={{
+                  opacity: !isLoggedIn || isSubmitting ? 0.5 : 1,
+                  cursor: !isLoggedIn || isSubmitting ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isSubmitting ? '등록 중...' : '등록하기'}
+              </S.SubmitButton>
             </div>
           </S.FeedbackSection>
 

@@ -1,38 +1,36 @@
 import { useState } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import MapContainer from '@/components/map/MapContainer';
-import { RouteLocation } from '@/types/map/route';
+import {
+  useEventDetails,
+  useReviews,
+  useReviewSubmission,
+  calculateAverageRating,
+} from '@/hooks/event/useEventPage';
+import * as S from '../styles/event/EventPage2.styles';
+
+// Assets
 import dividerLine from '../assets/dividerLine.png';
 import StarFull from '../assets/StarFull.png';
 import StarEm from '../assets/StarEm.png';
-import * as S from '../styles/event/EventPage2.styles';
 import profile from '../assets/profile.png';
 import profile3 from '../assets/profile3.png';
-import eventImage from '../assets/eventImg.png';
 import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
 import product from '../assets/product.png';
-import { useNavigate } from 'react-router-dom';
+import eventImage from '../assets/eventImg.png';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
-interface Review {
-  id: number;
-  profileImage: string;
-  username: string;
-  rating: number;
-  maxRating: number;
-  likes: number;
-  dislikes: number;
-  content: string;
-  userVote: 'like' | 'dislike' | null;
-}
-
-// 기존의 eventData, profileData, postData는 그대로 유지
-const eventData = {
+// 임시 데이터는 API 연동 전까지 유지
+const tempEventData = {
   title: '다이아몬드 에이스 ACT2 팝업스토어',
   titleJp: 'ダイヤのA act II」POP UP SHOP in AMNIBUS STORE',
   subtitle: '다이아몬드 에이스 ACT2',
-  image: eventImage,
-  backimage: backimage,
+  image: eventImage, // 추가
+  backimage: backimage, // 추가
   date: {
     start: '2024년 11월 22일',
     end: '2024년 12월 8일',
@@ -130,127 +128,102 @@ const postData = [
 ];
 
 const EventPage = () => {
-  const [reviewText, setReviewText] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editText, setEditText] = useState('');
-  const [inputRating, setInputRating] = useState(0);
-  const [editRating, setEditRating] = useState(0);
-  const [activeTab, setActiveTab] = useState('후기');
   const navigate = useNavigate();
-  const [reviews, setReviews] = useState<Review[]>(
-    reviewData.map((review) => ({
-      ...review,
-      userVote: null,
-    })),
-  );
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const { eventId: urlEventId } = useParams<{ eventId: string }>();
+  const eventId = Number(urlEventId) || 1;
+  const [activeTab, setActiveTab] = useState('기본정보');
 
-  const calculateAverageRating = (reviews: Review[]) => {
-    if (reviews.length === 0) return 0;
+  // Custom hooks 사용
+  const { eventDetails, loading, error } = useEventDetails(eventId);
+  const {
+    reviews,
+    setReviews,
+    editingId,
+    editText,
+    editRating,
+    setEditText,
+    setEditRating,
+    handleEditStart,
+    handleEditCancel,
+    handleEditComplete,
+    handleDelete,
+    handleLike,
+    handleDislike,
+  } = useReviews(reviewData.map((review) => ({ ...review, userVote: null })));
 
-    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return (sum / reviews.length).toFixed(1); // 소수점 한 자리까지 표시
+  const {
+    reviewText,
+    setReviewText,
+    inputRating,
+    setInputRating,
+    submitError,
+    handleReviewSubmit,
+  } = useReviewSubmission(eventId, reviews, setReviews, profileData);
+
+  const handleTextAreaClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      e.stopPropagation();
+      dispatch(openLoginModal());
+    }
   };
 
-  const handleReviewSubmit = () => {
-    if (reviewText.trim() === '') {
-      window.confirm('후기를 등록해주세요!');
+  const handleReviewButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
       return;
     }
-    if (inputRating === 0) {
-      window.confirm('별점을 등록해주세요!');
-      return;
-    }
-
-    const newReview: Review = {
-      id: reviews.length + 1,
-      profileImage: profileData.profileImage,
-      username: profileData.name,
-      rating: inputRating,
-      maxRating: 4,
-      likes: 0,
-      dislikes: 0,
-      content: reviewText,
-      userVote: null,
-    };
-
-    setReviews([newReview, ...reviews]);
-    setReviewText('');
-    setInputRating(0);
+    handleReviewSubmit();
   };
 
-  const handleEditStart = (review: Review) => {
-    setEditingId(review.id);
-    setEditText(review.content);
-    setEditRating(review.rating);
-  };
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
 
-  const handleEditCancel = () => {
-    setEditingId(null);
-    setEditText('');
-    setEditRating(0);
-  };
+  if (error) {
+    return <div>{error}</div>;
+  }
 
-  const handleEditComplete = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) =>
-        review.id === reviewId ? { ...review, content: editText, rating: editRating } : review,
-      ),
-    );
-    setEditingId(null);
-    setEditText('');
-    setEditRating(0);
-  };
-
-  const handleDelete = (reviewId: number) => {
-    if (window.confirm('리뷰를 삭제하시겠습니까?')) {
-      setReviews(reviews.filter((review) => review.id !== reviewId));
-    }
-  };
-
-  const handleLike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          if (review.userVote === 'like') {
-            return { ...review, likes: review.likes - 1, userVote: null };
-          } else {
-            const newLikes = review.likes + 1;
-            const newDislikes =
-              review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes;
-            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'like' };
-          }
-        }
-        return review;
-      }),
-    );
-  };
-
-  const handleDislike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          if (review.userVote === 'dislike') {
-            return { ...review, dislikes: review.dislikes - 1, userVote: null };
-          } else {
-            const newDislikes = review.dislikes + 1;
-            const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes;
-            return { ...review, likes: newLikes, dislikes: newDislikes, userVote: 'dislike' };
-          }
-        }
-        return review;
-      }),
-    );
-  };
+  // API 응답이 없을 경우 임시 데이터 사용
+  const displayData = eventDetails
+    ? {
+        title: eventDetails.title,
+        titleJp: eventDetails.name,
+        subtitle: eventDetails.animationName,
+        image: eventDetails.thumbnailImage.fileUrl,
+        backimage: eventDetails.backgroundImage.fileUrl,
+        date: {
+          start: eventDetails.startDate,
+          end: eventDetails.endDate,
+        },
+        location: {
+          id: eventDetails.eventLocation.id,
+          name: eventDetails.eventLocation.name,
+          coordinates: {
+            lat: Number(eventDetails.eventLocation.latitude),
+            lng: Number(eventDetails.eventLocation.longitude),
+          },
+          isSelected: false,
+          animeName: eventDetails.animationName,
+          address: eventDetails.eventLocation.name,
+          hashtags: ['팝업스토어'],
+        },
+        productImage: eventDetails.goodsImage.fileUrl,
+      }
+    : tempEventData;
 
   return (
     <S.Container>
       <S.Content>
-        <S.EventHeader imageUrl={eventData.backimage}>
+        <S.EventHeader imageUrl={displayData.backimage}>
           <S.EventHeaderInner>
-            <S.EventImage src={eventImage} alt={eventData.title} />
+            <S.EventImage src={displayData.image} alt={displayData.title} />
             <S.EventInfo>
-              <S.EventTitle>{eventData.title}</S.EventTitle>
-              <S.EventSubtitle>{eventData.subtitle}</S.EventSubtitle>
+              <S.EventTitle>{displayData.title}</S.EventTitle>
+              <S.EventSubtitle>{displayData.subtitle}</S.EventSubtitle>
               <S.SaveButton onClick={() => navigate('/saved-events')}>이벤트 저장하기</S.SaveButton>
             </S.EventInfo>
           </S.EventHeaderInner>
@@ -270,43 +243,44 @@ const EventPage = () => {
           <S.EventInfoSection>
             <S.Section>
               <S.SectionTitle>이벤트 이름</S.SectionTitle>
-              <S.SectionText>{eventData.titleJp}</S.SectionText>
+              <S.SectionText>{displayData.titleJp}</S.SectionText>
             </S.Section>
 
             <S.Section>
               <S.SectionTitle>일자</S.SectionTitle>
               <S.SectionText>
-                {eventData.date.start} - {eventData.date.end}
+                {displayData.date.start} - {displayData.date.end}
               </S.SectionText>
             </S.Section>
 
             <S.Section>
               <S.SectionTitle>위치</S.SectionTitle>
-              <S.SectionText>{eventData.location.name}</S.SectionText>
+              <S.SectionText>{displayData.location.name}</S.SectionText>
               <S.MapWrapper>
                 <MapContainer
                   apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                  center={eventData.location.coordinates}
+                  center={displayData.location.coordinates}
                   zoom={17}
                   locations={[
                     {
-                      id: 1,
-                      latitude: eventData.location.coordinates.lat,
-                      longitude: eventData.location.coordinates.lng,
-                      name: eventData.location.name,
+                      id: displayData.location.id,
+                      latitude: displayData.location.coordinates.lat,
+                      longitude: displayData.location.coordinates.lng,
+                      name: displayData.location.name,
                       isSelected: false,
-                      animeName: '다이아몬드 에이스 ACT2',
-                      address: 'Tokyo AMNIBUS STORE(MAGNET by SHIBUYA109 5F)',
-                      hashtags: ['팝업스토어', '다이아몬드에이스'],
+                      animeName: displayData.location.animeName,
+                      address: displayData.location.address,
+                      hashtags: displayData.location.hashtags,
                     },
                   ]}
                 />
               </S.MapWrapper>
             </S.Section>
+
             <S.Section>
               <S.SectionTitle>판매제품</S.SectionTitle>
               <S.ProductContainer>
-                <S.ProductImage src={eventData.productImage} alt="판매제품 목록" />
+                <S.ProductImage src={displayData.productImage} alt="판매제품 목록" />
               </S.ProductContainer>
             </S.Section>
           </S.EventInfoSection>
@@ -334,11 +308,16 @@ const EventPage = () => {
                 </S.ProfileSection>
                 <S.InputSection>
                   <S.TextArea
-                    placeholder="한 줄 후기를 남겨주세요!"
+                    placeholder={isLoggedIn ? '한 줄 후기를 남겨주세요!' : '로그인이 필요합니다.'}
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
+                    onClick={handleTextAreaClick}
+                    isNotLoggedIn={!isLoggedIn}
                   />
-                  <S.ReviewButton onClick={handleReviewSubmit}>등록하기</S.ReviewButton>
+                  <S.ReviewButton onClick={handleReviewButtonClick} isNotLoggedIn={!isLoggedIn}>
+                    등록하기
+                  </S.ReviewButton>
+                  {submitError && <S.ErrorMessage>{submitError}</S.ErrorMessage>}
                 </S.InputSection>
               </S.InputHeader>
             </S.ReviewInput>
@@ -349,7 +328,7 @@ const EventPage = () => {
 
             <S.ReviewList>
               {reviews.map((review) => (
-                <S.ReviewCard key={review.id} isMyReview={review.username === profileData.name}>
+                <S.ReviewCard key={review.id} $isMyReview={review.username === profileData.name}>
                   <S.ReviewHeader>
                     <S.Avatar src={review.profileImage} alt="프로필" />
                     <S.UserInfo>
@@ -437,6 +416,7 @@ const EventPage = () => {
                 </S.ReviewCard>
               ))}
             </S.ReviewList>
+
             <S.ReviewCount>후기 게시물 (10)</S.ReviewCount>
             <S.PostGrid>
               {postData.map((post) => (

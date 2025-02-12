@@ -158,6 +158,29 @@ export const SearchBarWrapper = styled.div`
   margin-top: 20px;
 `;
 
+export const ErrorMessage = styled.div`
+  color: #ff6b6b;
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #fff5f5;
+  border-radius: 4px;
+  border: 1px solid #ffc9c9;
+`;
+
+export const ReviewTypeButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0c004b;
+  font-weight: bold;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const SearchInput = styled.input`
   border: none;
   padding: 10px;
@@ -474,6 +497,7 @@ export const FeedbackInput = styled.textarea`
   resize: none;
   box-sizing: border-box;
   outline: none;
+  color: black;
 `;
 
 export const ProfileContainer = styled.div`
@@ -537,19 +561,20 @@ export const ReviewProfileName = styled.div`
 `;
 
 export const SubmitButton = styled.button`
-  background-color: white;
-  color: #0c004b;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 20px;
+  bottom: 20px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  z-index: 2;
 
-  &:hover {
-    background-color: #f0f0f0;
+  &:focus {
+    outline: none;
+    border: none;
   }
 `;
 
@@ -1013,52 +1038,7 @@ export const ProfileImage6 = styled.div`
     object-fit: cover;
   }
 `;
-export const ReviewCard6 = styled.div`
-  display: flex;
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-  gap: 20px;
-`;
 
-export const ReviewContent6 = styled.div`
-  flex: 1;
-`;
-
-export const ReviewTitle6 = styled.h3`
-  font-family: Gothic A1;
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 37.5px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  color: black;
-  margin: 48px 30px 26px 53px;
-  width: 700px;
-  height: 70px;
-`;
-
-export const ReviewText6 = styled.p`
-  font-family: Gothic A1;
-  font-size: 20px;
-  font-weight: 300;
-  line-height: 25px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  margin: 0px 48px 0px 53px;
-  color: black;
-  width: 700px;
-  height: 125px;
-`;
-
-export const ReviewImage6 = styled.img`
-  width: 349px;
-  height: 189px;
-  border-radius: 15px;
-  object-fit: cover;
-  margin: 48px 67px 0px 0px;
-`;
 // ReviewPage7 specific styles
 export const ContentContainer7 = styled.div`
   display: flex;
@@ -1184,4 +1164,73 @@ export const Button7 = styled.button`
   font-weight: 700;
   margin-top: 10px;
   align-self: center;
+`;
+
+export const SelectText = styled.span`
+  color: #0c004b;
+`;
+
+export const ArrowIcon = styled.span`
+  color: #0c004b;
+`;
+export const SelectBoxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+`;
+
+export const SelectBox = styled.div`
+  position: relative;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  color: #0c004b;
+`;
+
+export const DropdownList = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  z-index: 1;
+`;
+
+export const DropdownItem = styled.div`
+  padding: 10px;
+  cursor: pointer;
+  color: #0c004b;
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+export const SeInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  &:focus {
+    outline: none;
+  }
+`;
+export const ReviewFormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* SelectBoxContainer와 RouteSection 사이 간격 조절 */
+`;
+export const NoResults = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
 `;

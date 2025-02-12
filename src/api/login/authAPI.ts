@@ -220,6 +220,41 @@ export const authAPI = {
     }
   },
 
+  // logout: async (): Promise<LogoutResponse> => {
+  //   try {
+  //     // 토큰이 없는 경우 즉시 성공 반환
+  //     const accessToken = tokenStorage.getAccessToken();
+  //     if (!accessToken) {
+  //       return {
+  //         isSuccess: true,
+  //         code: 'SUCCESS',
+  //         message: '로그아웃 되었습니다.'
+  //       };
+  //     }
+
+  //     const response = await instance.post<LogoutResponse>('/auth/logout');
+  //     return response.data;
+  //   } catch (error: unknown) {
+  //     console.error('Error during logout:', error);
+  //     if (axios.isAxiosError(error)) {
+  //       // 401 에러는 이미 로그아웃된 상태로 간주
+  //       if (error.response?.status === 401) {
+  //         return {
+  //           isSuccess: true,
+  //           code: 'SUCCESS',
+  //           message: '로그아웃 되었습니다.'
+  //         };
+  //       }
+  //       return handleError<LogoutResponse>(error);
+  //     }
+  //     return {
+  //       isSuccess: false,
+  //       code: 'UNKNOWN_ERROR',
+  //       message: '로그아웃 중 오류가 발생했습니다.'
+  //     };
+  //   }
+  // };
+
   // 로그아웃
   logout: async (): Promise<LogoutResponse> => {
     try {

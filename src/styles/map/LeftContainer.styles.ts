@@ -137,7 +137,6 @@ export const DeleteButton = styled.button`
   border: none;
   outline: none;
   cursor: pointer;
-  background: url('/src/assets/search_delete.png') no-repeat center / contain;
   padding: 0;
   display: flex;
   align-items: center;
@@ -171,19 +170,49 @@ export const RecommendationsContainer = styled.div`
 
 export const RecommendationItem = styled.div<RecommendationItemProps>`
   box-sizing: border-box;
-  width: 237px; // 296 * 0.8
-  height: 25px; // 31 * 0.8
+  width: 237px;
+  min-height: 25px;
   border: 1px solid #d1c1ff;
-  border-radius: 16px; // 20 * 0.8
-  padding: 4px 16px; // 5 * 0.8, 20 * 0.8
+  border-radius: 16px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  position: relative;
 
   &:hover {
     background-color: rgba(209, 193, 255, 0.1);
+  }
+
+  &[data-show-tooltip='true']:hover::after {
+    content: attr(data-full-text);
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 8px;
+    background: rgba(37, 38, 96, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: normal;
+    max-width: 300px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s,
+      visibility 0.2s;
+    pointer-events: none;
+  }
+
+  &[data-show-tooltip='true']:hover::after {
+    opacity: 1;
+    visibility: visible;
   }
 `;
 
@@ -191,7 +220,15 @@ export const RecommendationText = styled.span`
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 400;
-  font-size: 13px; // 16 * 0.8
-  line-height: 16px; // 20 * 0.8
+  font-size: 13px;
+  line-height: 16px;
   color: #ffffff;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  max-height: 32px;
 `;
