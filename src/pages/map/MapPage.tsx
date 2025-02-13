@@ -225,6 +225,8 @@ const MapPage = () => {
             placeDetails={placeDetails}
             onClose={handleCloseDetail}
             placeLikeId={selectedPlaceLikeId || undefined}
+            // 선택된 장소의 원본 이름을 사용
+            originalName={selectedPlace?.name}
           />
         )}
       </MapWrapper>

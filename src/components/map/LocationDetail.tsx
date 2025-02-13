@@ -54,6 +54,7 @@ interface LocationDetailProps {
   onClose?: () => void;
   routeDetail?: RouteDetailResult | null;
   isLoading?: boolean;
+  originalName?: string;
 }
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
@@ -62,6 +63,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   onClose,
   routeDetail,
   isLoading: isDetailLoading,
+  originalName,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -80,7 +82,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
 
   const displayData = useMemo(
     () => ({
-      name: routeDetail?.name || placeDetails?.name || location.name || '',
+      name: originalName || routeDetail?.name || location.name || '', // originalName 우선 사용
       animeName:
         routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
         location.animeName ||
@@ -88,7 +90,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       address: placeDetails?.address || '',
       tags: routeDetail?.hashtags || location.hashtags || [],
     }),
-    [routeDetail, placeDetails, location],
+    [routeDetail, location, originalName], // originalName 의존성 추가
   );
 
   const imageSource = useMemo(() => {
