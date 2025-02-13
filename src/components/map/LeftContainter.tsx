@@ -226,15 +226,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     text: string;
     onClick: () => void;
   }) => {
-    const { textRef, isOverflowing } = useCheckOverflow(text);
-
     return (
-      <S.RecommendationItem
-        onClick={onClick}
-        data-full-text={text}
-        data-show-tooltip={isOverflowing}
-      >
-        <S.RecommendationText ref={textRef}>{text}</S.RecommendationText>
+      <S.RecommendationItem onClick={onClick} data-full-text={text}>
+        <S.RecommendationText>{text}</S.RecommendationText>
       </S.RecommendationItem>
     );
   };
