@@ -136,7 +136,7 @@ const ReviewPage5 = () => {
             <S.RouteButtonContainer>
               <S.Button
                 onClick={() =>
-                  navigate(`/route/${reviewData.id}`, {
+                  navigate(`/route/${reviewData.route.routeId}`, {
                     state: {
                       routeSource: RouteSource.REVIEW,
                     },
