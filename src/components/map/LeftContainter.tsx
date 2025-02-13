@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
-import Search from '../common/Search';
+import Search from '../common/MapSearch';
 import BackButton from '../common/BackButton';
 import { Place } from '@/types/map/place';
 import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
@@ -10,6 +10,8 @@ import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { RouteSource } from '@/types/map/routeSource';
 import { useSavedRoutes } from '@/hooks/map/useSavedRoutes';
+import { SearchSuggestion } from '@/hooks/map/useMapSearch';
+import { useSearch } from '@/hooks/map/useMapSearch';
 import searchDeleteIcon from '../../assets/search_delete.png';
 
 interface LeftContainerProps {
@@ -21,7 +23,8 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const { loadRecentSearches, saveRecentSearch, deleteRecentSearch } = useSearch();
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecentSearches());
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
@@ -32,6 +35,11 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     fetchSavedRoutes,
   } = useSavedRoutes();
 
+  // 컴포넌트 마운트 시 최근 검색어 로드
+  useEffect(() => {
+    setRecentSearches(loadRecentSearches());
+  }, [loadRecentSearches]);
+
   // 데이터 로깅
   useEffect(() => {
     if (favoritePlaces.length > 0) {
@@ -40,33 +48,90 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     }
   }, [favoritePlaces]);
 
+  // localStorage의 값이 외부에서 변경될 수 있으므로 동기화를 위한 이벤트 리스너 추가
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'recentSearches') {
+        const saved = localStorage.getItem('recentSearches');
+        setRecentSearches(saved ? JSON.parse(saved) : []);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // 뒤로가기 처리
   const handleBack = () => {
     window.history.back();
   };
 
-  // 검색 처리
-  const handleSearch = (value: string) => {
-    if (!value.trim()) return;
-    setRecentSearches((prev) => {
-      const filtered = prev.filter((item) => item !== value);
-      const updated = [...filtered, value];
-      return updated.slice(-5);
-    });
-  };
+  // // 검색 처리
+  // const handleSearch = (value: string) => {
+  //   if (!value.trim()) return;
+  //   setRecentSearches((prev) => {
+  //     const filtered = prev.filter((item) => item !== value);
+  //     const updated = [...filtered, value];
+  //     return updated.slice(-5);
+  //   });
+  // };
 
-  // 검색어 삭제
-  const handleDeleteSearch = (searchText: string) => {
-    setRecentSearches((prev) => prev.filter((item) => item !== searchText));
-  };
+  // // 검색어 삭제
+  // const handleDeleteSearch = (searchText: string) => {
+  //   setRecentSearches((prev) => prev.filter((item) => item !== searchText));
+  // };
 
-  // Place 타입을 처리하는 함수
-  const handleSearchPlaceSelect = (place: Place) => {
-    setSelectedPlace(place);
+  // Search 컴포넌트에서 suggestion 클릭 시 호출될 핸들러
+  const handlePlaceSelect = (placeData: SearchSuggestion['data']) => {
+    const searchText = `${placeData.selectedAnimation.animationName} - ${placeData.name}`;
+    saveRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+
+    const place: Place = {
+      id: placeData.placeId,
+      title: placeData.name,
+      name: placeData.name,
+      isSelected: false,
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      animeName: placeData.selectedAnimation.animationName,
+      address: '',
+      hashtags: placeData.selectedAnimation.hashTags.map((tag) => tag.name) || [],
+    };
+
     if (onPlaceSelect) {
       onPlaceSelect(place);
     }
   };
+
+  const handleEventSelect = (eventData: SearchSuggestion['data']) => {
+    const searchText = `${eventData.animationTitle} - ${eventData.name}`;
+    saveRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+
+    console.log('Event selected:', eventData);
+  };
+
+  // 검색어 삭제 처리
+  const handleDeleteSearch = (searchText: string) => {
+    deleteRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+  };
+
+  // 일반 검색 처리
+  const handleSearch = (value: string) => {
+    if (!value.trim()) return;
+    saveRecentSearch(value);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+  };
+
+  // Place 타입을 처리하는 함수
+  // const handleSearchPlaceSelect = (place: Place) => {
+  //   setSelectedPlace(place);
+  //   if (onPlaceSelect) {
+  //     onPlaceSelect(place);
+  //   }
+  // };
 
   // placeId를 처리하는 함수
   const handleFavoritePlaceClick = (placeId: number) => {
@@ -231,7 +296,11 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
   return (
     <S.Container>
       <BackButton onClick={handleBack} />
-      <Search onSearch={handleSearch} onSuggestionSelect={handleSearchPlaceSelect} />
+      <Search
+        onSearch={handleSearch}
+        onPlaceSelect={handlePlaceSelect}
+        onEventSelect={handleEventSelect}
+      />
       <S.ButtonContainer>
         <S.SavedRoutesButton
           isActive={activeView === 'savedRoutes'}
