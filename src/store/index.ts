@@ -12,11 +12,14 @@ import {
 import storage from 'redux-persist/lib/storage';
 import authReducer, { AuthState } from './auth/authSlice';
 import modalReducer, { ModalState } from './slices/modalSlice';
+import userReducer from './slices/userSlice'; // 추가
+import { UserState } from './slices/userSlice'; // 추가 (타입 export 필요)
 
 // store의 전체 state 타입 정의
 interface RootState {
   auth: AuthState;
-  modal: ModalState; // modal 상태 타입 추가
+  modal: ModalState;
+  user: UserState; // 추가
 }
 
 const persistConfig = {
@@ -31,7 +34,8 @@ const persistedReducer = persistReducer(persistConfig, authReducer);
 export const store = configureStore({
   reducer: {
     auth: persistedReducer,
-    modal: modalReducer, // modal reducer 추가
+    modal: modalReducer,
+    user: userReducer, // 추가
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
