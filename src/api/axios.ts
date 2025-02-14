@@ -18,11 +18,17 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getAccessToken();
-    console.log('Request interceptor token:', token); // 토큰 확인 로그
+    // 기존 로그
+    console.log('Request interceptor token:', token);
     console.log('Base URL:', config.baseURL);
     console.log('Path:', config.url);
     console.log('Method:', config.method);
     console.log('Headers:', config.headers);
+
+    // 최종 요청 URL 로그 추가
+    const fullUrl = `${config.baseURL}${config.url}`;
+    console.log('Full Request URL:', fullUrl);
+    console.log('Is Production:', window.location.hostname !== 'localhost');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

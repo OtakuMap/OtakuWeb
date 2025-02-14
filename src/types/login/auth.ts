@@ -16,62 +16,62 @@ export interface LoginResponse {
 }
 
 export interface OAuthLoginRequest {
-    code: string;
-  }
+  code: string;
+}
 
 export interface LogoutResponse {
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result?: string;
-  }
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: string;
+}
 
 // 회원가입
 export interface RegisterRequest {
-    name: string;
-    userId: string;
-    email: string;
-    password: string;
-    passwordCheck: string;
-  }
-  
-  export interface RegisterResponse {
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result?: {
-        id: number;
-        createdAt: string;
-      };
-  }
+  name: string;
+  userId: string;
+  email: string;
+  password: string;
+  passwordCheck: string;
+}
+
+export interface RegisterResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    id: number;
+    createdAt: string;
+  };
+}
 
 // 이메일 중복 여부
-  export interface CheckEmailDuplicationRequest {
-    email: string;
-  }
-  
-  export interface CheckEmailDuplicationResponse {
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result?: {
-        duplicated: boolean;
-      };
-  }
+export interface CheckEmailDuplicationRequest {
+  email: string;
+}
 
-// 아이디 중복 여부 
-  export interface CheckIDDuplicationRequest {
-    userId: string;
-  }
-  
-  export interface CheckIDDuplicationResponse {
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result?: {
-        duplicated: boolean;
-      };
-  }
+export interface CheckEmailDuplicationResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    duplicated: boolean;
+  };
+}
+
+// 아이디 중복 여부
+export interface CheckIDDuplicationRequest {
+  userId: string;
+}
+
+export interface CheckIDDuplicationResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    duplicated: boolean;
+  };
+}
 
 // 아이디찾기
 export interface SearchIdRequest {
@@ -84,8 +84,8 @@ export interface SearchIdResponse {
   code: string;
   message: string;
   result?: {
-      userId: boolean;
-    };
+    userId: string;
+  };
 }
 
 // 비밀번호 찾기
@@ -101,7 +101,22 @@ export interface SearchPwResponse {
   result: string;
 }
 
-// 회원가입시 이메일 코드 전송 
+// 비밀번호 찾기시 이메일 코드 전송
+export interface SearchPwSendEmailVerifyCodeRequest {
+  code: string;
+  userId: string;
+}
+
+export interface SearchPwSendEmailVerifyCodeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    verified: boolean;
+  };
+}
+
+// 회원가입시 이메일 코드 전송
 export interface sendEmailVerifyCodeRequest {
   email: string;
 }
@@ -109,7 +124,7 @@ export interface sendEmailVerifyCodeRequest {
 export interface sendEmailVerifyCodeResponse {
   isSuccess: boolean;
   code: string;
-  message: string; 
+  message: string;
   result: string;
 }
 
@@ -124,8 +139,20 @@ export interface EmailVerifyCodeResponse {
   code: string;
   message: string;
   result?: {
-      verified: boolean;
-    };
+    verified: boolean;
+  };
 }
 
+// 비밀번호 변경
+export interface resetPwRequest {
+  userId: string;
+  password: string;
+  passwordCheck: string;
+}
 
+export interface resetPwResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}

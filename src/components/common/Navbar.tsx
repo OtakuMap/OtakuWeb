@@ -49,6 +49,16 @@ const Navbar = () => {
     setShowProfilePopup(false);
   };
 
+  const handleReviewHome = () => {
+    navigate('/review6');
+    setShowProfilePopup(false);
+  };
+
+  const handleMyPoint = () => {
+    navigate('/my-point');
+    setShowProfilePopup(false);
+  };
+
   const handleNotificationClick = () => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());
@@ -131,8 +141,10 @@ const Navbar = () => {
         <S.ProfileName>{userProfile?.nickname || '닉네임'}</S.ProfileName>
       </S.ProfileSection>
       <S.MenuList>
-        <S.MenuItem onClick={() => handleMyPage()}>마이페이지</S.MenuItem>
-        <S.MenuItem onClick={() => handleLogout()}>로그아웃</S.MenuItem>
+        <S.MenuItem onClick={handleMyPage}>마이페이지</S.MenuItem>
+        <S.MenuItem onClick={handleReviewHome}>내 후기 홈</S.MenuItem>
+        <S.MenuItem onClick={handleMyPoint}>내 포인트</S.MenuItem>
+        <S.MenuItem onClick={handleLogout}>로그아웃</S.MenuItem>
       </S.MenuList>
     </>
   );
@@ -197,7 +209,7 @@ const Navbar = () => {
           )}
         </S.IconsContainer>
       </S.Nav>
-      <S.Overlay isVisible={showPopup || showProfilePopup} />
+      <S.Overlay $isVisible={showPopup || showProfilePopup} onClick={closeAllPopups} />
     </>
   );
 };
