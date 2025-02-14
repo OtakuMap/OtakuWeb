@@ -18,6 +18,8 @@ import {
   EmailVerifyCodeRequest,
   EmailVerifyCodeResponse,
   LogoutResponse,
+  resetPwRequest,
+  resetPwResponse,
 } from '../../types/login/auth';
 import { tokenStorage } from '@/utils/token';
 
@@ -210,6 +212,19 @@ export const authAPI = {
     }
   },
   // 비밀번호 변경
+  newsetPw: async (userData: resetPwRequest): Promise<resetPwResponse> => {
+    try {
+      console.log('Request URL:', '/users/reset-password');
+      console.log('Request Data:', userData);
+
+      const response = await instance.post<resetPwResponse>('/users/reset-password', userData);
+      console.log('Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during resetPw:', error);
+      return handleError<resetPwResponse>(error);
+    }
+  },
 
   // 회원가입 - 이메일 인증 메일 전송
   sendEmailVerifyCode: async (

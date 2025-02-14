@@ -142,3 +142,17 @@ export interface EmailVerifyCodeResponse {
     verified: boolean;
   };
 }
+
+// 비밀번호 변경
+export interface resetPwRequest {
+  userId: string;
+  password: string;
+  passwordCheck: string;
+}
+
+export interface resetPwResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}

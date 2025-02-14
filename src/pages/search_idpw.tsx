@@ -89,7 +89,7 @@ const SearchIdPWPage: React.FC = () => {
 
       if (response.isSuccess) {
         alert('인증번호 인증 성공!');
-        navigate('/newsetpw');
+        navigate(`/newsetpw?userId=${encodeURIComponent(pwId)}`); // ✅ userId를 쿼리 파라미터로 전달
       } else {
         alert(response.message || '인증번호 인증 실패');
       }
