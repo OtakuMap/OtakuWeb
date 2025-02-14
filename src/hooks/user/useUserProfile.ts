@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
-import { UserProfile } from '@/types/user/user';
+import { useDispatch } from 'react-redux';
 import { getUserProfile } from '@/api/user/user';
 import { useAppSelector } from '../reduxHooks';
+import { setUserProfile, clearUserProfile } from '@/store/slices/userSlice';
 
 export const useUserProfile = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
   const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const userProfile = useAppSelector((state) => state.user.profile);
 
   const fetchUserProfile = async () => {
     if (!isLoggedIn) {
-      setUserProfile(null);
+      dispatch(clearUserProfile());
       return;
     }
 
@@ -21,7 +24,7 @@ export const useUserProfile = () => {
       const response = await getUserProfile();
 
       if (response.isSuccess) {
-        setUserProfile(response.result);
+        dispatch(setUserProfile(response.result));
       } else {
         throw new Error(response.message);
       }
@@ -38,9 +41,9 @@ export const useUserProfile = () => {
     if (isLoggedIn) {
       fetchUserProfile();
     } else {
-      setUserProfile(null);
+      dispatch(clearUserProfile());
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, dispatch]);
 
   return {
     userProfile,

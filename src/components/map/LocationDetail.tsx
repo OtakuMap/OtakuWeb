@@ -1,55 +1,74 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import * as S from '../../styles/map/LocationDetail.styles';
-import { LocationDetail as LocationDetailType, HashTag } from '../../types/map/route';
+import { RouteLocation, HashTag } from '@/types/map/route';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { PlaceDetails } from '../../utils/mapUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
-import { usePlaceLikeDetail } from '@/hooks/map/usePlaceLikeDetail';
 import nextIcon from '../../assets/next.png';
 import logoRepeat from '../../assets/logorepeat.png';
 import favIcon from '../../assets/fav.png';
 import favActiveIcon from '../../assets/fav2.png';
 
-const Tag: React.FC<{ tagName: string }> = ({ tagName }) => {
+interface RouteDetailResult {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  isFavorite: boolean;
+  isLiked: boolean;
+  animationListDTO: {
+    placeAnimations: Array<{
+      placeAnimationId: number;
+      animationId: number;
+      animationName: string;
+    }>;
+    listSize: number;
+  };
+  hashtags: HashTag[];
+}
+
+const Tag: React.FC<{ tag: string | HashTag }> = ({ tag }) => {
   const tagRef = useRef<HTMLDivElement>(null);
+  const tagText = typeof tag === 'string' ? tag : tag.name;
 
   useEffect(() => {
     if (tagRef.current) {
       const isOverflowed = tagRef.current.scrollWidth > tagRef.current.clientWidth;
       tagRef.current.setAttribute('data-overflow', String(isOverflowed));
     }
-  }, [tagName]);
+  }, [tagText]);
 
   return (
-    <S.Tag ref={tagRef} data-full-text={`#${tagName}`}>
-      #{tagName}
+    <S.Tag ref={tagRef} data-full-text={`#${tagText}`}>
+      #{tagText}
     </S.Tag>
   );
 };
 
 interface LocationDetailProps {
-  location: LocationDetailType;
+  location: RouteLocation;
   placeDetails?: PlaceDetails;
   onClose?: () => void;
-  placeLikeId?: number;
+  routeDetail?: RouteDetailResult | null;
+  isLoading?: boolean;
 }
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
   location,
   placeDetails,
   onClose,
-  placeLikeId,
+  routeDetail,
+  isLoading: isDetailLoading,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const { placeLikeDetail, isLoading, error, fetchPlaceLikeDetail } = usePlaceLikeDetail();
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(routeDetail?.isFavorite || false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const titleRef = useRef<HTMLDivElement>(null);
@@ -57,54 +76,27 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   const addressRef = useRef<HTMLDivElement>(null);
 
   const MAX_TAGS = 3;
-  const allPlaces = [location, ...(location.relatedPlaces || [])];
-  const currentPlace = allPlaces[currentIndex];
+  const allPlaces = [location];
 
   const displayData = useMemo(
     () => ({
-      name: placeLikeDetail?.placeName || placeDetails?.name || currentPlace.name || '',
-      animeName: placeLikeDetail?.animationName || currentPlace.animeName || '',
-      address: placeDetails?.address || currentPlace.address || '',
-      tags: placeLikeDetail?.hashtags || currentPlace.hashtags || [],
+      name: routeDetail?.name || placeDetails?.name || location.name || '',
+      animeName:
+        routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
+        location.animeName ||
+        '',
+      address: placeDetails?.address || '',
+      tags: routeDetail?.hashtags || location.hashtags || [],
     }),
-    [placeLikeDetail, placeDetails, currentPlace],
+    [routeDetail, placeDetails, location],
   );
 
   const imageSource = useMemo(() => {
-    console.log('LocationDetail - Current placeDetails:', placeDetails);
-    console.log('LocationDetail - Photo URL:', placeDetails?.photoUrl);
-
     if (imageLoadFailed) {
-      console.log('LocationDetail - Image load failed, using fallback image');
       return logoRepeat;
     }
     return placeDetails?.photoUrl || logoRepeat;
   }, [placeDetails, imageLoadFailed]);
-
-  useEffect(() => {
-    // mounted 변수 제거하고 cleanup 함수만 사용
-    const loadPlaceDetail = async () => {
-      if (!placeLikeId) return;
-
-      try {
-        await fetchPlaceLikeDetail(placeLikeId);
-      } catch (error) {
-        console.error('Failed to fetch place detail:', error);
-      }
-    };
-
-    loadPlaceDetail();
-
-    return () => {
-      // cleanup 필요한 경우에만 작성
-    };
-  }, [placeLikeId, fetchPlaceLikeDetail]);
-
-  useEffect(() => {
-    if (placeLikeDetail) {
-      setIsFavorited(placeLikeDetail.isFavorite);
-    }
-  }, [placeLikeDetail]);
 
   useEffect(() => {
     const checkOverflow = (element: HTMLDivElement | null): boolean => {
@@ -130,8 +122,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   };
 
   const handleReviewClick = () => {
-    const placeId = placeLikeDetail?.placeLikeId || location.id;
-    navigate(`/places/${placeId}/review`);
+    navigate(`/places/${location.id}/review`);
   };
 
   const handleFavClick = () => {
@@ -143,12 +134,10 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   };
 
   const handleImageError = useCallback(() => {
-    console.log('LocationDetail - Image failed to load:', placeDetails?.photoUrl);
     setImageLoadFailed(true);
-  }, [placeDetails?.photoUrl]);
+  }, []);
 
-  if (isLoading) return <S.Container>Loading...</S.Container>;
-  if (error) return <S.Container>Error: {error.message}</S.Container>;
+  if (isDetailLoading) return <S.Container>Loading...</S.Container>;
 
   return (
     <S.Container>
@@ -184,10 +173,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       </S.Address>
 
       <S.TagContainer>
-        {displayData.tags.slice(0, MAX_TAGS).map((tag, index) => {
-          const tagName = typeof tag === 'string' ? tag : tag.name;
-          return <Tag key={index} tagName={tagName} />;
-        })}
+        {displayData.tags.slice(0, MAX_TAGS).map((tag, index) => (
+          <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
+        ))}
       </S.TagContainer>
 
       <S.FavButton onClick={handleFavClick}>

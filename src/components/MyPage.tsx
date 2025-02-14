@@ -4,11 +4,14 @@ import { getUserInfo } from '../api/userInfo';
 import { updateNickname } from '../api/userInfo/nickname';
 import { reportEvent } from '../api/userInfo/report-event';
 import { updateNotificationSettings } from '../api/userInfo/notification-settings';
-import { logout } from '../api/userInfo/logout';
+// import { logout } from '../api/userInfo/logout';
 import { updateProfileImage } from '../api/userInfo/profile_image';
-import { uploadImage } from '../api/common/upload-image'; // 추가된 import
+import { uploadImage } from '../api/common/upload-image';
 import { UserInfo } from '../types/userInfo/userType';
 import { deleteAllReviews } from '../api/userInfo/deleteReviews';
+import { useAuth } from '../hooks/login/useAuth';
+import { useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/userSlice';
 import StarIcon from '../assets/star.png';
 import SpaceIcon from '../assets/space.png';
 import PencilIcon from '../assets/pencil.png';
@@ -16,6 +19,8 @@ import * as S from '../styles/mypage/mypage.style';
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { logout } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isEditing, setIsEditing] = useState({
     nickname: false,
@@ -102,18 +107,9 @@ const MyPage = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await logout();
-      if (response.isSuccess) {
-        navigate('/');
-      } else {
-        alert(response.message || '로그아웃에 실패했습니다.');
-      }
+      await logout(); // useAuth의 logout 사용
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert('로그아웃 처리 중 예기치 않은 오류가 발생했습니다.');
-      }
+      alert('로그아웃 처리 중 예기치 않은 오류가 발생했습니다.');
     }
   };
 
@@ -122,7 +118,19 @@ const MyPage = () => {
       if (isEditing.nickname) {
         const response = await updateNickname(formData.nickname);
         if (response.isSuccess) {
-          setUserInfo((prev) => (prev ? { ...prev, nickname: formData.nickname } : null));
+          // Redux 상태 업데이트 (Navbar용)
+          dispatch(updateProfile({ nickname: formData.nickname }));
+
+          // 로컬 상태 업데이트 (MyPage용)
+          setUserInfo((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  nickname: formData.nickname,
+                }
+              : null,
+          );
+
           setIsEditing((prev) => ({ ...prev, nickname: false }));
           alert('닉네임이 성공적으로 수정되었습니다.');
         }
