@@ -7,8 +7,12 @@ import {
   RegisterResponse,
   CheckEmailDuplicationResponse,
   CheckIDDuplicationResponse,
+  SearchIdRequest,
   SearchIdResponse,
+  SearchPwRequest,
   SearchPwResponse,
+  SearchPwSendEmailVerifyCodeRequest,
+  SearchPwSendEmailVerifyCodeResponse,
   sendEmailVerifyCodeRequest,
   sendEmailVerifyCodeResponse,
   EmailVerifyCodeRequest,
@@ -171,18 +175,40 @@ export const authAPI = {
   },
 
   // 비밀번호 찾기 (인증번호 요청)
-  searchPw: async (userId: string): Promise<SearchPwResponse> => {
+
+  searchPw: async (userData: SearchPwRequest): Promise<SearchPwResponse> => {
     try {
-      const response = await instance.post<SearchPwResponse>('/auth/reset-password', { userId });
+      console.log('Request URL:', '/auth/find-password');
+      console.log('Request Data:', userData);
+
+      const response = await instance.post<SearchPwResponse>('/auth/find-password', userData);
+      console.log('Response:', response);
       return response.data;
     } catch (error: unknown) {
-      console.error('Error during password reset:', error);
+      console.error('Error during searchPw:', error);
       return handleError<SearchPwResponse>(error);
     }
   },
 
   // 비밀번호 찾기 코드 인증
+  searchPwsendEmailVerifyCode: async (
+    userData: SearchPwSendEmailVerifyCodeRequest,
+  ): Promise<SearchPwSendEmailVerifyCodeResponse> => {
+    try {
+      console.log('Request URL:', '/auth/verify-password-code');
+      console.log('Request Data:', userData);
 
+      const response = await instance.post<SearchPwSendEmailVerifyCodeResponse>(
+        '/auth/verify-password-code',
+        userData,
+      );
+      console.log('Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during searchPwsendEmailVerifyCode:', error);
+      return handleError<SearchPwSendEmailVerifyCodeResponse>(error);
+    }
+  },
   // 비밀번호 변경
 
   // 회원가입 - 이메일 인증 메일 전송
