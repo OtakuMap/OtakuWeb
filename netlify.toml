@@ -1,6 +1,6 @@
 [[redirects]]
   from = "/api/*"
-  to = "http://3.39.72.211:8080/api/:splat"
+  to = "https://api.otakumap.site/api/:splat"
   status = 200
   force = true
   

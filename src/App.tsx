@@ -31,6 +31,10 @@ import ReviewPage6 from './pages/ReviewPage6';
 import ReviewPage7 from './pages/ReviewPage7';
 import EventPage from './pages/EventPage2';
 import LoginModal from './components/common/LoginModal';
+import PurchaseIncomeCheck from './pages/point/purchaseIncomeCheck';
+import PointCharge from './pages/point/pointCharge';
+import MyPoint from './pages/point/myPoint';
+import OAuthRedirectHandler from './pages/OAuthRedirect';
 
 const AppContainer = styled.div`
   position: relative;
@@ -94,7 +98,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
         <Route path="/event/:eventId" element={<EventPage />} />
-
+<Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
+        <Route path="/point-charge" element={<PointCharge />} />
+        <Route path="/my-point" element={<MyPoint />} />
+        
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
         <Route
           path="/route-management"

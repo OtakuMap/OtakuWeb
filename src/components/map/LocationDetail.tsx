@@ -1,67 +1,128 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import * as S from '../../styles/map/LocationDetail.styles';
-import { LocationDetail as LocationDetailType } from '../../types/map/route';
+import { RouteLocation, HashTag } from '@/types/map/route';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { PlaceDetails, getPlaceDetails } from '../../utils/mapUtils';
+import { PlaceDetails } from '../../utils/mapUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
-import { usePlaceLikeDetail } from '@/hooks/map/usePlaceLikeDetail';
 import nextIcon from '../../assets/next.png';
 import logoRepeat from '../../assets/logorepeat.png';
 import favIcon from '../../assets/fav.png';
 import favActiveIcon from '../../assets/fav2.png';
 
-interface LocationDetailProps {
-  location: LocationDetailType;
-  placeDetails?: PlaceDetails;
-  onClose?: () => void;
-  placeLikeId?: number;
+interface RouteDetailResult {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  isFavorite: boolean;
+  isLiked: boolean;
+  animationListDTO: {
+    placeAnimations: Array<{
+      placeAnimationId: number;
+      animationId: number;
+      animationName: string;
+    }>;
+    listSize: number;
+  };
+  hashtags: HashTag[];
 }
 
-const DEFAULT_IMAGE = logoRepeat;
+const Tag: React.FC<{ tag: string | HashTag }> = ({ tag }) => {
+  const tagRef = useRef<HTMLDivElement>(null);
+  const tagText = typeof tag === 'string' ? tag : tag.name;
+
+  useEffect(() => {
+    if (tagRef.current) {
+      const isOverflowed = tagRef.current.scrollWidth > tagRef.current.clientWidth;
+      tagRef.current.setAttribute('data-overflow', String(isOverflowed));
+    }
+  }, [tagText]);
+
+  return (
+    <S.Tag ref={tagRef} data-full-text={`#${tagText}`}>
+      #{tagText}
+    </S.Tag>
+  );
+};
+
+interface LocationDetailProps {
+  location: RouteLocation;
+  placeDetails?: PlaceDetails;
+  onClose?: () => void;
+  routeDetail?: RouteDetailResult | null;
+  isLoading?: boolean;
+}
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
   location,
   placeDetails,
   onClose,
-  placeLikeId,
+  routeDetail,
+  isLoading: isDetailLoading,
 }) => {
   const navigate = useNavigate();
-  const allPlaces = [location, ...(location.relatedPlaces || [])];
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(routeDetail?.isFavorite || false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const [placeDetailsData, setPlaceDetailsData] = useState<PlaceDetails | undefined>(placeDetails);
-  const currentPlace = allPlaces[currentIndex];
 
-  // placeLikeDetail hook 사용
-  const { placeLikeDetail, isLoading, error, fetchPlaceLikeDetail } = usePlaceLikeDetail();
+  const titleRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
+  const addressRef = useRef<HTMLDivElement>(null);
 
-  // placeLikeId가 있을 경우 상세 정보 조회
-  useEffect(() => {
-    if (placeLikeId) {
-      fetchPlaceLikeDetail(placeLikeId);
+  const MAX_TAGS = 3;
+  const allPlaces = [location];
+
+  const displayData = useMemo(
+    () => ({
+      name: routeDetail?.name || placeDetails?.name || location.name || '',
+      animeName:
+        routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
+        location.animeName ||
+        '',
+      address: placeDetails?.address || '',
+      tags: routeDetail?.hashtags || location.hashtags || [],
+    }),
+    [routeDetail, placeDetails, location],
+  );
+
+  const imageSource = useMemo(() => {
+    if (imageLoadFailed) {
+      return logoRepeat;
     }
-  }, [placeLikeId]);
+    return placeDetails?.photoUrl || logoRepeat;
+  }, [placeDetails, imageLoadFailed]);
 
   useEffect(() => {
-    if (placeLikeDetail) {
-      setIsFavorited(placeLikeDetail.isFavorite);
-    }
-  }, [placeLikeDetail]);
+    const checkOverflow = (element: HTMLDivElement | null): boolean => {
+      if (!element) return false;
+      if (element.classList.contains('address')) {
+        return element.scrollHeight > element.clientHeight;
+      }
+      return element.scrollWidth > element.clientWidth;
+    };
+
+    const elements = [{ ref: titleRef }, { ref: subtitleRef }, { ref: addressRef }];
+
+    elements.forEach(({ ref }) => {
+      if (ref.current) {
+        const isOverflowed = checkOverflow(ref.current);
+        ref.current.setAttribute('data-overflow', String(isOverflowed));
+      }
+    });
+  }, [displayData]);
 
   const handleNextLocation = () => {
     setCurrentIndex((prev) => (prev === allPlaces.length - 1 ? 0 : prev + 1));
   };
 
   const handleReviewClick = () => {
-    // placeLikeDetail이 있으면 placeLikeId를, 없으면 location의 id를 사용
-    const placeId = placeLikeDetail?.placeLikeId || location.id;
-    navigate(`/places/${placeId}/review`);
+    navigate(`/places/${location.id}/review`);
   };
 
   const handleFavClick = () => {
@@ -69,78 +130,51 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       dispatch(openLoginModal());
       return;
     }
-
-    // 로그인된 상태일 때만 좋아요 기능 실행
     setIsFavorited(!isFavorited);
   };
 
-  const imageSource = useMemo(() => {
-    console.log('PlaceDetails in LocationDetail:', placeDetails);
-    console.log('Current photoUrl:', placeDetails?.photoUrl);
-
-    // 1. 이미지 로드 실패한 경우
-    if (imageLoadFailed) {
-      console.log('Image load failed, using default');
-      return logoRepeat;
-    }
-
-    // 2. placeDetails가 있고 photoUrl이 있는 경우
-    if (placeDetails?.photoUrl) {
-      console.log('Using placeDetails photoUrl');
-      return placeDetails.photoUrl;
-    }
-
-    console.log('No valid photo URL found, using default');
-    // 3. 그 외의 경우 기본 이미지 사용
-    return logoRepeat;
-  }, [placeDetails?.photoUrl, imageLoadFailed]);
-
   const handleImageError = useCallback(() => {
-    console.log('Image load failed, switching to default image');
     setImageLoadFailed(true);
   }, []);
 
-  if (isLoading) {
-    return <S.Container>Loading...</S.Container>;
-  }
-
-  if (error) {
-    return <S.Container>Error: {error.message}</S.Container>;
-  }
+  if (isDetailLoading) return <S.Container>Loading...</S.Container>;
 
   return (
     <S.Container>
       {onClose && (
         <S.CloseButton onClick={onClose}>
-          <X
-            size={20}
-            color="#FFFFFF"
-            style={{ width: '20px', height: '20px' }}
-            absoluteStrokeWidth
-          />
+          <X size={20} color="#FFFFFF" absoluteStrokeWidth />
         </S.CloseButton>
       )}
+
       <S.LocationImage
         src={imageSource}
-        alt={placeLikeDetail ? placeLikeDetail.placeName : currentPlace.name}
+        alt={displayData.name}
         onError={handleImageError}
         key={imageSource}
       />
+
       {allPlaces.length > 1 && (
         <S.PaginationButton onClick={handleNextLocation}>
           <img src={nextIcon} alt="next" />
         </S.PaginationButton>
       )}
-      <S.Title>
-        {placeLikeDetail ? placeLikeDetail.placeName : placeDetails?.name || currentPlace.name}
+
+      <S.Title ref={titleRef} title={displayData.name}>
+        {displayData.name}
       </S.Title>
-      <S.Subtitle>
-        {placeLikeDetail ? placeLikeDetail.animationName : currentPlace.animeName}
+
+      <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
+        {displayData.animeName}
       </S.Subtitle>
-      <S.Address>{placeDetails?.address || currentPlace.address}</S.Address>
+
+      <S.Address ref={addressRef} title={displayData.address} className="address">
+        {displayData.address}
+      </S.Address>
+
       <S.TagContainer>
-        {(placeLikeDetail?.hashtags || currentPlace.hashtags).map((tag, index) => (
-          <S.Tag key={index}>#{typeof tag === 'string' ? tag : tag.name}</S.Tag>
+        {displayData.tags.slice(0, MAX_TAGS).map((tag, index) => (
+          <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
         ))}
       </S.TagContainer>
 

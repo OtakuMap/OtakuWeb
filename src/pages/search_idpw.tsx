@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, SearchIdPwBox, Section, Title, DetailText, 
-  FormGroup, Name, Input, InputShort, Divider, ActionButton, ActionButtonShort } 
-  from '../styles/login/search_idpw.style';
+import {
+  Container,
+  SearchIdPwBox,
+  Section,
+  Title,
+  DetailText,
+  FormGroup,
+  Name,
+  Input,
+  InputShort,
+  Divider,
+  ActionButton,
+  ActionButtonShort,
+} from '../styles/login/search_idpw.style';
 import { authAPI } from '../api/login/authAPI';
 
 const SearchIdPWPage: React.FC = () => {
@@ -24,10 +35,12 @@ const SearchIdPWPage: React.FC = () => {
     }
 
     try {
-      const response = await authAPI.searchId({ name: idName, email: idEmail }); // 필드명 확인 후 수정
-      if (response.isSuccess) {
-        setFoundUserId(response.result.userId); // 찾은 아이디 저장
-        alert('아이디가 조회되었습니다.');
+      console.log('아이디 찾기 요청:', { name: idName, email: idEmail });
+      const response = await authAPI.searchId({ name: idName, email: idEmail });
+
+      if (response.isSuccess && response.result?.userId) {
+        setFoundUserId(response.result.userId);
+        alert(`아이디: ${response.result.userId}`);
       } else {
         alert(response.message || '아이디 조회에 실패했습니다.');
       }
@@ -45,7 +58,9 @@ const SearchIdPWPage: React.FC = () => {
     }
 
     try {
-      const response = await authAPI.searchPw({ name: pwName, id: pwId }); // 필드명 확인 후 수정
+      console.log('비밀번호 찾기 요청:', { name: pwName, userId: pwId });
+      const response = await authAPI.searchPw({ name: pwName, userId: pwId });
+
       if (response.isSuccess) {
         setIsCodeSent(true);
         alert('인증번호가 이메일로 전송되었습니다.');
@@ -66,10 +81,15 @@ const SearchIdPWPage: React.FC = () => {
     }
 
     try {
-      const response = await authAPI.emailVerifyCode({ email: pwId, code: verificationCode });
+      console.log('인증번호 검증 요청:', { userId: pwId, code: verificationCode });
+      const response = await authAPI.searchPwsendEmailVerifyCode({
+        userId: pwId,
+        code: verificationCode,
+      });
+
       if (response.isSuccess) {
         alert('인증번호 인증 성공!');
-        navigate('/newsetpw');
+        navigate(`/newsetpw?userId=${encodeURIComponent(pwId)}`); // ✅ userId를 쿼리 파라미터로 전달
       } else {
         alert(response.message || '인증번호 인증 실패');
       }
@@ -106,9 +126,9 @@ const SearchIdPWPage: React.FC = () => {
           <ActionButton onClick={handleSearchId}>조회하기</ActionButton>
           {foundUserId && <DetailText>찾은 아이디: {foundUserId}</DetailText>}
         </Section>
-        
+
         <Divider />
-        
+
         {/* 비밀번호 찾기 */}
         <Section>
           <Title>비밀번호 찾기</Title>
