@@ -55,6 +55,8 @@ interface LocationDetailProps {
   routeDetail?: RouteDetailResult | null;
   isLoading?: boolean;
   originalName?: string;
+  isEvent?: boolean; //이벤트인지?
+  eventId?: number; //이벤트 ID
 }
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
@@ -64,6 +66,8 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   routeDetail,
   isLoading: isDetailLoading,
   originalName,
+  isEvent,
+  eventId,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -82,15 +86,17 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
 
   const displayData = useMemo(
     () => ({
-      name: originalName || routeDetail?.name || location.name || '', // originalName 우선 사용
+      name: originalName || routeDetail?.name || location?.name || '',
       animeName:
         routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
-        location.animeName ||
+        location?.animeName ||
         '',
       address: placeDetails?.address || '',
-      tags: routeDetail?.hashtags || location.hashtags || [],
+      tags: (routeDetail?.hashtags || location?.hashtags || []).map((tag) =>
+        typeof tag === 'string' ? tag : tag.name,
+      ),
     }),
-    [routeDetail, location, originalName], // originalName 의존성 추가
+    [routeDetail, location, originalName, placeDetails],
   );
 
   const imageSource = useMemo(() => {
@@ -124,7 +130,11 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   };
 
   const handleReviewClick = () => {
-    navigate(`/places/${location.id}/review`);
+    if (isEvent && eventId) {
+      navigate(`/event/${eventId}`);
+    } else {
+      navigate(`/places/${location.id}/review`);
+    }
   };
 
   const handleFavClick = () => {
@@ -184,7 +194,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         <img src={isFavorited ? favActiveIcon : favIcon} alt="favorite" />
       </S.FavButton>
 
-      <S.ReviewButton onClick={handleReviewClick}>명소 후기</S.ReviewButton>
+      <S.ReviewButton onClick={handleReviewClick}>
+        {isEvent ? '이벤트 후기' : '명소 후기'}
+      </S.ReviewButton>
     </S.Container>
   );
 };

@@ -16,10 +16,15 @@ import searchDeleteIcon from '../../assets/search_delete.png';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
+  onEventSelect?: (event: any) => void;
   onFavoritePlaceClick?: (placeId: number) => void;
 }
 
-const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
+const LeftContainer: React.FC<LeftContainerProps> = ({
+  onPlaceSelect,
+  onEventSelect,
+  onFavoritePlaceClick,
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loadRecentSearches, saveRecentSearch, deleteRecentSearch } = useSearch();
@@ -109,9 +114,11 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
   const handleEventSelect = (eventData: SearchSuggestion['data']) => {
     const searchText = `${eventData.animationTitle} - ${eventData.name}`;
     saveRecentSearch(searchText);
-    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+    setRecentSearches(loadRecentSearches());
 
-    console.log('Event selected:', eventData);
+    if (onEventSelect) {
+      onEventSelect(eventData);
+    }
   };
 
   // 검색어 삭제 처리
