@@ -45,7 +45,14 @@ const {
 
 const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&prompt=login`;
 
-const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}`;
+const generateState = () => {
+  return Math.random().toString(36).substring(2, 15); // 랜덤 문자열 생성
+};
+
+const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code
+  &client_id=${VITE_NAVER_CLIENT_ID}
+  &redirect_uri=${VITE_NAVER_REDIRECT_URI}
+  &state=${generateState()}`; // ✅ state 값 추가
 
 const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile`;
 
@@ -73,18 +80,20 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
     setLastLogin(provider);
-    switch (provider) {
-      case 'kakao':
-        window.location.href = KAKAO_AUTH_URL;
-        break;
-      case 'naver':
-        window.location.href = NAVER_AUTH_URL;
-        break;
-      case 'google':
-        window.location.href = GOOGLE_AUTH_URL;
-        break;
-      default:
-        console.error('Unknown provider');
+
+    if (provider === 'naver') {
+      const state = generateState();
+      localStorage.setItem('naver_state', state); // ✅ state 값 저장
+      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code
+        &client_id=${VITE_NAVER_CLIENT_ID}
+        &redirect_uri=${VITE_NAVER_REDIRECT_URI}
+        &state=${state}`;
+    } else if (provider === 'kakao') {
+      window.location.href = KAKAO_AUTH_URL;
+    } else if (provider === 'google') {
+      window.location.href = GOOGLE_AUTH_URL;
+    } else {
+      console.error('Unknown provider');
     }
   };
 
