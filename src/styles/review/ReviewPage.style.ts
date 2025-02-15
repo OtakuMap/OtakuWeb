@@ -1234,3 +1234,43 @@ export const NoResults = styled.div`
   color: #666;
   font-size: 1rem;
 `;
+export const DropdownContainer3 = styled.div`
+  position: relative;
+  width: 200px;
+  margin: 10px 0;
+`;
+
+export const DropdownButton3 = styled.button`
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+export const DropdownList3 = styled.ul`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+export const DropdownItem3 = styled.li`
+  padding: 10px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;

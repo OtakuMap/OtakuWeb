@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback, forwardRef } from 'react';
 import * as S from '../../styles/map/MapContainer.styles';
 import { RouteLocation } from '../../types/map/route';
 import { getPlaceDetails, PlaceDetails } from '../../utils/mapUtils';
+import pinIcon from '../../assets/pin.png';
 
 // interface MapContainerProps {
 //   apiKey: string;
@@ -63,7 +64,7 @@ const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 
   const script = document.createElement('script');
   script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&v=beta`;
-  script.async = true;
+  script.defer = true;
 
   GOOGLE_MAPS_LOADING_STATE.promise = new Promise((resolve, reject) => {
     script.addEventListener('load', () => {
@@ -171,7 +172,7 @@ const MapContainer = forwardRef<google.maps.Map | null, MapContainerProps>(
           position: { lat: location.latitude, lng: location.longitude },
           map: mapInstance.current,
           icon: {
-            url: '/src/assets/pin.png',
+            url: pinIcon,
             scaledSize: new window.google.maps.Size(initialSize.width * 2, initialSize.height * 2),
           },
         });
@@ -181,7 +182,7 @@ const MapContainer = forwardRef<google.maps.Map | null, MapContainerProps>(
           const newZoom = mapInstance.current?.getZoom() || 12;
           const newSize = getMarkerSize(newZoom);
           marker.setIcon({
-            url: '/src/assets/pin.png',
+            url: pinIcon,
             scaledSize: new window.google.maps.Size(newSize.width * 2, newSize.height * 2),
           });
         });

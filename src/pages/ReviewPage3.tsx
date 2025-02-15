@@ -1,43 +1,71 @@
 // ReviewPage3.tsx
-
 import { useState, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
-// import baseball from '../assets/baseball.png';
+import { MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import * as S from '../styles/review/ReviewPage.style';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchReviews } from '../api/review/PlaceReview';
+import { fetchPlaceAnimations } from '../api/review/animation';
 import { ReviewResponse, SortType, AnimationGroup } from '../types/review/PlaceReview';
+import { PlaceAnimation } from '../types/review/animation';
 
 const ReviewPage3 = () => {
   const navigate = useNavigate();
   const { placeId } = useParams<{ placeId: string }>();
+
+  // Review-related states
   const [reviewData, setReviewData] = useState<ReviewResponse['result'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sort, setSort] = useState<SortType>('latest');
 
+  // Animation-related states
+  const [placeAnimations, setPlaceAnimations] = useState<PlaceAnimation[]>([]);
+  const [selectedAnimation, setSelectedAnimation] = useState<PlaceAnimation | null>(null);
+  const [isAnimationDropdownOpen, setIsAnimationDropdownOpen] = useState(false);
+
   useEffect(() => {
-    const loadReviews = async () => {
+    const loadData = async () => {
       if (!placeId) return;
 
       try {
         setLoading(true);
-        const response = await fetchReviews(placeId, currentPage, 10, sort);
-        if (response.isSuccess) {
-          setReviewData(response.result);
+
+        // Fetch place animations
+        const animationResponse = await fetchPlaceAnimations(placeId);
+        console.log('Animation Response:', animationResponse);
+
+        if (animationResponse.isSuccess && animationResponse.result) {
+          // result 존재 여부 체크 추가
+          console.log('Place Animations:', animationResponse.result.placeAnimations);
+          setPlaceAnimations(animationResponse.result.placeAnimations);
+
+          // Set default animation if available
+          if (animationResponse.result.placeAnimations.length > 0) {
+            setSelectedAnimation(animationResponse.result.placeAnimations[0]);
+            console.log('Selected Animation:', animationResponse.result.placeAnimations[0]);
+          }
+        } else {
+          console.error('Failed to load animations:', animationResponse.message);
+        }
+
+        // Fetch reviews
+        const reviewResponse = await fetchReviews(placeId, currentPage, 10, sort);
+        if (reviewResponse.isSuccess) {
+          setReviewData(reviewResponse.result);
           setError(null);
         } else {
-          setError(response.message);
+          setError(reviewResponse.message);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load reviews');
+        console.error('Error loading animations:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
       } finally {
         setLoading(false);
       }
     };
 
-    loadReviews();
+    loadData();
   }, [placeId, currentPage, sort]);
 
   const handleShortReviewClick = () => {
@@ -51,7 +79,16 @@ const ReviewPage3 = () => {
 
   const handleSortChange = (newSort: SortType) => {
     setSort(newSort);
-    setCurrentPage(0); // Reset to first page when sorting changes
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  const toggleAnimationDropdown = () => {
+    setIsAnimationDropdownOpen(!isAnimationDropdownOpen);
+  };
+
+  const handleAnimationSelect = (animation: PlaceAnimation) => {
+    setSelectedAnimation(animation);
+    setIsAnimationDropdownOpen(false);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -71,7 +108,26 @@ const ReviewPage3 = () => {
           </S.SaveLocationButton>
         </S.LocationBar>
 
-        <S.DropdownButton>다이아몬드 에이스 ▼</S.DropdownButton>
+        {/* Animation Dropdown */}
+        <S.DropdownContainer3>
+          <S.DropdownButton3 onClick={toggleAnimationDropdown}>
+            {selectedAnimation ? selectedAnimation.animationName : '애니메이션 선택'}
+            {isAnimationDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </S.DropdownButton3>
+          {isAnimationDropdownOpen && (
+            <S.DropdownList3>
+              {placeAnimations.map((animation) => (
+                <S.DropdownItem3
+                  key={animation.placeAnimationId}
+                  onClick={() => handleAnimationSelect(animation)}
+                >
+                  {animation.animationName}
+                </S.DropdownItem3>
+              ))}
+            </S.DropdownList3>
+          )}
+        </S.DropdownContainer3>
+
         <S.TagContainer>
           <S.Tag>#다이에이</S.Tag>
           <S.Tag>#고시엔</S.Tag>

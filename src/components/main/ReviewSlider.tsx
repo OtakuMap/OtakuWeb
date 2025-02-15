@@ -4,7 +4,7 @@ import type { Settings } from 'react-slick';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import * as S from '../styles/review/ReviewSlider.styles';
+import * as S from '../../styles/review/ReviewSlider.styles';
 
 interface Review {
   id?: string;

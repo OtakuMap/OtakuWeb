@@ -8,28 +8,16 @@ import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { RouteSource } from '@/types/map/routeSource';
+import { useSavedRoutes } from '@/hooks/map/useSavedRoutes';
+import searchDeleteIcon from '../../assets/search_delete.png';
 
 interface LeftContainerProps {
   onPlaceSelect?: (place: Place) => void;
+  onFavoritePlaceClick?: (placeId: number) => void;
 }
 
-// 임시 데이터들 - savedRoutes만 남기고 favoritePlaces는 제거
-const savedRoutesData = [
-  {
-    id: 1,
-    title: '도쿄 애니메이션 성지순례 코스',
-  },
-  {
-    id: 2,
-    title: '오사카 하이큐 성지순례',
-  },
-  {
-    id: 3,
-    title: '요코하마 원피스 투어',
-  },
-];
-
-const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
+const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
@@ -37,6 +25,12 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
+  const {
+    savedRoutes,
+    isLoading: savedRoutesLoading,
+    error: savedRoutesError,
+    fetchSavedRoutes,
+  } = useSavedRoutes();
 
   // 데이터 로깅
   useEffect(() => {
@@ -76,9 +70,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
 
   // placeId를 처리하는 함수
   const handleFavoritePlaceClick = (placeId: number) => {
-    console.log('Fetching details for place:', placeId);
-    // TODO: placeId를 사용하여 장소 상세 정보를 가져오는 API 호출
-    // 예: navigate(`/place/${placeId}`);
+    if (onFavoritePlaceClick) {
+      onFavoritePlaceClick(placeId);
+    }
   };
 
   const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
@@ -86,7 +80,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
     const displayText = search.length > MAX_LENGTH ? `${search.slice(0, MAX_LENGTH)}...` : search;
     return (
       <S.RecentSearchItem>
-        <S.DeleteButton onClick={onDelete} />
+        <S.DeleteButton onClick={onDelete}>
+          <img src={searchDeleteIcon} alt="Delete" />
+        </S.DeleteButton>
         <S.SearchText>{displayText}</S.SearchText>
       </S.RecentSearchItem>
     );
@@ -98,7 +94,21 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
       dispatch(openLoginModal());
       return;
     }
-    setActiveView(activeView === 'savedRoutes' ? 'none' : 'savedRoutes');
+
+    const newView = activeView === 'savedRoutes' ? 'none' : 'savedRoutes';
+    setActiveView(newView);
+
+    if (newView === 'savedRoutes') {
+      fetchSavedRoutes({
+        lastId: 0,
+        limit: 10,
+      }).catch((error) => {
+        if (error.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          navigate('/login');
+        }
+      });
+    }
   };
 
   // favoritePlaces 버튼 클릭 핸들러
@@ -130,11 +140,29 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
       case 'savedRoutes':
         return (
           <S.RecommendationsContainer>
-            {savedRoutesData.map((route) => (
-              <S.RecommendationItem key={route.id} onClick={() => navigate('/route')}>
-                <S.RecommendationText>{route.title}</S.RecommendationText>
-              </S.RecommendationItem>
-            ))}
+            {savedRoutesLoading ? (
+              <div>로딩 중...</div>
+            ) : savedRoutesError ? (
+              <div>에러가 발생했습니다: {savedRoutesError.message}</div>
+            ) : savedRoutes.length === 0 ? (
+              <div>저장된 루트가 없습니다.</div>
+            ) : (
+              savedRoutes.map((route) => (
+                <S.RecommendationItem
+                  key={route.id}
+                  data-full-text={route.name} // 툴팁용 전체 텍스트
+                  onClick={() =>
+                    navigate(`/route/${route.routeId}`, {
+                      state: {
+                        routeSource: RouteSource.SAVED_ROUTE,
+                      },
+                    })
+                  }
+                >
+                  <S.RecommendationText>{route.name}</S.RecommendationText>
+                </S.RecommendationItem>
+              ))
+            )}
           </S.RecommendationsContainer>
         );
       case 'favoritePlaces':
@@ -150,7 +178,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect }) => {
               favoritePlaces.map((place) => (
                 <S.RecommendationItem
                   key={place.id}
-                  onClick={() => handleFavoritePlaceClick(place.placeId)}
+                  onClick={() => handleFavoritePlaceClick(place.id)}
                 >
                   <S.RecommendationText>{place.name}</S.RecommendationText>
                 </S.RecommendationItem>

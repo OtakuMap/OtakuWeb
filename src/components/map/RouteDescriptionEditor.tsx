@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as S from '../../styles/map/RouteDescriptionEditor.styles';
+import { toast } from 'react-toastify';
 
 interface RouteDescriptionEditorProps {
-  description: string;
+  description: string; // title -> description으로 변경
   onSave: (description: string) => void;
 }
 
@@ -10,6 +11,11 @@ const RouteDescriptionEditor = ({ description, onSave }: RouteDescriptionEditorP
   const [currentDescription, setCurrentDescription] = useState(description);
 
   const handleSave = () => {
+    if (!currentDescription.trim()) {
+      // 공백만 있는 경우도 체크
+      toast.error('한 글자 이상 입력해주세요.');
+      return;
+    }
     onSave(currentDescription);
   };
 

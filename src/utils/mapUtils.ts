@@ -1,3 +1,9 @@
+import logoRepeat from '../assets/logorepeat.png';
+
+// interface GooglePlacePhoto extends google.maps.places.PlacePhoto {
+//   photo_reference: string;
+// }
+
 export interface PlaceDetails {
   address: string;
   photoUrl?: string;
@@ -56,45 +62,59 @@ export const getPlaceDetails = async (
     let placeId: string | undefined;
     let photoUrl: string | undefined;
 
+    console.log('Places API search results:', places);
+
+    // if (places && places.length > 0) {
+    //   name = places[0].name;
+    //   placeId = places[0].place_id;
+
+    //   if (places[0].photos && places[0].photos.length > 0) {
+    //     try {
+    //       // Google Maps JavaScript API의 Place Photo URL을 직접 구성
+    //       const photo = places[0].photos[0];
+    //       // 중요: 아래와 같이 rawReference 형식의 url 생성
+    //       const rawReference = photo
+    //         .getUrl({ maxWidth: 800, maxHeight: 800 })
+    //         .split('1s')[1]
+    //         .split('&')[0];
+
+    //       if (rawReference) {
+    //         // Places Photo API URL 형식으로 변경
+    //         photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${rawReference}&key=${apiKey}`;
+    //         console.log('Final constructed photo URL:', photoUrl);
+    //       } else {
+    //         photoUrl = logoRepeat;
+    //       }
+    //     } catch (error) {
+    //       console.error('Error getting photo URL:', error);
+    //       photoUrl = logoRepeat;
+    //     }
+    //   }
+    // }
     if (places && places.length > 0) {
       name = places[0].name;
       placeId = places[0].place_id;
 
       if (places[0].photos && places[0].photos.length > 0) {
-        photoUrl = places[0].photos[0].getUrl({
-          maxWidth: 800,
-          maxHeight: 600,
-        });
-      } else if (placeId) {
-        const detailsRequest = {
-          placeId: placeId,
-          fields: ['photos', 'formatted_address', 'name'],
-        };
-
-        const placeDetails = await new Promise<google.maps.places.PlaceResult>(
-          (resolve, reject) => {
-            service.getDetails(detailsRequest, (result, status) => {
-              if (status === 'OK' && result) {
-                resolve(result);
-              } else {
-                reject(new Error(`Place Details failed: ${status}`));
-              }
-            });
-          },
-        );
-
-        if (placeDetails.photos && placeDetails.photos.length > 0) {
-          photoUrl = placeDetails.photos[0].getUrl({
+        try {
+          const photo = places[0].photos[0];
+          photoUrl = photo.getUrl({
             maxWidth: 800,
-            maxHeight: 600,
+            maxHeight: 800,
           });
+          console.log('getUrl photo URL:', photoUrl);
+        } catch (error) {
+          console.error('Error getting photo URL:', error);
+          photoUrl = logoRepeat;
         }
+      } else {
+        photoUrl = logoRepeat;
       }
     }
 
     // 이미지가 없는 경우 기본 이미지 사용
     if (!photoUrl) {
-      photoUrl = '/src/assets/logorepeat.png';
+      photoUrl = logoRepeat;
     }
 
     return {
@@ -107,7 +127,7 @@ export const getPlaceDetails = async (
     console.error('Error fetching place details:', error);
     return {
       address: '',
-      photoUrl: '/src/assets/logorepeat.png',
+      photoUrl: logoRepeat,
       name: undefined,
       placeId: undefined,
     };

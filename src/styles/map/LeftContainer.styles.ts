@@ -137,7 +137,6 @@ export const DeleteButton = styled.button`
   border: none;
   outline: none;
   cursor: pointer;
-  background: url('/src/assets/search_delete.png') no-repeat center / contain;
   padding: 0;
   display: flex;
   align-items: center;
@@ -172,18 +171,36 @@ export const RecommendationsContainer = styled.div`
 export const RecommendationItem = styled.div<RecommendationItemProps>`
   box-sizing: border-box;
   width: 237px; // 296 * 0.8
-  height: 25px; // 31 * 0.8
+  min-height: 25px; // 31 * 0.8
   border: 1px solid #d1c1ff;
   border-radius: 16px; // 20 * 0.8
-  padding: 4px 16px; // 5 * 0.8, 20 * 0.8
+  padding: 8px 16px; // 수정: 상하 패딩 증가
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  position: relative; // 툴팁을 위한 position 설정
 
   &:hover {
     background-color: rgba(209, 193, 255, 0.1);
+  }
+
+  // 호버 시 전체 텍스트를 보여주는 툴팁
+  &:hover::after {
+    content: attr(data-full-text);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -40px;
+    background: rgba(37, 38, 96, 0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -191,7 +208,17 @@ export const RecommendationText = styled.span`
   font-family: 'Gothic A1';
   font-style: normal;
   font-weight: 400;
-  font-size: 13px; // 16 * 0.8
-  line-height: 16px; // 20 * 0.8
+  font-size: 13px;
+  line-height: 16px;
   color: #ffffff;
+  text-align: center;
+
+  // 2줄까지 표시하고 말줄임표 처리
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  max-height: 32px; // line-height * 2
 `;

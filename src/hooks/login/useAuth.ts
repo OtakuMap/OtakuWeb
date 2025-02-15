@@ -93,12 +93,25 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await authAPI.logout();
+      setLoading(true);
+      const response = await authAPI.logout();
+
+      if (response.isSuccess) {
+        // 순서가 중요: 먼저 로컬 스토리지를 정리하고, 리덕스 상태를 업데이트
+        tokenStorage.clearTokens(); // 먼저 토큰 제거
+        dispatch(logoutAction()); // 리덕스 상태 초기화
+        navigate('/'); // 마지막으로 페이지 이동
+      } else {
+        // 로그아웃 실패 시 사용자에게 알림
+        console.error('Logout failed:', response.message);
+        throw new Error(response.message);
+      }
     } catch (error) {
       console.error('Logout error:', error);
+      // 에러 처리를 위해 상위 컴포넌트로 에러를 전파
+      throw error;
     } finally {
-      dispatch(logoutAction());
-      navigate('/');
+      setLoading(false);
     }
   };
 

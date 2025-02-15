@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { tokenStorage } from '../utils/token';
 
+const API_BASE =
+  window.location.hostname === 'localhost'
+    ? '/api' // 로컬에서는 프록시 사용
+    : '/api'; // 배포 환경에서도 동일하게
+
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,6 +19,10 @@ instance.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getAccessToken();
     console.log('Request interceptor token:', token); // 토큰 확인 로그
+    console.log('Base URL:', config.baseURL);
+    console.log('Path:', config.url);
+    console.log('Method:', config.method);
+    console.log('Headers:', config.headers);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -38,7 +47,7 @@ instance.interceptors.response.use(
           window.location.href = '/';
           return Promise.reject(new Error('No refresh token available'));
         }
-        
+
         // 토큰 재발급 요청
         const response = await axios.post('/api/auth/reissue', null, {
           headers: {
@@ -47,13 +56,8 @@ instance.interceptors.response.use(
         });
 
         // 응답에서 새 토큰들 저장 (userId와 role 모두 저장)
-        const { 
-          accessToken, 
-          refreshToken: newRefreshToken, 
-          userId,
-          role 
-        } = response.data.result;
-        
+        const { accessToken, refreshToken: newRefreshToken, userId, role } = response.data.result;
+
         tokenStorage.setTokens(accessToken, newRefreshToken, userId, role);
 
         // 원래 요청 재시도

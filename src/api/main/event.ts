@@ -1,16 +1,11 @@
-import instance from '@/api/axios';
+import publicInstance from '@/api/publicInstance';
 import { PopularEventsResponse } from '@/types/main/event';
 import { AxiosError } from 'axios';
-import { tokenStorage } from '@/utils/token';
 
 export const getPopularEvents = async () => {
   try {
-    const token = tokenStorage.getAccessToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
-    const response = await instance.get<PopularEventsResponse>('/events/popular');
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 딜레이
+    const response = await publicInstance.get<PopularEventsResponse>('/events/popular');
 
     if (!response.data || !response.data.result) {
       // 임시 더미 데이터 반환

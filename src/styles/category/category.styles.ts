@@ -10,6 +10,7 @@ export const Container = styled.div`
 `;
 
 export const Sidebar = styled.div`
+  margin-top: 30px;
   display: flex;
   width: 300px;
   overflow: hidden;

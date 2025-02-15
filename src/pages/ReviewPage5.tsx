@@ -8,16 +8,18 @@ import defaultProfileImage from '../assets/profile.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { ReviewDetail, ReviewType } from '@/types/review/review';
 import { RouteData } from '@/types/review/route';
+import { RouteSource } from '@/types/map/routeSource';
+//import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const ReviewPage5 = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [isSaving, setIsSaving] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   const { reviewId } = useParams();
   const [searchParams] = useSearchParams();
   const type = (searchParams.get('type') as ReviewType) || 'PLACE';
@@ -132,7 +134,17 @@ const ReviewPage5 = () => {
               ))}
             </S.RouteList>
             <S.RouteButtonContainer>
-              <S.Button onClick={() => navigate('/map')}>루트 지도에서 보기</S.Button>
+              <S.Button
+                onClick={() =>
+                  navigate(`/route/${reviewData.reviewId}`, {
+                    state: {
+                      routeSource: RouteSource.REVIEW,
+                    },
+                  })
+                }
+              >
+                루트 지도에서 보기
+              </S.Button>
               <S.SupportButton>후기 구매하기</S.SupportButton>
             </S.RouteButtonContainer>
           </S.SideContent>

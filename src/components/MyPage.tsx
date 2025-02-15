@@ -4,6 +4,9 @@ import { getUserInfo } from '../api/userInfo';
 import { updateNickname } from '../api/userInfo/nickname';
 import { reportEvent } from '../api/userInfo/report-event';
 import { updateNotificationSettings } from '../api/userInfo/notification-settings';
+import { logout } from '../api/userInfo/logout';
+import { updateProfileImage } from '../api/userInfo/profile_image';
+import { uploadImage } from '../api/common/upload-image'; // 추가된 import
 import { UserInfo } from '../types/userInfo/userType';
 import { deleteAllReviews } from '../api/userInfo/deleteReviews';
 import StarIcon from '../assets/star.png';
@@ -57,6 +60,63 @@ const MyPage = () => {
     fetchUserInfo();
   }, []);
 
+  // 수정된 이미지 변경 핸들러
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 파일 크기 체크 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('파일 크기는 5MB 이하여야 합니다.');
+      return;
+    }
+
+    // 이미지 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    try {
+      // 1. 먼저 이미지 업로드
+      const uploadResponse = await uploadImage('profile', file);
+      if (!uploadResponse.isSuccess) {
+        throw new Error('이미지 업로드에 실패했습니다.');
+      }
+
+      // 2. 업로드된 이미지 URL로 프로필 이미지 업데이트
+      const updateResponse = await updateProfileImage(uploadResponse.result);
+      if (updateResponse.isSuccess) {
+        const userResponse = await getUserInfo();
+        setUserInfo(userResponse.result);
+        alert('프로필 이미지가 성공적으로 변경되었습니다.');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('프로필 이미지 변경 중 오류가 발생했습니다.');
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await logout();
+      if (response.isSuccess) {
+        navigate('/');
+      } else {
+        alert(response.message || '로그아웃에 실패했습니다.');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('로그아웃 처리 중 예기치 않은 오류가 발생했습니다.');
+      }
+    }
+  };
+
   const handleSave = async () => {
     try {
       if (isEditing.nickname) {
@@ -91,7 +151,6 @@ const MyPage = () => {
     }));
   };
 
-  // 후기 페이지 이동 핸들러 추가
   const handleReviewClick = () => {
     navigate('/review6');
   };
@@ -134,7 +193,6 @@ const MyPage = () => {
       const response = await deleteAllReviews();
       if (response.isSuccess) {
         alert('모든 후기가 성공적으로 삭제되었습니다.');
-        // 사용자 정보 다시 불러오기 (donation 정보 업데이트를 위해)
         const userResponse = await getUserInfo();
         setUserInfo(userResponse.result);
       }
@@ -180,7 +238,16 @@ const MyPage = () => {
       <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
 
       <S.ProfileContainer>
-        <S.Avatar imageUrl={userInfo?.profileImageUrl} />
+        <label htmlFor="profile-image-input" style={{ cursor: 'pointer' }}>
+          <S.Avatar imageUrl={userInfo?.profileImageUrl} />
+          <input
+            id="profile-image-input"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+          />
+        </label>
         <S.Nickname>{userInfo?.nickname}</S.Nickname>
         <S.Email>{userInfo?.email}</S.Email>
       </S.ProfileContainer>
@@ -258,7 +325,7 @@ const MyPage = () => {
           <S.ReviewAmount>{userInfo?.donation || 0}P</S.ReviewAmount>
         </S.ReviewSection>
       </S.Section>
-      {/* Modal 추가 */}
+
       {showDeleteModal && (
         <S.ModalOverlay>
           <S.ModalContainer>
@@ -325,7 +392,7 @@ const MyPage = () => {
         </S.ToggleContainer>
       </S.Section>
 
-      <S.LogoutButton>로그아웃</S.LogoutButton>
+      <S.LogoutButton onClick={handleLogout}>로그아웃</S.LogoutButton>
       <S.BottomRightIcon src={SpaceIcon} alt="Space Icon" />
     </S.Container>
   );

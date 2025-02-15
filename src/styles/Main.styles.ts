@@ -300,3 +300,19 @@ export const Divider = styled.div`
   background-color: #464654;
   margin-top: 40px;
 `;
+
+export const HeartButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1;
+`;
+
+export const HeartImage = styled.img`
+  width: 24px;
+  height: 24px;
+`;

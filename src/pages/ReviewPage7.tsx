@@ -1,8 +1,13 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import profile from '../assets/profile.png';
 import picture from '../assets/picture.png';
 import mapIcon from '../assets/mapIcon.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { useReviewPage } from '@/hooks/review/useReviewPage7';
+import { useWriteReview } from '@/api/review/WriteReview';
+import { WriteReviewRequest } from '@/types/review/WriteReview';
+import { useImageUpload } from '@/api/review/image';
 
 const profileData = {
   profileImage: profile,
@@ -11,6 +16,11 @@ const profileData = {
 };
 
 const ReviewPage7 = () => {
+  const navigate = useNavigate();
+  const { submitReview, isLoading } = useWriteReview();
+  const { upload, isUploading } = useImageUpload();
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+
   const {
     // Form State
     title,
@@ -47,8 +57,75 @@ const ReviewPage7 = () => {
     handleVisibilitySelect,
     handleRouteChange,
     deleteRoute,
-    handleSubmit,
   } = useReviewPage({ initialProfileData: profileData });
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.[0]) return;
+
+    try {
+      const file = event.target.files[0];
+      const response = await upload('review', file);
+
+      if (response.isSuccess) {
+        setUploadedImageUrl(response.result);
+      }
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다.');
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // 필수 입력값 검증
+      if (!title.trim()) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+      if (!content.trim()) {
+        alert('내용을 입력해주세요.');
+        return;
+      }
+      if (!selectedReviewType) {
+        alert('리뷰 타입을 선택해주세요.');
+        return;
+      }
+
+      // reviewType 타입 체크
+      if (selectedReviewType !== '이벤트 후기' && selectedReviewType !== '명소 후기') {
+        alert('올바른 리뷰 타입을 선택해주세요.');
+        return;
+      }
+
+      const reviewData: Omit<WriteReviewRequest, 'userId'> = {
+        placeId: 1, // 실제 장소 ID로 변경 필요
+        title,
+        content,
+        reviewType: selectedReviewType,
+        animation: selectedAnimation === 'custom' ? customAnimation : selectedAnimation,
+        visibility: selectedVisibility as '전체 열람가능' | '구매자만 열람가능',
+        routes: routes.map((route) => ({
+          id: route.id,
+          value: route.value,
+        })),
+        imageUrl: uploadedImageUrl,
+      };
+
+      const response = await submitReview(reviewData);
+
+      if (response.isSuccess) {
+        alert('리뷰가 성공적으로 등록되었습니다.');
+        navigate('/reviews');
+      }
+    } catch (error) {
+      console.error('리뷰 등록 실패:', error);
+      alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  if (isLoading || isUploading) {
+    return <div>업로드 중...</div>;
+  }
 
   return (
     <S.Container>
@@ -162,10 +239,25 @@ const ReviewPage7 = () => {
                 </S.RouteItem7>
               ))}
               <S.AddSection>
-                <S.AddPic src={picture} alt="사진 추가" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload">
+                  <S.AddPic
+                    src={uploadedImageUrl || picture}
+                    alt="사진 추가"
+                    style={{ cursor: 'pointer' }}
+                  />
+                </label>
                 <S.AddMap src={mapIcon} alt="지도 추가" />
               </S.AddSection>
-              <S.Button7 onClick={handleSubmit}>업로드 하기</S.Button7>
+              <S.Button7 onClick={handleSubmit} disabled={isLoading || isUploading}>
+                {isLoading || isUploading ? '업로드 중...' : '업로드 하기'}
+              </S.Button7>
             </S.RouteSection>
           </S.ReviewFormContainer>
         </S.ContentContainer7>

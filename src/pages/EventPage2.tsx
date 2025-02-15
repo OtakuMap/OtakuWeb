@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MapContainer from '@/components/map/MapContainer';
+import { saveEvent } from '@/api/event/SaveEvent';
+import { EventReview } from '@/types/event/review';
+import { getEventReviews } from '@/api/event/review';
+import { EventShortReview } from '@/types/event/short-review';
+import { getEventShortReviews } from '@/api/event/short-review';
 import {
   useEventDetails,
   useReviews,
@@ -12,11 +17,12 @@ import * as S from '../styles/event/EventPage2.styles';
 
 // Assets
 import dividerLine from '../assets/dividerLine.png';
+import BackPage from '../assets/BackPage.png';
+import NextPage from '../assets/NextPage.png';
 import StarFull from '../assets/StarFull.png';
 import StarEm from '../assets/StarEm.png';
 import profile from '../assets/profile.png';
 import profile3 from '../assets/profile3.png';
-import review from '../assets/reviewData.png';
 import backimage from '../assets/backimage.png';
 import product from '../assets/product.png';
 import eventImage from '../assets/eventImg.png';
@@ -104,36 +110,24 @@ const reviewData = [
   },
 ];
 
-const postData = [
-  {
-    id: 1,
-    image: review,
-    title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-  },
-  {
-    id: 2,
-    image: review,
-    title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-  },
-  {
-    id: 3,
-    image: review,
-    title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-  },
-  {
-    id: 4,
-    image: review,
-    title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-  },
-];
-
 const EventPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const { eventId: urlEventId } = useParams<{ eventId: string }>();
   const eventId = Number(urlEventId) || 1;
+  const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('기본정보');
+  const [isSaving, setIsSaving] = useState(false);
+  const [eventReviews, setEventReviews] = useState<EventReview[]>([]);
+  const [reviewsTotalPages, setReviewsTotalPages] = useState(1);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+  const [shortReviews, setShortReviews] = useState<EventShortReview[]>([]);
+  const [shortReviewsLoading, setShortReviewsLoading] = useState(false);
+  const [shortReviewsError, setShortReviewsError] = useState<string | null>(null);
+
+  const itemsPerPage = 4; // 한 페이지당 4개 아이템 표시
 
   // Custom hooks 사용
   const { eventDetails, loading, error } = useEventDetails(eventId);
@@ -162,6 +156,62 @@ const EventPage = () => {
     handleReviewSubmit,
   } = useReviewSubmission(eventId, reviews, setReviews, profileData);
 
+  // 후기 게시물 불러오는 useEffect 추가
+  useEffect(() => {
+    const fetchEventReviews = async () => {
+      if (!eventId) return;
+
+      setReviewsLoading(true);
+      setReviewsError(null);
+
+      try {
+        const response = await getEventReviews(eventId, currentPage - 1); // API는 0부터 시작하므로 currentPage - 1
+
+        if (response.isSuccess) {
+          setEventReviews(response.result.eventReviews);
+          setReviewsTotalPages(response.result.totalPages);
+        } else {
+          setReviewsError(response.message);
+        }
+      } catch (error) {
+        console.error('Error fetching event reviews:', error);
+        setReviewsError('후기 게시물을 불러오는데 실패했습니다.');
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchEventReviews();
+  }, [eventId, currentPage]);
+
+  //한줄후기 조회하는 API 추가
+  useEffect(() => {
+    const fetchShortReviews = async () => {
+      if (!eventId) return;
+
+      setShortReviewsLoading(true);
+      setShortReviewsError(null);
+
+      try {
+        const response = await getEventShortReviews(eventId, 0); // 첫 페이지로 고정
+
+        if (response.isSuccess) {
+          // 새로 등록된 리뷰를 포함하여 리스트 업데이트
+          setShortReviews(response.result.eventShortReviewList);
+        } else {
+          setShortReviewsError(response.message);
+        }
+      } catch (error) {
+        console.error('Error fetching short reviews:', error);
+        setShortReviewsError('한줄 후기를 불러오는데 실패했습니다.');
+      } finally {
+        setShortReviewsLoading(false);
+      }
+    };
+
+    fetchShortReviews();
+  }, [eventId, shortReviews.length]); // shortReviews.length 추가로 리뷰 등록 시 자동 새로고침
+
   const handleTextAreaClick = (e: React.MouseEvent) => {
     if (!isLoggedIn) {
       e.preventDefault();
@@ -177,6 +227,30 @@ const EventPage = () => {
       return;
     }
     handleReviewSubmit();
+  };
+  const handleSaveEvent = async () => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    if (isSaving) return;
+
+    try {
+      setIsSaving(true);
+      const response = await saveEvent(eventId);
+      if (response.isSuccess) {
+        // You can add a success toast notification here if needed
+        navigate('/saved-events');
+      } else {
+        // Handle error case
+        console.error('Failed to save event:', response.message);
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -215,6 +289,15 @@ const EventPage = () => {
       }
     : tempEventData;
 
+  // 페이지네이션 핸들러 추가
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, reviewsTotalPages));
+  };
+
   return (
     <S.Container>
       <S.Content>
@@ -224,7 +307,9 @@ const EventPage = () => {
             <S.EventInfo>
               <S.EventTitle>{displayData.title}</S.EventTitle>
               <S.EventSubtitle>{displayData.subtitle}</S.EventSubtitle>
-              <S.SaveButton onClick={() => navigate('/saved-events')}>이벤트 저장하기</S.SaveButton>
+              <S.SaveButton onClick={handleSaveEvent} disabled={isSaving}>
+                {isSaving ? '저장 중...' : '이벤트 저장하기'}
+              </S.SaveButton>
             </S.EventInfo>
           </S.EventHeaderInner>
         </S.EventHeader>
@@ -321,18 +406,29 @@ const EventPage = () => {
                 </S.InputSection>
               </S.InputHeader>
             </S.ReviewInput>
-
             <S.ReviewCount>
-              한 줄 리뷰 ({reviews.length})<span>평균 평점: {calculateAverageRating(reviews)}</span>
+              한 줄 리뷰 ({shortReviews.length}){shortReviewsLoading && <span> 로딩중...</span>}
+              {shortReviewsError && <span style={{ color: 'red' }}> {shortReviewsError}</span>}
+              <span>
+                평균 평점:{' '}
+                {shortReviews.length > 0
+                  ? (
+                      shortReviews.reduce((acc, review) => acc + review.rating, 0) /
+                      shortReviews.length
+                    ).toFixed(1)
+                  : '0.0'}
+              </span>
             </S.ReviewCount>
-
             <S.ReviewList>
-              {reviews.map((review) => (
-                <S.ReviewCard key={review.id} $isMyReview={review.username === profileData.name}>
+              {shortReviews.map((review) => (
+                <S.ReviewCard
+                  key={review.id}
+                  $isMyReview={false} // $isMyReview prop은 필수이므로 기본값 제공
+                >
                   <S.ReviewHeader>
-                    <S.Avatar src={review.profileImage} alt="프로필" />
+                    <S.Avatar src={review.profileImage.fileUrl} alt="프로필" />
                     <S.UserInfo>
-                      <S.UserName>{review.username}</S.UserName>
+                      <S.UserName>{review.id}</S.UserName>
                       {editingId === review.id ? (
                         <S.StarRatingInput>
                           {[1, 2, 3, 4].map((star) => (
@@ -416,16 +512,34 @@ const EventPage = () => {
                 </S.ReviewCard>
               ))}
             </S.ReviewList>
-
-            <S.ReviewCount>후기 게시물 (10)</S.ReviewCount>
+            <S.ReviewCount>
+              후기 게시물 ({eventReviews.length}){reviewsLoading && <span> 로딩중...</span>}
+              {reviewsError && <span style={{ color: 'red' }}> {reviewsError}</span>}
+            </S.ReviewCount>
             <S.PostGrid>
-              {postData.map((post) => (
-                <S.PostCard key={post.id}>
-                  <S.PostImage src={post.image} alt={post.title} />
-                  <S.PostTitle>{post.title}</S.PostTitle>
+              {eventReviews.map((review) => (
+                <S.PostCard
+                  key={review.id}
+                  onClick={() => navigate(`/review/${review.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <S.PostImage src={review.reviewPhotoUrl.fileUrl} alt={review.title} />
+                  <S.PostTitle>{review.title}</S.PostTitle>
                 </S.PostCard>
               ))}
             </S.PostGrid>
+            <S.Pagination>
+              <S.PaginationButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                <img src={BackPage} alt="이전 페이지" />
+              </S.PaginationButton>
+              {currentPage}/{reviewsTotalPages || 1}
+              <S.PaginationButton
+                onClick={handleNextPage}
+                disabled={currentPage === reviewsTotalPages}
+              >
+                <img src={NextPage} alt="다음 페이지" />
+              </S.PaginationButton>
+            </S.Pagination>
           </S.ReviewSection>
         )}
       </S.Content>
