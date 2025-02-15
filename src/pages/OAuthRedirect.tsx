@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/login/useAuth';
 
 const OAuthRedirectHandler = () => {
   const { oauthLogin } = useAuth();
   const navigate = useNavigate();
-  const { provider } = useParams<{ provider: 'kakao' | 'naver' | 'google' }>(); // useParams는 최상단에서 호출
-  const code: string | null = new URL(window.location.href).searchParams.get('code');
+  const { provider } = useParams<{ provider: 'kakao' | 'naver' | 'google' }>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const code = searchParams.get('code');
+  const state = searchParams.get('state');
+  const savedState = localStorage.getItem('naver_state'); // Get the saved state from localStorage
 
   useEffect(() => {
     const handleLogin = async () => {
@@ -24,9 +28,18 @@ const OAuthRedirectHandler = () => {
         return;
       }
 
+      // Add state validation to prevent CSRF attacks
+      if (provider === 'naver' && state !== savedState) {
+        console.error('State 값 불일치! CSRF 공격 가능성 있음.');
+        alert('잘못된 요청입니다. 다시 시도해주세요.');
+        navigate('/');
+        return;
+      }
+
       try {
+        console.log(`Logging in with provider: ${provider}, code: ${code}, state: ${state}`);
         await oauthLogin(provider, code);
-        navigate('/main'); // 로그인 성공 시 메인 페이지로 이동
+        navigate('/main');
       } catch (error) {
         console.error('OAuth Login failed:', error);
         alert('로그인에 실패했습니다. 다시 시도해주세요.');
@@ -35,7 +48,7 @@ const OAuthRedirectHandler = () => {
     };
 
     handleLogin();
-  }, [code, provider, navigate, oauthLogin]);
+  }, [code, provider, state, savedState, navigate, oauthLogin]);
 
   return <div>로그인 중입니다. 잠시만 기다려 주세요...</div>;
 };
