@@ -101,6 +101,21 @@ export interface SearchPwResponse {
   result: string;
 }
 
+// 비밀번호 찾기시 이메일 코드 전송
+export interface SearchPwSendEmailVerifyCodeRequest {
+  code: string;
+  userId: string;
+}
+
+export interface SearchPwSendEmailVerifyCodeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    verified: boolean;
+  };
+}
+
 // 회원가입시 이메일 코드 전송
 export interface sendEmailVerifyCodeRequest {
   email: string;
@@ -126,4 +141,18 @@ export interface EmailVerifyCodeResponse {
   result?: {
     verified: boolean;
   };
+}
+
+// 비밀번호 변경
+export interface resetPwRequest {
+  userId: string;
+  password: string;
+  passwordCheck: string;
+}
+
+export interface resetPwResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
 }
