@@ -3,6 +3,7 @@ import picture from '../assets/picture.png';
 import mapIcon from '../assets/mapIcon.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { useReviewPage } from '@/hooks/review/useReviewPage7';
+import MapSelectionModal from '@/components/map/MapSelectionModal';
 
 const profileData = {
   profileImage: profile,
@@ -48,6 +49,13 @@ const ReviewPage7 = () => {
     handleRouteChange,
     deleteRoute,
     handleSubmit,
+
+    locations,
+    isMapModalOpen,
+    setIsMapModalOpen,
+    handleLocationSelect,
+    handleLocationNameChange,
+    deleteLocation,
   } = useReviewPage({ initialProfileData: profileData });
 
   return (
@@ -150,6 +158,33 @@ const ReviewPage7 = () => {
               </S.SelectBox>
             </S.SelectBoxContainer>
             <S.RouteSection>
+              {locations.map((location) => (
+                <S.RouteItem7 key={location.order}>
+                  <S.RouteNumber>{location.order}</S.RouteNumber>
+                  <S.RouteInput
+                    placeholder={`${location.order}번째 장소`}
+                    value={location.name}
+                    onChange={(e) => handleLocationNameChange(location.order, e.target.value)}
+                  />
+                  <S.DeleteButton7 onClick={() => deleteLocation(location.order)}>
+                    ×
+                  </S.DeleteButton7>
+                </S.RouteItem7>
+              ))}
+              <S.AddSection>
+                <S.AddPic src={picture} alt="사진 추가" />
+                <S.AddMap src={mapIcon} alt="지도 추가" onClick={() => setIsMapModalOpen(true)} />
+              </S.AddSection>
+              <S.Button7 onClick={handleSubmit}>업로드 하기</S.Button7>
+            </S.RouteSection>
+
+            {/* 모달 추가 */}
+            <MapSelectionModal
+              isOpen={isMapModalOpen}
+              onClose={() => setIsMapModalOpen(false)}
+              onLocationSelect={handleLocationSelect}
+            />
+            {/* <S.RouteSection>
               {routes.map((route) => (
                 <S.RouteItem7 key={route.id}>
                   <S.RouteNumber>{route.id}</S.RouteNumber>
@@ -166,7 +201,7 @@ const ReviewPage7 = () => {
                 <S.AddMap src={mapIcon} alt="지도 추가" />
               </S.AddSection>
               <S.Button7 onClick={handleSubmit}>업로드 하기</S.Button7>
-            </S.RouteSection>
+            </S.RouteSection> */}
           </S.ReviewFormContainer>
         </S.ContentContainer7>
       </S.WhiteContainer>

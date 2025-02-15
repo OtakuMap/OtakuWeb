@@ -2,7 +2,8 @@ export type NotificationType =
   | 'COMMUNITY_ACTIVITY'
   | 'POST_SAVE'
   | 'POST_SUPPORT'
-  | 'SERVICE_NOTICE';
+  | 'SERVICE_NOTICE'
+  | 'EVENT_STARTED';
 
 export interface Notification {
   id: number;
