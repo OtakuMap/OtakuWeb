@@ -10,7 +10,7 @@ const OAuthRedirectHandler = () => {
   const searchParams = new URLSearchParams(location.search);
   const code = searchParams.get('code');
   const state = searchParams.get('state');
-  const savedState = localStorage.getItem('naver_state'); // Get the saved state from localStorage
+  const savedState = localStorage.getItem('oauth_state'); // Get the saved state from localStorage
 
   useEffect(() => {
     const handleLogin = async () => {
@@ -29,7 +29,7 @@ const OAuthRedirectHandler = () => {
       }
 
       // Add state validation to prevent CSRF attacks
-      if (provider === 'naver' && state !== savedState) {
+      if (state !== savedState) {
         console.error('State 값 불일치! CSRF 공격 가능성 있음.');
         alert('잘못된 요청입니다. 다시 시도해주세요.');
         navigate('/');
@@ -50,7 +50,7 @@ const OAuthRedirectHandler = () => {
     handleLogin();
   }, [code, provider, state, savedState, navigate, oauthLogin]);
 
-  return <div>로그인 중입니다. 잠시만 기다려 주세요...</div>;
+  return <p>로그인 중입니다. 잠시만 기다려 주세요...</p>;
 };
 
 export default OAuthRedirectHandler;

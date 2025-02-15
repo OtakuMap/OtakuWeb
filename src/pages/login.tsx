@@ -81,17 +81,17 @@ const LoginPage: React.FC = () => {
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
     setLastLogin(provider);
 
+    const state = generateState(); // state 값 생성
+
+    // state 값을 localStorage에 저장
+    localStorage.setItem('oauth_state', state);
+
     if (provider === 'naver') {
-      const state = generateState();
-      localStorage.setItem('naver_state', state); // ✅ state 값 저장
-      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code
-        &client_id=${VITE_NAVER_CLIENT_ID}
-        &redirect_uri=${VITE_NAVER_REDIRECT_URI}
-        &state=${state}`;
+      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`; // state 값 추가
     } else if (provider === 'kakao') {
-      window.location.href = KAKAO_AUTH_URL;
+      window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${state}`; // state 값 추가
     } else if (provider === 'google') {
-      window.location.href = GOOGLE_AUTH_URL;
+      window.location.href = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&state=${state}`; // state 값 추가
     } else {
       console.error('Unknown provider');
     }
