@@ -82,6 +82,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/cover" element={<Cover />} />
         <Route path="/my-page" element={<MyPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/oauth/callback/:provider" element={<OAuthRedirectHandler />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/search-id-pw" element={<SearchIdPWPage />} />
         <Route path="/newsetpw" element={<NewSetPWPage />} />
@@ -99,10 +100,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/review7" element={<ReviewPage7 />} />
         <Route path="/event" element={<EventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />
-<Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
+        <Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
         <Route path="/point-charge" element={<PointCharge />} />
         <Route path="/my-point" element={<MyPoint />} />
-        
+
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
         <Route
           path="/route-management"
