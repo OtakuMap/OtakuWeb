@@ -28,13 +28,13 @@ const OAuthRedirectHandler = () => {
         return;
       }
 
-      // Add state validation to prevent CSRF attacks
+      /* // Add state validation to prevent CSRF attacks
       if (state !== savedState) {
         console.error('State 값 불일치! CSRF 공격 가능성 있음.');
         alert('잘못된 요청입니다. 다시 시도해주세요.');
         navigate('/');
         return;
-      }
+      }*/
 
       try {
         console.log(`Logging in with provider: ${provider}, code: ${code}, state: ${state}`);

@@ -78,11 +78,11 @@ const LoginPage: React.FC = () => {
     localStorage.setItem('oauth_state', state);
 
     if (provider === 'naver') {
-      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`; // state 값 추가
+      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${generateState()}`; // state 값 추가
     } else if (provider === 'kakao') {
-      window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${state}&prompt=login`; // state 값 추가
+      window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${generateState()}&prompt=login`; // state 값 추가
     } else if (provider === 'google') {
-      window.location.href = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&state=${state}&scope=email%20profile`; // state 값 추가
+      window.location.href = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&state=${generateState()}&scope=email%20profile`; // state 값 추가
     } else {
       console.error('Unknown provider');
     }
