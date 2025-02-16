@@ -33,18 +33,14 @@ import {
   RecentLoginWrapper,
   RecentLoginText,
 } from '../styles/login/login.style';
-
 const {
   VITE_KAKAO_CLIENT_ID,
   VITE_GOOGLE_CLIENT_ID,
+  VITE_NAVER_CLIENT_ID,
   VITE_KAKAO_REDIRECT_URI,
   VITE_GOOGLE_REDIRECT_URI,
   VITE_NAVER_REDIRECT_URI,
-  VITE_NAVER_CLIENT_ID,
 } = import.meta.env;
-
-/*const generateState = () => Math.random().toString(36).substring(2, 15); // 랜덤 state 생성
- */
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -53,7 +49,6 @@ const LoginPage: React.FC = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [lastLogin, setLastLogin] = useState<'kakao' | 'naver' | 'google' | null>(null);
 
@@ -62,69 +57,73 @@ const LoginPage: React.FC = () => {
     const provider = queryParams.get('provider');
     const code = queryParams.get('code');
     const state = queryParams.get('state');
+    const savedState = localStorage.getItem('oauth_state');
 
-    if (provider && code) {
-      // 로컬 저장된 state와 비교
-      const storedState = localStorage.getItem(`${provider}_state`);
-      if (storedState !== state) {
-        console.error('Invalid state value');
-        setError('잘못된 요청입니다. 다시 시도해주세요.');
-        return;
-      }
+    if (!code || !provider) return;
 
-      // OAuth 로그인 실행
-      oauthLogin(provider as 'kakao' | 'naver' | 'google', code);
-
-      // URL 정리
-      navigate('/', { replace: true });
+    if (!savedState || state !== savedState) {
+      setError('OAuth 인증 실패: CSRF 검증 실패.');
+      return;
     }
-  }, [location, oauthLogin, navigate]);
 
-  const FIXED_STATE = 'fixed_state_value'; // 테스트용 고정 state 값
+    localStorage.removeItem('oauth_state'); // 검증 후 state 삭제
+    setError(null);
+
+    oauthLogin(provider as 'kakao' | 'naver' | 'google', code).catch(() => {
+      setError('OAuth 로그인에 실패했습니다.');
+    });
+  }, [location, oauthLogin]);
+
+  const generateState = () => Math.random().toString(36).substring(2, 15);
 
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
-    const state = FIXED_STATE; // state를 고정된 값으로 설정
-    localStorage.setItem(`${provider}_state`, state);
+    setLastLogin(provider);
+    const state = generateState();
+    localStorage.setItem('oauth_state', state);
 
     let authUrl = '';
-    if (provider === 'naver') {
-      authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code
-      &client_id=${VITE_NAVER_CLIENT_ID}
-      &redirect_uri=${VITE_NAVER_REDIRECT_URI}
-      &state=${state}`;
-    } else if (provider === 'kakao') {
-      authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code
-      &client_id=${VITE_KAKAO_CLIENT_ID}
-      &redirect_uri=${VITE_KAKAO_REDIRECT_URI}
-      &state=${state}`;
-    } else if (provider === 'google') {
-      authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code
-      &client_id=${VITE_GOOGLE_CLIENT_ID}
-      &redirect_uri=${VITE_GOOGLE_REDIRECT_URI}
-      &scope=email%20profile
-      &state=${state}`;
+    switch (provider.trim()) {
+      case 'kakao':
+        authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_KAKAO_REDIRECT_URI)}&state=${state}&prompt=login`;
+        break;
+      case 'naver':
+        authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_NAVER_REDIRECT_URI)}&state=${state}`;
+        break;
+      case 'google':
+        authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_GOOGLE_REDIRECT_URI)}&scope=email%20profile&state=${state}`;
+        break;
+      default:
+        console.error('Unknown provider');
+        return;
     }
 
     window.location.href = authUrl;
+
+    console.log(`Redirecting to: ${authUrl}`);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isSubmitting || loading) return;
+    if (loading) return;
+
     if (!userId || !password) {
       setError('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
+
     try {
-      setIsSubmitting(true);
+      setError(null);
       await login(userId, password);
-      console.log('Login success');
+      console.log('Login form submission successful');
     } catch (err) {
-      console.error('Login failed');
+      console.error('Login form submission failed');
       setError('로그인에 실패했습니다.');
-    } finally {
-      setIsSubmitting(false);
     }
+  };
+
+  const handleButtonClick = () => {
+    if (!formRef.current || loading) return;
+    formRef.current.requestSubmit();
   };
 
   return (
@@ -165,7 +164,7 @@ const LoginPage: React.FC = () => {
           <ActionLink onClick={() => navigate('/search-id-pw')}>아이디/비밀번호 찾기</ActionLink>
           <ActionLink onClick={() => navigate('/signup')}>회원가입</ActionLink>
         </Actions>
-        <ActionButton onClick={() => formRef.current?.requestSubmit()} disabled={loading}>
+        <ActionButton onClick={handleButtonClick} disabled={loading}>
           {loading ? '로그인 중...' : '로그인하기'}
         </ActionButton>
         <Actions2>
