@@ -33,7 +33,6 @@ import {
   RecentLoginWrapper,
   RecentLoginText,
 } from '../styles/login/login.style';
-
 const {
   VITE_KAKAO_CLIENT_ID,
   VITE_GOOGLE_CLIENT_ID,
@@ -43,9 +42,11 @@ const {
   VITE_NAVER_CLIENT_ID,
 } = import.meta.env;
 
-const generateState = () => {
-  return Math.random().toString(36).substring(2, 15); // 랜덤 문자열 생성
-};
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&prompt=login`;
+
+const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}`;
+
+const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile`;
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -57,12 +58,10 @@ const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [lastLogin, setLastLogin] = useState<'kakao' | 'naver' | 'google' | null>(null);
-
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const provider = queryParams.get('provider');
     const code = queryParams.get('code');
-
     if (provider && code) {
       // OAuth 인증 후 코드가 있다면 로그인 시도
       oauthLogin(provider as 'kakao' | 'naver' | 'google', code);
@@ -71,34 +70,29 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
     setLastLogin(provider);
-
-    const state = generateState(); // state 값 생성
-
-    // state 값을 localStorage에 저장
-    localStorage.setItem('oauth_state', state);
-
-    if (provider === 'naver') {
-      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${generateState()}`; // state 값 추가
-    } else if (provider === 'kakao') {
-      window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${generateState()}&prompt=login`; // state 값 추가
-    } else if (provider === 'google') {
-      window.location.href = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&state=${generateState()}&scope=email%20profile`; // state 값 추가
-    } else {
-      console.error('Unknown provider');
+    switch (provider) {
+      case 'kakao':
+        window.location.href = KAKAO_AUTH_URL;
+        break;
+      case 'naver':
+        window.location.href = NAVER_AUTH_URL;
+        break;
+      case 'google':
+        window.location.href = GOOGLE_AUTH_URL;
+        break;
+      default:
+        console.error('Unknown provider');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     // 이미 제출 중이면 중단
     if (isSubmitting || loading) return;
-
     if (!userId || !password) {
       setError('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
-
     try {
       setIsSubmitting(true);
       await login(userId, password);
@@ -110,12 +104,10 @@ const LoginPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleButtonClick = () => {
     if (isSubmitting || loading) return;
     formRef.current?.requestSubmit(); // dispatchEvent 대신 requestSubmit 사용
   };
-
   return (
     <Container>
       <LoginBox>
@@ -162,14 +154,12 @@ const LoginPage: React.FC = () => {
           <ActionLink2>간편 회원가입/로그인</ActionLink2>
           <ShortDivider />
         </Actions2>
-
         {lastLogin && (
           <RecentLoginWrapper>
             <img src={Speech_bubble} alt="말풍선" style={{ width: '71px' }} />
             <RecentLoginText>최근 로그인</RecentLoginText>
           </RecentLoginWrapper>
         )}
-
         <SocialLogin>
           <SocialIcon src={kakaoIcon} alt="Kakao Login" onClick={() => handleLogin('kakao')} />
           <SocialIcon src={naverIcon} alt="Naver Login" onClick={() => handleLogin('naver')} />
@@ -179,5 +169,4 @@ const LoginPage: React.FC = () => {
     </Container>
   );
 };
-
 export default LoginPage;
