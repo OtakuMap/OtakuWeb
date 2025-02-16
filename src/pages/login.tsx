@@ -42,9 +42,9 @@ const {
   VITE_NAVER_CLIENT_ID,
 } = import.meta.env;
 
-const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&prompt=login`;
+const generateState = () => Math.random().toString(36).substring(2, 15);
 
-const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}`;
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&prompt=login`;
 
 const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile`;
 
@@ -70,6 +70,9 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
     setLastLogin(provider);
+    const state = generateState();
+    localStorage.setItem('oauth_state', state);
+    const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`;
     switch (provider) {
       case 'kakao':
         window.location.href = KAKAO_AUTH_URL;
