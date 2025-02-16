@@ -88,7 +88,6 @@ export const authAPI = {
     }
   },
 
-  // OAuth 로그인
   oauthLogin: async (
     provider: 'google' | 'kakao' | 'naver',
     oauthData: OAuthLoginRequest,
@@ -98,7 +97,7 @@ export const authAPI = {
       console.log('OAuth 요청 URL:', url);
       console.log('OAuth 요청 데이터:', oauthData);
 
-      const response = await instance.post<LoginResponse>(url, oauthData);
+      const response = await instance.post<LoginResponse>(url, oauthData, { timeout: 5000 }); // 5초
       console.log('OAuth 응답:', response.data);
 
       return response.data;
