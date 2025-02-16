@@ -87,6 +87,7 @@ const LoginPage: React.FC = () => {
     localStorage.setItem(`${provider}_state`, state);
 
     let authUrl = '';
+
     if (provider === 'naver') {
       authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code
       &client_id=${VITE_NAVER_CLIENT_ID}
@@ -103,9 +104,11 @@ const LoginPage: React.FC = () => {
       &redirect_uri=${VITE_GOOGLE_REDIRECT_URI}
       &scope=email%20profile
       &state=${state}`;
+
     }
 
     window.location.href = authUrl;
+    console.log(`Redirecting to: ${authUrl}`);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
