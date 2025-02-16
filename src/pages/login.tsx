@@ -36,17 +36,11 @@ import {
 const {
   VITE_KAKAO_CLIENT_ID,
   VITE_GOOGLE_CLIENT_ID,
+  VITE_NAVER_CLIENT_ID,
   VITE_KAKAO_REDIRECT_URI,
   VITE_GOOGLE_REDIRECT_URI,
   VITE_NAVER_REDIRECT_URI,
-  VITE_NAVER_CLIENT_ID,
 } = import.meta.env;
-
-const generateState = () => Math.random().toString(36).substring(2, 15);
-
-const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&prompt=login`;
-
-const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile`;
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -54,63 +48,83 @@ const LoginPage: React.FC = () => {
   const { login, oauthLogin, loading } = useAuth();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null); // error 상태 추가
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [lastLogin, setLastLogin] = useState<'kakao' | 'naver' | 'google' | null>(null);
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const provider = queryParams.get('provider');
     const code = queryParams.get('code');
-    if (provider && code) {
-      // OAuth 인증 후 코드가 있다면 로그인 시도
-      oauthLogin(provider as 'kakao' | 'naver' | 'google', code);
+    const state = queryParams.get('state');
+    const savedState = localStorage.getItem('oauth_state');
+
+    if (!code || !provider) return;
+
+    if (!savedState || state !== savedState) {
+      setError('OAuth 인증 실패: CSRF 검증 실패.');
+      return;
     }
+
+    localStorage.removeItem('oauth_state'); // 검증 후 state 삭제
+    setError(null);
+
+    oauthLogin(provider as 'kakao' | 'naver' | 'google', code).catch(() => {
+      setError('OAuth 로그인에 실패했습니다.');
+    });
   }, [location, oauthLogin]);
+
+  const generateState = () => Math.random().toString(36).substring(2, 15);
 
   const handleLogin = (provider: 'kakao' | 'naver' | 'google') => {
     setLastLogin(provider);
     const state = generateState();
     localStorage.setItem('oauth_state', state);
-    const NAVER_AUTH_URL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`;
+
+    let authUrl = '';
+
     switch (provider) {
       case 'kakao':
-        window.location.href = KAKAO_AUTH_URL;
+        authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${state}&prompt=login`;
         break;
       case 'naver':
-        window.location.href = NAVER_AUTH_URL;
+        authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`;
         break;
       case 'google':
-        window.location.href = GOOGLE_AUTH_URL;
+        authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile&state=${state}`;
         break;
       default:
         console.error('Unknown provider');
+        return;
     }
+
+    window.location.href = authUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // 이미 제출 중이면 중단
-    if (isSubmitting || loading) return;
+    if (loading) return;
+
     if (!userId || !password) {
       setError('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
+
     try {
-      setIsSubmitting(true);
+      setError(null);
       await login(userId, password);
       console.log('Login form submission successful');
     } catch (err) {
       console.error('Login form submission failed');
       setError('로그인에 실패했습니다.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
   const handleButtonClick = () => {
-    if (isSubmitting || loading) return;
-    formRef.current?.requestSubmit(); // dispatchEvent 대신 requestSubmit 사용
+    if (!formRef.current || loading) return;
+    formRef.current.requestSubmit();
   };
+
   return (
     <Container>
       <LoginBox>
