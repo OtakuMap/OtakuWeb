@@ -82,16 +82,15 @@ const LoginPage: React.FC = () => {
     localStorage.setItem('oauth_state', state);
 
     let authUrl = '';
-
-    switch (provider) {
+    switch (provider.trim()) {
       case 'kakao':
-        authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${VITE_KAKAO_REDIRECT_URI}&state=${state}&prompt=login`;
+        authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${VITE_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_KAKAO_REDIRECT_URI)}&state=${state}&prompt=login`;
         break;
       case 'naver':
-        authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${VITE_NAVER_REDIRECT_URI}&state=${state}`;
+        authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${VITE_NAVER_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_NAVER_REDIRECT_URI)}&state=${state}`;
         break;
       case 'google':
-        authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${VITE_GOOGLE_REDIRECT_URI}&scope=email%20profile&state=${state}`;
+        authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_GOOGLE_REDIRECT_URI)}&scope=email%20profile&state=${state}`;
         break;
       default:
         console.error('Unknown provider');
@@ -99,6 +98,7 @@ const LoginPage: React.FC = () => {
     }
 
     window.location.href = authUrl;
+    console.log(`Redirecting to: ${authUrl}`);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
