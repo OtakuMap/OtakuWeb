@@ -13,6 +13,7 @@ import nextIcon from '../../assets/next.png';
 import logoRepeat from '../../assets/logorepeat.png';
 import favIcon from '../../assets/fav.png';
 import favActiveIcon from '../../assets/fav2.png';
+import { PlaceLikeDetail } from '@/types/map/placeLikeDetail';
 
 interface LocationItem {
   id: string;
@@ -88,6 +89,7 @@ interface LocationDetailProps {
   initialIsLiked?: boolean;
   routeAnimationId?: number;
   locationItems?: LocationItem[];
+  placeLikeDetail?: PlaceLikeDetail | null;
 }
 
 const LocationDetail: React.FC<LocationDetailProps> = ({
@@ -102,6 +104,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   eventId,
   initialIsLiked = false,
   routeAnimationId,
+  placeLikeDetail,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -169,41 +172,6 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     return isEvent;
   }, [currentItem, isEvent]);
 
-  // const likeProps: UseLikeProps = useMemo(() => {
-  //   if (localLocationItems && localLocationItems.length > 0 && currentItem) {
-  //     if (currentItem.type === 'event') {
-  //       const eventId = currentItem.data.eventId;
-  //       return {
-  //         initialIsLiked: currentItem.data.isLiked,
-  //         id: eventId || 0,
-  //         type: 'event' as const,
-  //       };
-  //     } else {
-  //       return {
-  //         initialIsLiked: currentItem.data.isLiked,
-  //         id: currentItem.data.placeId || 0,
-  //         type: 'place' as const,
-  //         animationId: currentItem.data.selectedAnimation?.animationId,
-  //       };
-  //     }
-  //   }
-
-  //   return {
-  //     initialIsLiked: routeDetail?.isLiked ?? initialIsLiked,
-  //     id: isEvent ? (eventId as number) : location.id,
-  //     type: isEvent ? 'event' : 'place',
-  //     animationId: !isEvent ? routeAnimationId : undefined,
-  //   };
-  // }, [
-  //   currentItem,
-  //   localLocationItems,
-  //   routeDetail?.isLiked,
-  //   initialIsLiked,
-  //   isEvent,
-  //   eventId,
-  //   location.id,
-  //   routeAnimationId,
-  // ]);
   const likeProps: UseLikeProps = useMemo(() => {
     if (localLocationItems && localLocationItems.length > 0 && currentItem) {
       if (currentItem.type === 'event') {
@@ -219,7 +187,6 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
           id: currentItem.data.placeId || 0,
           type: 'place' as const,
           animationId: currentItem.data.selectedAnimation?.animationId,
-          // 새 API 사용
           useOldApi: false,
         };
       }
@@ -229,8 +196,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       initialIsLiked: routeDetail?.isLiked ?? initialIsLiked,
       id: isEvent ? (eventId as number) : location.id,
       type: isEvent ? 'event' : 'place',
-      animationId: !isEvent ? routeAnimationId : undefined,
-      // 새 API 사용
+      animationId: !isEvent
+        ? routeAnimationId || placeLikeDetail?.animation?.animationId
+        : undefined,
       useOldApi: false,
     };
   }, [
@@ -287,6 +255,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         routeDetail?.animationName ||
         routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
         location?.animeName ||
+        placeLikeDetail?.animation?.name ||
         '',
       address: placeDetails?.address || '',
       tags: (routeDetail?.hashtags || location?.hashtags || []).map((tag) =>

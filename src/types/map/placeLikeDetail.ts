@@ -3,14 +3,18 @@ export interface HashTag {
   name: string;
 }
 
+export interface Animation {
+  animationId: number;
+  name: string;
+}
+
 export interface PlaceLikeDetail {
   placeLikeId: number;
   placeId: number;
   placeName: string;
-  animationName: string;
+  animation: Animation; // animationName 대신 animation 객체로 변경
   lat: number;
   lng: number;
-  isFavorite: boolean;
   isLiked: boolean;
   hashtags: HashTag[];
 }

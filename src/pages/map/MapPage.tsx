@@ -269,7 +269,7 @@ const MapPage = () => {
           isSelected: true,
           latitude: placeLikeDetail.lat,
           longitude: placeLikeDetail.lng,
-          animeName: placeLikeDetail.animationName,
+          animeName: placeLikeDetail.animation.name,
           hashtags: placeLikeDetail.hashtags.map((tag: HashTag) => tag.name),
           type: 'place',
         },
@@ -314,6 +314,7 @@ const MapPage = () => {
             eventId={selectedEvent?.eventId}
             initialIsLiked={initialIsLiked}
             locationItems={selectedLocationGroup?.items}
+            placeLikeDetail={placeLikeDetail} // 추가
           />
         )}
       </MapWrapper>
