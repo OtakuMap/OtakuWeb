@@ -8,7 +8,6 @@ const OAuthRedirectHandler = () => {
   const location = useLocation();
 
   const code: string | null = new URL(window.location.href).searchParams.get('code');
-
   useEffect(() => {
     const handleLogin = async () => {
       if (!code) {
@@ -17,12 +16,10 @@ const OAuthRedirectHandler = () => {
         navigate('/');
         return;
       }
-
       let provider: 'google' | 'kakao' | 'naver' | null = null;
       if (location.pathname.includes('kakao')) provider = 'kakao';
       else if (location.pathname.includes('naver')) provider = 'naver';
       else if (location.pathname.includes('google')) provider = 'google';
-
       if (provider) {
         try {
           await oauthLogin(provider, code); // ⬅ 객체가 아닌 문자열 전달
@@ -34,7 +31,6 @@ const OAuthRedirectHandler = () => {
         }
       }
     };
-
     handleLogin();
   }, [code, navigate, oauthLogin]);
 
