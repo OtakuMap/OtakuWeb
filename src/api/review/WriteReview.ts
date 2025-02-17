@@ -1,14 +1,35 @@
 // api/review/WriteReview.ts
-
 import { AxiosError } from 'axios';
 import instance from '@/api/axios';
 import { WriteReviewRequest, WriteReviewResponse } from '@/types/review/WriteReview';
 
-const REVIEW_API_ENDPOINT = '/review';
+const REVIEW_API_ENDPOINT = '/reviews';
 
-export const writeReview = async (reviewData: WriteReviewRequest): Promise<WriteReviewResponse> => {
+export const writeReview = async (
+  reviewData: WriteReviewRequest,
+  images?: File[],
+): Promise<WriteReviewResponse> => {
   try {
-    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, reviewData);
+    const formData = new FormData();
+
+    // JSON 데이터를 request 키로 추가
+    formData.append(
+      'request',
+      new Blob([JSON.stringify(reviewData)], { type: 'application/json' }),
+    );
+
+    // 이미지 파일들 추가
+    if (images?.length) {
+      images.forEach((image) => {
+        formData.append('images', image);
+      });
+    }
+
+    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -19,30 +40,19 @@ export const writeReview = async (reviewData: WriteReviewRequest): Promise<Write
   }
 };
 
-// Hook implementation for the ReviewPage component
+// Hook implementation
 import { useState } from 'react';
-import { tokenStorage } from '@/utils/token';
 
 export const useWriteReview = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submitReview = async (reviewData: Omit<WriteReviewRequest, 'userId'>) => {
+  const submitReview = async (reviewData: WriteReviewRequest, images?: File[]) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const userId = tokenStorage.getUserId();
-
-      if (!userId) {
-        throw new Error('로그인이 필요합니다.');
-      }
-
-      const response = await writeReview({
-        ...reviewData,
-        userId: Number(userId),
-      });
-
+      const response = await writeReview(reviewData, images);
       return response;
     } catch (error: unknown) {
       const errorMessage =

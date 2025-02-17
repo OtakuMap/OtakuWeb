@@ -1129,11 +1129,13 @@ export const AddSection = styled.div`
 export const AddPic = styled.img`
   width: 40px;
   height: 40px;
+  object-fit: contain;
 `;
 
 export const AddMap = styled.img`
   width: 40px;
   height: 40px;
+  object-fit: contain;
 `;
 
 export const UploadButton = styled.button`
@@ -1178,6 +1180,8 @@ export const SelectBoxContainer = styled.div`
   flex-direction: column;
   gap: 10px;
   margin: 20px 0;
+  width: 100%;
+  min-width: 350px;
 `;
 
 export const SelectBox = styled.div`
@@ -1191,6 +1195,7 @@ export const SelectBox = styled.div`
   align-items: center;
   background-color: white;
   color: #0c004b;
+  width: 100%;
 `;
 
 export const DropdownList = styled.div`
@@ -1202,6 +1207,8 @@ export const DropdownList = styled.div`
   border: 1px solid #ddd;
   border-radius: 5px;
   z-index: 1;
+  width: 100%;
+  min-width: 100%;
 `;
 
 export const DropdownItem = styled.div`
@@ -1211,6 +1218,7 @@ export const DropdownItem = styled.div`
   &:hover {
     background: #f5f5f5;
   }
+  width: 100%;
 `;
 
 export const SeInput = styled.input`
@@ -1272,5 +1280,63 @@ export const DropdownItem3 = styled.li`
   cursor: pointer;
   &:hover {
     background-color: #f0f0f0;
+  }
+  color: black;
+`;
+
+// styles/review/ReviewPage.style.ts에 추가
+
+export const LoadingText = styled.div`
+  padding: 8px;
+  text-align: center;
+  color: #666;
+`;
+
+export const NoResult = styled.div`
+  padding: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const AddButton = styled.button`
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 4px;
+
+  &:hover {
+    background-color: #0052a3;
+  }
+`;
+
+// styles/review/ReviewPage.style.ts
+export const AddLocationButton = styled.button`
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #f0f0f0;
+  border: 1px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+    color: #999;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #e0e0e0;
   }
 `;

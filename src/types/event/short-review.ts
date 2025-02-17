@@ -1,5 +1,11 @@
+// types/event/short-review.ts
 export interface ShortReviewRequest {
   userId: number;
+  rating: number;
+  content: string;
+}
+
+export interface UpdateShortReviewRequest {
   rating: number;
   content: string;
 }
@@ -17,7 +23,6 @@ export interface ShortReviewResponse {
   };
 }
 
-// New types for review list
 export interface ProfileImage {
   id: number;
   uuid: string;
@@ -30,6 +35,10 @@ export interface EventShortReview {
   content: string;
   rating: number;
   profileImage: ProfileImage;
+  username: string;
+  likes: number;
+  dislikes: number;
+  userVote?: 'like' | 'dislike' | null;
 }
 
 export interface EventShortReviewListResponse {
@@ -41,4 +50,18 @@ export interface EventShortReviewListResponse {
     currentPage: number;
     totalPages: number;
   };
+}
+
+export interface DeleteShortReviewResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
+}
+
+export interface UpdateShortReviewResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: string;
 }

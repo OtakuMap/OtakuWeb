@@ -1,3 +1,5 @@
+// types/review/short-review.ts
+
 // Place types
 export interface PlaceData {
   id: number;
@@ -12,11 +14,19 @@ export interface ShortReviewRequest {
   content: string;
 }
 
+export interface UpdateShortReviewRequest {
+  rating: number;
+  content: string;
+}
+
 // Response types
-export interface ShortReviewResponse {
+export interface BaseResponse {
   isSuccess: boolean;
   code: string;
   message: string;
+}
+
+export interface ShortReviewResponse extends BaseResponse {
   result: ShortReviewResult;
 }
 
@@ -29,10 +39,7 @@ export interface ShortReviewResult {
   placeAnimationId: number;
 }
 
-export interface ShortReviewListResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
+export interface ShortReviewListResponse extends BaseResponse {
   result: ShortReviewListResult;
 }
 
@@ -46,20 +53,26 @@ export interface ShortReviewListResult {
 
 export interface ShortReviewItem {
   id: number;
+  content: string;
+  rating: number;
   user: {
     id: number;
     nickname: string;
   };
-  content: string;
-  rating: number;
-  createdAt: string;
   likes: number;
   dislikes: number;
+  isLiked: boolean;
+  isDisliked: boolean;
 }
 
-export interface PlaceResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
+export interface PlaceResponse extends BaseResponse {
   result: PlaceData;
+}
+
+export interface UpdateShortReviewResponse extends BaseResponse {
+  result: string;
+}
+
+export interface DeleteShortReviewResponse extends BaseResponse {
+  result: string;
 }

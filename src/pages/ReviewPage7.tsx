@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import profile from '../assets/profile.png';
 import picture from '../assets/picture.png';
 import mapIcon from '../assets/mapIcon.png';
 import * as S from '../styles/review/ReviewPage.style';
@@ -8,21 +7,113 @@ import { useReviewPage } from '@/hooks/review/useReviewPage7';
 import { useWriteReview } from '@/api/review/WriteReview';
 import { WriteReviewRequest } from '@/types/review/WriteReview';
 import { useImageUpload } from '@/api/review/image';
-
-const profileData = {
-  profileImage: profile,
-  name: 'Otkkk011',
-  date: '2025.01.12',
-};
+import { getUserProfile } from '@/api/review/user';
+import { UserProfile } from '@/types/review/user';
+import { searchAnimations, addAnimation } from '@/api/review/AddAnimation';
+import { AnimationItem } from '@/types/review/AddAnimation';
+import MapSelectionModal from '@/components/map/MapSelectionModal';
+import { tokenStorage } from '@/utils/token';
+import { AxiosError } from 'axios';
 
 const ReviewPage7 = () => {
   const navigate = useNavigate();
   const { submitReview, isLoading } = useWriteReview();
   const { upload, isUploading } = useImageUpload();
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+
+  // 애니메이션 관련 상태 추가
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState<AnimationItem[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedAnimationId, setSelectedAnimationId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getUserProfile();
+        if (response.isSuccess) {
+          setProfileData(response.result);
+        } else {
+          console.error('Failed to fetch profile:', response.message);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setIsProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // 애니메이션 검색 핸들러
+  const handleAnimationSearch = async (keyword: string) => {
+    if (!keyword.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const response = await searchAnimations(keyword);
+      if (response.isSuccess) {
+        setSearchResults(response.result.animations);
+      } else {
+        console.error('검색 실패:', response.message);
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          alert('로그인이 필요한 서비스입니다.');
+          navigate('/login');
+        } else {
+          console.error('애니메이션 검색 실패:', error.message);
+          alert('검색에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        console.error('애니메이션 검색 실패:', error);
+        alert('검색에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  // 새로운 애니메이션 추가 핸들러
+  const handleAddAnimation = async (name: string) => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        alert('로그인이 필요한 서비스입니다.');
+        navigate('/login');
+        return;
+      }
+
+      const response = await addAnimation({ name });
+      if (response.isSuccess) {
+        setSelectedAnimationId(response.result.animationId);
+        handleAnimationSelect(response.result.name);
+        setSearchResults([]);
+        setSearchKeyword('');
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          alert('로그인이 필요한 서비스입니다.');
+          navigate('/login');
+        } else {
+          console.error('애니메이션 추가 실패:', error.message);
+          alert('애니메이션 추가에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        console.error('애니메이션 추가 실패:', error);
+        alert('애니메이션 추가에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
 
   const {
-    // Form State
     title,
     setTitle,
     content,
@@ -30,49 +121,26 @@ const ReviewPage7 = () => {
     selectedReviewType,
     selectedAnimation,
     selectedVisibility,
-
-    // Dropdown States
     isReviewTypeOpen,
     isAnimationOpen,
     isVisibilityOpen,
-
-    // Custom Animation States
-    customAnimation,
-    isTypingCustom,
-    inputRef,
-
-    // Routes
-    routes,
-
-    // Handlers
+    locations,
+    handleLocationSelect,
+    handleLocationNameChange,
+    deleteLocation,
+    addLocation,
     toggleReviewType,
     handleReviewTypeSelect,
     toggleAnimation,
     handleAnimationSelect,
-    handleCustomAnimationInput,
-    handleCustomAnimationKeyDown,
-    handleCustomAnimationBlur,
-    handleInputClick,
     toggleVisibility,
     handleVisibilitySelect,
-    handleRouteChange,
-    deleteRoute,
-  } = useReviewPage({ initialProfileData: profileData });
+    handleLocationDetailChange, // 새로 추가된 handler
+  } = useReviewPage();
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files?.[0]) return;
-
-    try {
-      const file = event.target.files[0];
-      const response = await upload('review', file);
-
-      if (response.isSuccess) {
-        setUploadedImageUrl(response.result);
-      }
-    } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-      alert('이미지 업로드에 실패했습니다.');
-    }
+    setUploadedImage(event.target.files[0]);
   };
 
   const handleSubmit = async () => {
@@ -90,28 +158,32 @@ const ReviewPage7 = () => {
         alert('리뷰 타입을 선택해주세요.');
         return;
       }
-
-      // reviewType 타입 체크
-      if (selectedReviewType !== '이벤트 후기' && selectedReviewType !== '명소 후기') {
-        alert('올바른 리뷰 타입을 선택해주세요.');
+      if (!selectedAnimationId) {
+        alert('애니메이션을 선택해주세요.');
+        return;
+      }
+      if (locations.length === 0) {
+        alert('최소 1개 이상의 루트 아이템이 필요합니다.');
         return;
       }
 
-      const reviewData: Omit<WriteReviewRequest, 'userId'> = {
-        placeId: 1, // 실제 장소 ID로 변경 필요
+      const reviewData: WriteReviewRequest = {
         title,
         content,
-        reviewType: selectedReviewType,
-        animation: selectedAnimation === 'custom' ? customAnimation : selectedAnimation,
-        visibility: selectedVisibility as '전체 열람가능' | '구매자만 열람가능',
-        routes: routes.map((route) => ({
-          id: route.id,
-          value: route.value,
-        })),
-        imageUrl: uploadedImageUrl,
+        reviewType: selectedReviewType === '이벤트 후기' ? 'EVENT' : 'PLACE',
+        animeId: selectedAnimationId,
+        routeItems: locations
+          .filter((location) => location.name.trim() !== '')
+          .map((location, index) => ({
+            name: location.name,
+            lat: location.latitude,
+            lng: location.longitude,
+            detail: location.detail || '',
+            order: index,
+          })),
       };
 
-      const response = await submitReview(reviewData);
+      const response = await submitReview(reviewData, uploadedImage ? [uploadedImage] : undefined);
 
       if (response.isSuccess) {
         alert('리뷰가 성공적으로 등록되었습니다.');
@@ -122,9 +194,12 @@ const ReviewPage7 = () => {
       alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
     }
   };
+  if (isLoading || isUploading || isProfileLoading) {
+    return <div>로딩 중...</div>;
+  }
 
-  if (isLoading || isUploading) {
-    return <div>업로드 중...</div>;
+  if (!profileData) {
+    return <div>프로필을 불러올 수 없습니다.</div>;
   }
 
   return (
@@ -140,11 +215,22 @@ const ReviewPage7 = () => {
           />
           <S.MetaInfo>
             <S.Avatar>
-              <img src={profileData.profileImage} alt={`${profileData.name}의 프로필`} />
+              <img src={profileData.profileImageUrl} alt={`${profileData.nickname}의 프로필`} />
             </S.Avatar>
             <S.UserInfo>
-              <S.Username>{profileData.name}</S.Username>
-              <S.Date>{profileData.date}</S.Date>
+              <S.Username>{profileData.nickname}</S.Username>
+              <S.Date>
+                {new Date()
+                  .toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                  })
+                  .split('.')
+                  .map((part) => part.trim())
+                  .filter(Boolean)
+                  .join('.')}
+              </S.Date>
             </S.UserInfo>
           </S.MetaInfo>
         </S.HeaderContainer7>
@@ -158,7 +244,7 @@ const ReviewPage7 = () => {
           <S.ReviewFormContainer>
             <S.SelectBoxContainer>
               <S.SelectBox onClick={toggleReviewType}>
-                <span>{selectedReviewType}</span>
+                <span>{selectedReviewType || '리뷰 타입 선택'}</span>
                 <span>▼</span>
                 {isReviewTypeOpen && (
                   <S.DropdownList>
@@ -171,48 +257,62 @@ const ReviewPage7 = () => {
                   </S.DropdownList>
                 )}
               </S.SelectBox>
+
               <S.SelectBox onClick={toggleAnimation}>
-                <span>{selectedAnimation}</span>
+                <span>{selectedAnimation || '애니메이션 선택'}</span>
                 <span>▼</span>
                 {isAnimationOpen && (
                   <S.DropdownList>
-                    {isTypingCustom ? (
-                      <S.SeInput
-                        ref={inputRef}
-                        value={customAnimation}
-                        onChange={handleCustomAnimationInput}
-                        onKeyDown={handleCustomAnimationKeyDown}
-                        onBlur={handleCustomAnimationBlur}
-                        onClick={handleInputClick}
-                        autoFocus
-                      />
-                    ) : (
-                      <S.DropdownItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAnimationSelect('custom');
-                        }}
-                      >
-                        직접 입력하기
-                      </S.DropdownItem>
-                    )}
+                    <S.SeInput
+                      placeholder="애니메이션을 입력하고 Enter를 눌러 검색"
+                      value={searchKeyword}
+                      onChange={(e) => {
+                        setSearchKeyword(e.target.value);
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (searchKeyword.trim()) {
+                            await handleAnimationSearch(searchKeyword);
+                          }
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
 
-                    {/* 일반 애니메이션 목록 */}
-                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 1')}>
-                      애니메이션 1
-                    </S.DropdownItem>
-                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 2')}>
-                      애니메이션 2
-                    </S.DropdownItem>
-                    <S.DropdownItem onClick={() => handleAnimationSelect('애니메이션 3')}>
-                      애니메이션 3
-                    </S.DropdownItem>
+                    {isSearching ? (
+                      <S.LoadingText>검색 중...</S.LoadingText>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((animation) => (
+                        <S.DropdownItem
+                          key={animation.animationId}
+                          onClick={() => {
+                            setSelectedAnimationId(animation.animationId);
+                            handleAnimationSelect(animation.name);
+                          }}
+                        >
+                          {animation.name}
+                        </S.DropdownItem>
+                      ))
+                    ) : searchKeyword ? (
+                      <S.NoResult>
+                        <div>검색 결과가 없습니다.</div>
+                        <S.AddButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddAnimation(searchKeyword);
+                          }}
+                        >
+                          "{searchKeyword}" 추가하기
+                        </S.AddButton>
+                      </S.NoResult>
+                    ) : null}
                   </S.DropdownList>
                 )}
               </S.SelectBox>
 
               <S.SelectBox onClick={toggleVisibility}>
-                <span>{selectedVisibility}</span>
+                <span>{selectedVisibility || '열람 범위 선택'}</span>
                 <span>▼</span>
                 {isVisibilityOpen && (
                   <S.DropdownList>
@@ -226,18 +326,25 @@ const ReviewPage7 = () => {
                 )}
               </S.SelectBox>
             </S.SelectBoxContainer>
+
             <S.RouteSection>
-              {routes.map((route) => (
-                <S.RouteItem7 key={route.id}>
-                  <S.RouteNumber>{route.id}</S.RouteNumber>
+              {locations.map((location) => (
+                <S.RouteItem7 key={location.order}>
+                  <S.RouteNumber>{location.order}</S.RouteNumber>
                   <S.RouteInput
-                    placeholder={`${route.id}번째 장소`}
-                    value={route.value}
-                    onChange={(e) => handleRouteChange(route.id, e.target.value)}
+                    placeholder={`${location.order}번째 장소`}
+                    value={location.name}
+                    onChange={(e) => handleLocationNameChange(location.order, e.target.value)}
                   />
-                  <S.DeleteButton7 onClick={() => deleteRoute(route.id)}>×</S.DeleteButton7>
+                  <S.DeleteButton7 onClick={() => deleteLocation(location.order)}>
+                    ×
+                  </S.DeleteButton7>
                 </S.RouteItem7>
               ))}
+
+              {locations.length < 10 && (
+                <S.AddLocationButton onClick={addLocation}>+</S.AddLocationButton>
+              )}
               <S.AddSection>
                 <input
                   type="file"
@@ -248,12 +355,17 @@ const ReviewPage7 = () => {
                 />
                 <label htmlFor="image-upload">
                   <S.AddPic
-                    src={uploadedImageUrl || picture}
+                    src={uploadedImage ? URL.createObjectURL(uploadedImage) : picture}
                     alt="사진 추가"
                     style={{ cursor: 'pointer' }}
                   />
                 </label>
-                <S.AddMap src={mapIcon} alt="지도 추가" />
+                <S.AddMap
+                  src={mapIcon}
+                  alt="지도 추가"
+                  onClick={() => setIsMapModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                />
               </S.AddSection>
               <S.Button7 onClick={handleSubmit} disabled={isLoading || isUploading}>
                 {isLoading || isUploading ? '업로드 중...' : '업로드 하기'}
@@ -262,6 +374,12 @@ const ReviewPage7 = () => {
           </S.ReviewFormContainer>
         </S.ContentContainer7>
       </S.WhiteContainer>
+
+      <MapSelectionModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onLocationSelect={handleLocationSelect}
+      />
     </S.Container>
   );
 };

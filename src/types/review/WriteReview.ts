@@ -1,16 +1,21 @@
 // types/review/WriteReview.ts
 
+// Route Item Type
+export interface RouteItem {
+  name: string;
+  lat: number;
+  lng: number;
+  detail: string;
+  order: number;
+}
+
 // Request types
 export interface WriteReviewRequest {
-  userId: number;
-  placeId: number;
   title: string;
   content: string;
-  reviewType: string;
-  animation: string;
-  visibility: '전체 열람가능' | '구매자만 열람가능';
-  routes: { id: number; value: string }[];
-  imageUrl?: string | null; // 선택적 속성으로 추가
+  reviewType: 'EVENT' | 'PLACE';
+  animeId: number;
+  routeItems: RouteItem[];
 }
 
 // Response types
@@ -21,7 +26,6 @@ export interface WriteReviewResponse {
   result: {
     reviewId: number;
     title: string;
-    content: string;
     createdAt: string;
   };
 }
