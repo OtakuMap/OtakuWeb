@@ -7,7 +7,7 @@ interface RouteDescriptionEditorProps {
   onSave: (description: string) => void;
 }
 
-const MAX_LENGTH = 25;
+const MAX_LENGTH = 24;
 
 const RouteDescriptionEditor = ({ description, onSave }: RouteDescriptionEditorProps) => {
   const [currentDescription, setCurrentDescription] = useState(description);
