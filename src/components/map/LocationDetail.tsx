@@ -127,6 +127,18 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   const [itemLikes, setItemLikes] = useState<Record<string, boolean>>({});
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
+  // 로딩 상태
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(true);
+
+  // placeDetails가 변경될 때 로딩 상태 업데이트
+  useEffect(() => {
+    setIsDetailsLoading(true);
+    if (placeDetails?.address) {
+      setIsDetailsLoading(false);
+    }
+  }, [placeDetails]);
+
   // useEffect(() => {
   //   if (initialLocationItems) {
   //     // 선택된 아이템의 ID 찾기
@@ -417,12 +429,15 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     }
   };
 
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoading(false);
+  }, []);
+
   const handleImageError = useCallback(() => {
     setImageLoadFailed(true);
   }, []);
 
   if (isDetailLoading) return <S.Container>Loading...</S.Container>;
-
   return (
     <S.Container key={componentKey}>
       {onClose && (
@@ -430,32 +445,56 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
           <X size={20} color="#FFFFFF" absoluteStrokeWidth />
         </S.CloseButton>
       )}
+
+      {/* 이미지 스켈레톤 */}
+      {isImageLoading && <S.SkeletonImage />}
       <S.LocationImage
         src={imageSource}
         alt={displayData.name}
         onError={handleImageError}
-        key={`image-${currentItem?.id || location.id}-${Date.now()}`} // key 수정
-        loading="eager" // 이미지 로딩 우선순위 높임
+        onLoad={handleImageLoad}
+        key={`image-${currentItem?.id || location.id}-${Date.now()}`}
+        loading="eager"
+        style={{ display: isImageLoading ? 'none' : 'block' }}
       />
+
       {allPlaces.length > 1 && (
         <S.PaginationButton onClick={handleNextLocation}>
           <img src={nextIcon} alt="next" />
         </S.PaginationButton>
       )}
-      <S.Title ref={titleRef} title={displayData.name}>
-        {displayData.name}
-      </S.Title>
-      <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
-        {displayData.animeName}
-      </S.Subtitle>
-      <S.Address ref={addressRef} title={displayData.address} className="address">
-        {displayData.address}
-      </S.Address>
-      <S.TagContainer>
-        {displayData.tags.slice(0, MAX_TAGS).map((tag) => (
-          <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
-        ))}
-      </S.TagContainer>
+
+      {/* 콘텐츠 스켈레톤 */}
+      {isDetailsLoading ? (
+        <>
+          <S.SkeletonTitle />
+          <S.SkeletonSubtitle />
+          <S.SkeletonAddress />
+          <S.SkeletonTags>
+            <S.SkeletonTag />
+            <S.SkeletonTag />
+            <S.SkeletonTag />
+          </S.SkeletonTags>
+        </>
+      ) : (
+        <>
+          <S.Title ref={titleRef} title={displayData.name}>
+            {displayData.name}
+          </S.Title>
+          <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
+            {displayData.animeName}
+          </S.Subtitle>
+          <S.Address ref={addressRef} title={displayData.address} className="address">
+            {displayData.address}
+          </S.Address>
+          <S.TagContainer>
+            {displayData.tags.slice(0, MAX_TAGS).map((tag) => (
+              <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
+            ))}
+          </S.TagContainer>
+        </>
+      )}
+
       <S.FavButton onClick={handleFavClick}>
         <img
           src={
@@ -476,5 +515,59 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     </S.Container>
   );
 };
+
+//   return (
+//     <S.Container key={componentKey}>
+//       {onClose && (
+//         <S.CloseButton onClick={onClose}>
+//           <X size={20} color="#FFFFFF" absoluteStrokeWidth />
+//         </S.CloseButton>
+//       )}
+//       <S.LocationImage
+//         src={imageSource}
+//         alt={displayData.name}
+//         onError={handleImageError}
+//         key={`image-${currentItem?.id || location.id}-${Date.now()}`} // key 수정
+//         loading="eager" // 이미지 로딩 우선순위 높임
+//       />
+//       {allPlaces.length > 1 && (
+//         <S.PaginationButton onClick={handleNextLocation}>
+//           <img src={nextIcon} alt="next" />
+//         </S.PaginationButton>
+//       )}
+//       <S.Title ref={titleRef} title={displayData.name}>
+//         {displayData.name}
+//       </S.Title>
+//       <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
+//         {displayData.animeName}
+//       </S.Subtitle>
+//       <S.Address ref={addressRef} title={displayData.address} className="address">
+//         {displayData.address}
+//       </S.Address>
+//       <S.TagContainer>
+//         {displayData.tags.slice(0, MAX_TAGS).map((tag) => (
+//           <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
+//         ))}
+//       </S.TagContainer>
+//       <S.FavButton onClick={handleFavClick}>
+//         <img
+//           src={
+//             currentItem
+//               ? itemLikes[currentItem.id]
+//                 ? favActiveIcon
+//                 : favIcon
+//               : isLiked
+//                 ? favActiveIcon
+//                 : favIcon
+//           }
+//           alt="favorite"
+//         />
+//       </S.FavButton>
+//       <S.ReviewButton onClick={handleReviewClick}>
+//         {isCurrentEvent ? '이벤트 후기' : '명소 후기'}
+//       </S.ReviewButton>
+//     </S.Container>
+//   );
+// };
 
 export default LocationDetail;

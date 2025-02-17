@@ -44,6 +44,9 @@ const RoutePage = () => {
     undefined,
   );
 
+  // placeDetails 로딩 상태
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
   const {
     locations,
     setLocations,
@@ -54,12 +57,32 @@ const RoutePage = () => {
     initialLocations: state?.initialLocations,
   });
 
-  const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
+  // const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
+  const { routeDetail, fetchRouteDetail } = useRouteDetail();
 
+  // const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
+  //   setSelectedLocation(location);
+  //   if (placeDetails) {
+  //     setSelectedPlaceDetails(placeDetails);
+  //   }
+
+  //   if (routeId && routeInfo.animationId) {
+  //     try {
+  //       await fetchRouteDetail(parseInt(routeId), location.id, routeInfo.animationId);
+  //     } catch (error) {
+  //       console.error('Failed to fetch route detail:', error);
+  //     }
+  //   }
+  // };
   const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
+    // 로딩 시작
+    setIsLoadingDetails(true);
     setSelectedLocation(location);
+
     if (placeDetails) {
       setSelectedPlaceDetails(placeDetails);
+      // placeDetails가 있으면 바로 로딩 완료
+      setIsLoadingDetails(false);
     }
 
     if (routeId && routeInfo.animationId) {
@@ -69,16 +92,29 @@ const RoutePage = () => {
         console.error('Failed to fetch route detail:', error);
       }
     }
+
+    // 모든 데이터 로딩 완료
+    setIsLoadingDetails(false);
   };
 
   const handleCloseDetail = () => {
     setSelectedLocation(null);
     setSelectedPlaceDetails(undefined);
+    setIsLoadingDetails(false); // 닫을 때 로딩 상태도 리셋
     if (mapInstance.current) {
       mapInstance.current.setZoom(mapSettings.zoom);
       mapInstance.current.panTo(mapSettings.center);
     }
   };
+
+  // const handleCloseDetail = () => {
+  //   setSelectedLocation(null);
+  //   setSelectedPlaceDetails(undefined);
+  //   if (mapInstance.current) {
+  //     mapInstance.current.setZoom(mapSettings.zoom);
+  //     mapInstance.current.panTo(mapSettings.center);
+  //   }
+  // };
 
   const mapSettings = useMemo(() => {
     if (locations.length === 0) {
@@ -152,8 +188,8 @@ const RoutePage = () => {
             placeDetails={selectedPlaceDetails}
             onClose={handleCloseDetail}
             routeDetail={routeDetail}
-            isLoading={isDetailLoading}
-            // 여기서 routeInfo.animationId가 좋아요 토글에 사용됨
+            isLoading={isLoadingDetails}
+            // isLoading={isLoadingDetails || isDetailLoading} // 두 로딩 상태 combined
             routeAnimationId={routeInfo.animationId}
           />
         )}
