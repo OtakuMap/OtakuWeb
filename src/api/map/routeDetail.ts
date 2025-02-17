@@ -1,17 +1,6 @@
 import instance from '@/api/axios';
 import { AxiosError } from 'axios';
 
-interface PlaceAnimation {
-  placeAnimationId: number;
-  animationId: number;
-  animationName: string;
-}
-
-interface AnimationListDTO {
-  placeAnimations: PlaceAnimation[];
-  listSize: number;
-}
-
 export interface RouteDetailResponse {
   isSuccess: boolean;
   code: string;
@@ -23,8 +12,11 @@ export interface RouteDetailResponse {
     longitude: number;
     isFavorite: boolean;
     isLiked: boolean;
-    animationListDTO: AnimationListDTO;
-    hashtags: string[];
+    animationName: string;
+    hashtags: {
+      hashTagId: number;
+      name: string;
+    }[];
   };
 }
 
@@ -36,17 +28,39 @@ interface ApiErrorResponse {
   result: null;
 }
 
-export const getRouteDetail = async (routeId: number, placeId: number) => {
+export const getRouteDetail = async (routeId: number, placeId: number, animationId: number) => {
   try {
-    const response = await instance.get<RouteDetailResponse>(`/route/${routeId}/${placeId}`);
+    const url = `/routes/${routeId}/places/${placeId}`;
+    console.log('=== Route Detail API Request ===');
+    console.log('URL:', url);
+    console.log('Query Parameters:', { animationId });
+
+    const response = await instance.get<RouteDetailResponse>(url, {
+      params: { animationId },
+    });
+
+    console.log('=== Route Detail API Response ===');
+    console.log('Status:', response.status);
+    console.log('Headers:', response.headers);
+    console.log('Data:', response.data);
+
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
+    if (error instanceof AxiosError) {
+      console.error('=== Route Detail API Error ===');
+      console.error('Error Status:', error.response?.status);
+      console.error('Error Data:', error.response?.data);
+      console.error('Error Config:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        params: error.config?.params,
+        headers: error.config?.headers,
+      });
 
-    if (axiosError.response?.data) {
-      throw new Error(axiosError.response.data.message);
+      if (error.response?.data) {
+        throw new Error(error.response.data.message);
+      }
     }
-
     throw new Error('장소 상세 정보를 불러오는데 실패했습니다.');
   }
 };

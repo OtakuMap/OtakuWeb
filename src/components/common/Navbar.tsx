@@ -224,6 +224,8 @@ const getNotificationTitle = (type: NotificationType): string => {
       return '후원 알림';
     case 'SERVICE_NOTICE':
       return '서비스 공지';
+    case 'EVENT_STARTED':
+      return '이벤트 알림';
     default:
       return '알림';
   }

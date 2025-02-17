@@ -46,8 +46,9 @@ export const Header = styled.header`
 
   img {
     width: 100%;
-    height: auto;
+    height: 500px; /* 로고 이미지의 높이로 고정 */
     object-fit: cover;
+    object-position: center;
   }
 `;
 

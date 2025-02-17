@@ -6,13 +6,14 @@ import MapIcon from '../../assets/map.png';
 import ReviewIcon from '../../assets/review.png';
 import EventIcon from '../../assets/event.png';
 import HeartIcon from '../../assets/heart.png';
-import EmptyHeartIcon from '../../assets/heart-empty.png';
-import FilledHeartIcon from '../../assets/heart-filled.png';
+// import EmptyHeartIcon from '../../assets/heart-empty.png';
+// import FilledHeartIcon from '../../assets/heart-filled.png';
 import Logo from '../../assets/banner1.png';
 import sectionImage from '../../assets/1.png';
+import EventCard from './EventCard';
 import { useTopReviews } from '@/hooks/main/useTopReviews';
-// import { usePopularEvents } from '@/hooks/main/usePopularEvents';
-// import { useBanner } from '@/hooks/main/useBanner';
+import { usePopularEvents } from '@/hooks/main/usePopularEvents';
+import { useBanner } from '@/hooks/main/useBanner';
 import ReviewSlider from './ReviewSlider';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -24,23 +25,10 @@ const Main = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  // events 데이터를 먼저 로드
-  // const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
 
-  // 기존 useTopReviews를 수정하는 대신, enabled 옵션을 hook에 전달
-  // const {
-  //   data: reviews,
-  //   isLoading,
-  //   error,
-  // } = useTopReviews({
-  //   //enabled: !!events, // events가 로드된 후에만 실행
-  // });
-
-  // 마지막으로 banner 로드
-  // const { data: banner } = useQuery(['banner'], getBanner, {
-  //   enabled: !!reviews // reviews가 로드된 후에만 실행
-  // });
-  const [eventLikes, setEventLikes] = useState<{ [key: number]: boolean }>({});
+  const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
+  const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useTopReviews();
+  const { data: banner, isLoading: bannerLoading, error: bannerError } = useBanner();
 
   const handleMapClick = () => {
     navigate('/map');
@@ -66,14 +54,14 @@ const Main = () => {
     navigate(`/event/${eventId}`);
   };
 
-  const handleReviewItemClick = () => {
-    navigate('/review5');
+  const handleReviewItemClick = (reviewId: string) => {
+    navigate(`/review/${reviewId}`);
   };
 
   return (
     <S.Container>
       <S.Wrapper>
-        {/* <S.Header>
+        <S.Header>
           {bannerLoading ? (
             <img src={Logo} alt="Logo" /> // 로딩 중에는 기본 로고 표시
           ) : banner?.result?.fileUrl ? (
@@ -81,9 +69,6 @@ const Main = () => {
           ) : (
             <img src={Logo} alt="Logo" /> // API 응답이 없거나 실패한 경우 기본 로고 표시
           )}
-        </S.Header> */}
-        <S.Header>
-          <img src={Logo} alt="Logo" />
         </S.Header>
 
         <S.DetailsSection>
@@ -110,7 +95,7 @@ const Main = () => {
             <S.Image src={sectionImage} alt="Section Icon" />
             진행중인 인기 이벤트
           </S.SectionTitle>
-          {/* <S.EventContainer>
+          <S.EventContainer>
             {eventsLoading ? (
               <div>Loading...</div>
             ) : eventsError ? (
@@ -119,40 +104,19 @@ const Main = () => {
               <div>No events available</div>
             ) : (
               events.map((event) => (
-                <S.EventCard
+                <EventCard
                   key={event.id}
-                  onClick={() => handleEventCardClick(event.id)}
-                  style={{ cursor: 'pointer', position: 'relative' }}
-                >
-                  <S.EventPoster src={event.thumbnail.fileUrl} alt={event.title} />
-                  <S.HeartButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!isLoggedIn) {
-                        dispatch(openLoginModal());
-                      } else {
-                        setEventLikes((prev) => ({
-                          ...prev,
-                          [event.id]: !prev[event.id],
-                        }));
-                      }
-                    }}
-                  >
-                    <S.HeartImage
-                      src={isLoggedIn && eventLikes[event.id] ? FilledHeartIcon : EmptyHeartIcon}
-                      alt="Favorite"
-                    />
-                  </S.HeartButton>
-                  <S.EventDetails>
-                    <S.EventName>{event.title}</S.EventName>
-                    <S.EventDates>
-                      {event.startDate} - {event.endDate}
-                    </S.EventDates>
-                  </S.EventDetails>
-                </S.EventCard>
+                  id={event.id}
+                  thumbnail={event.thumbnail}
+                  title={event.title}
+                  startDate={event.startDate}
+                  endDate={event.endDate}
+                  isLiked={event.isLiked}
+                  onClick={handleEventCardClick}
+                />
               ))
             )}
-          </S.EventContainer> */}
+          </S.EventContainer>
         </S.EventSection>
 
         <S.Divider />
@@ -162,13 +126,16 @@ const Main = () => {
             <S.Image src={sectionImage} alt="Section Icon" />
             조회수 TOP 7 여행 후기
           </S.SectionTitle>
-          {/* {isLoading ? (
+          {reviewsLoading ? (
             <div>Loading...</div>
-          ) : error ? (
+          ) : reviewsError ? (
             <div>Error loading reviews</div>
           ) : (
-            <ReviewSlider reviews={reviews} onReviewClick={handleReviewItemClick} />
-          )} */}
+            <ReviewSlider
+              reviews={reviews}
+              onReviewClick={handleReviewItemClick} // 이 부분이 변경됨
+            />
+          )}
         </S.TopReviews>
 
         <S.Divider />

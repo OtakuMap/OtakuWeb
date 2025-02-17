@@ -6,7 +6,12 @@ const publicInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  timeout: 5000, // 타임아웃 설정
+  timeout: 15000, // 타임아웃 설정
+});
+
+publicInstance.interceptors.request.use((config) => {
+  console.log('Request headers:', config.headers);
+  return config;
 });
 
 publicInstance.interceptors.response.use(

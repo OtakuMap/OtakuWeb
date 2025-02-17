@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from '../../styles/map/LeftContainer.styles';
-import Search from '../common/Search';
+import Search from '../common/MapSearch';
 import BackButton from '../common/BackButton';
 import { Place } from '@/types/map/place';
 import { useFavoritePlaces } from '@/hooks/map/useFavoritePlaces';
@@ -10,20 +10,31 @@ import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
 import { RouteSource } from '@/types/map/routeSource';
 import { useSavedRoutes } from '@/hooks/map/useSavedRoutes';
+import { SearchSuggestion } from '@/hooks/map/useMapSearch';
+import { useSearch } from '@/hooks/map/useMapSearch';
 import searchDeleteIcon from '../../assets/search_delete.png';
+import { LocationGroup } from '@/types/map/search';
 
 interface LeftContainerProps {
-  onPlaceSelect?: (place: Place) => void;
-  onFavoritePlaceClick?: (placeId: number) => void;
+  onPlaceSelect: (place: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
+  onEventSelect: (event: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
+  onFavoritePlaceClick: (placeId: number) => void;
 }
 
-const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavoritePlaceClick }) => {
+const LeftContainer: React.FC<LeftContainerProps> = ({
+  onPlaceSelect,
+  onEventSelect,
+  onFavoritePlaceClick,
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { loadRecentSearches, saveRecentSearch, deleteRecentSearch } = useSearch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecentSearches());
   const [activeView, setActiveView] = useState<'none' | 'savedRoutes' | 'favoritePlaces'>('none');
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  // const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [searchValue, setSearchValue] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
   const {
     savedRoutes,
@@ -31,6 +42,11 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     error: savedRoutesError,
     fetchSavedRoutes,
   } = useSavedRoutes();
+
+  // 컴포넌트 마운트 시 최근 검색어 로드
+  useEffect(() => {
+    setRecentSearches(loadRecentSearches());
+  }, [loadRecentSearches]);
 
   // 데이터 로깅
   useEffect(() => {
@@ -40,33 +56,83 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     }
   }, [favoritePlaces]);
 
+  // localStorage의 값이 외부에서 변경될 수 있으므로 동기화를 위한 이벤트 리스너 추가
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'recentSearches') {
+        const saved = localStorage.getItem('recentSearches');
+        setRecentSearches(saved ? JSON.parse(saved) : []);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // 뒤로가기 처리
   const handleBack = () => {
     window.history.back();
   };
 
-  // 검색 처리
-  const handleSearch = (value: string) => {
-    if (!value.trim()) return;
-    setRecentSearches((prev) => {
-      const filtered = prev.filter((item) => item !== value);
-      const updated = [...filtered, value];
-      return updated.slice(-5);
-    });
+  // // 검색 처리
+  // const handleSearch = (value: string) => {
+  //   if (!value.trim()) return;
+  //   setRecentSearches((prev) => {
+  //     const filtered = prev.filter((item) => item !== value);
+  //     const updated = [...filtered, value];
+  //     return updated.slice(-5);
+  //   });
+  // };
+
+  // // 검색어 삭제
+  // const handleDeleteSearch = (searchText: string) => {
+  //   setRecentSearches((prev) => prev.filter((item) => item !== searchText));
+  // };
+
+  // Search 컴포넌트에서 suggestion 클릭 시 호출될 핸들러
+  const handlePlaceSelect = (
+    placeData: SearchSuggestion['data'],
+    locationGroup?: LocationGroup,
+  ) => {
+    const searchText = `${placeData.selectedAnimation.animationName} - ${placeData.name}`;
+    saveRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches());
+
+    if (onPlaceSelect) {
+      onPlaceSelect(placeData, locationGroup);
+    }
   };
 
-  // 검색어 삭제
+  const handleEventSelect = (eventData: SearchSuggestion['data'], locationGroup: LocationGroup) => {
+    const searchText = `${eventData.animationTitle} - ${eventData.name}`;
+    saveRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches());
+
+    if (onEventSelect) {
+      onEventSelect(eventData, locationGroup); // locationGroup 추가
+    }
+  };
+
+  // 검색어 삭제 처리
   const handleDeleteSearch = (searchText: string) => {
-    setRecentSearches((prev) => prev.filter((item) => item !== searchText));
+    deleteRecentSearch(searchText);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
+  };
+
+  // 일반 검색 처리
+  const handleSearch = (value: string) => {
+    if (!value.trim()) return;
+    saveRecentSearch(value);
+    setRecentSearches(loadRecentSearches()); // 즉시 상태 업데이트
   };
 
   // Place 타입을 처리하는 함수
-  const handleSearchPlaceSelect = (place: Place) => {
-    setSelectedPlace(place);
-    if (onPlaceSelect) {
-      onPlaceSelect(place);
-    }
-  };
+  // const handleSearchPlaceSelect = (place: Place) => {
+  //   setSelectedPlace(place);
+  //   if (onPlaceSelect) {
+  //     onPlaceSelect(place);
+  //   }
+  // };
 
   // placeId를 처리하는 함수
   const handleFavoritePlaceClick = (placeId: number) => {
@@ -75,17 +141,45 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     }
   };
 
-  const RecentSearchItem = ({ search, onDelete }: { search: string; onDelete: () => void }) => {
+  const RecentSearchItem = ({
+    search,
+    onDelete,
+    onClick,
+  }: {
+    search: string;
+    onDelete: () => void;
+    onClick: () => void;
+  }) => {
     const MAX_LENGTH = 15;
     const displayText = search.length > MAX_LENGTH ? `${search.slice(0, MAX_LENGTH)}...` : search;
+
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation(); // 이벤트 버블링 방지
+      onClick();
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+      e.stopPropagation(); // 이벤트 버블링 방지
+      onDelete();
+    };
+
     return (
-      <S.RecentSearchItem>
-        <S.DeleteButton onClick={onDelete}>
+      <S.RecentSearchItem onClick={handleClick}>
+        <S.DeleteButton onClick={handleDelete}>
           <img src={searchDeleteIcon} alt="Delete" />
         </S.DeleteButton>
         <S.SearchText>{displayText}</S.SearchText>
       </S.RecentSearchItem>
     );
+  };
+
+  const handleRecentSearchClick = (search: string) => {
+    // 대시(-)가 있는 경우 장소/이벤트 이름만 추출 (두번째 부분)
+    const searchTerm = search.includes('-') ? search.split('-')[1].trim() : search;
+
+    // 검색창에 장소/이벤트 이름 표시
+    setSearchValue(searchTerm);
+    // 검색 제안 표시 설정은 useEffect에서 처리됨
   };
 
   // 저장한 루트 보기 클릭 핸들러
@@ -134,26 +228,6 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     }
   };
 
-  const useCheckOverflow = (text: string) => {
-    const textRef = useRef<HTMLSpanElement>(null);
-    const [isOverflowing, setIsOverflowing] = useState(false);
-
-    useEffect(() => {
-      const checkOverflow = () => {
-        if (textRef.current) {
-          const isTextOverflowing = textRef.current.scrollHeight > textRef.current.clientHeight;
-          setIsOverflowing(isTextOverflowing);
-        }
-      };
-
-      checkOverflow();
-      window.addEventListener('resize', checkOverflow);
-      return () => window.removeEventListener('resize', checkOverflow);
-    }, [text]);
-
-    return { textRef, isOverflowing };
-  };
-
   const RecommendationItemWithOverflow = ({
     text,
     onClick,
@@ -161,15 +235,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
     text: string;
     onClick: () => void;
   }) => {
-    const { textRef, isOverflowing } = useCheckOverflow(text);
-
     return (
-      <S.RecommendationItem
-        onClick={onClick}
-        data-full-text={text}
-        data-show-tooltip={isOverflowing}
-      >
-        <S.RecommendationText ref={textRef}>{text}</S.RecommendationText>
+      <S.RecommendationItem onClick={onClick} data-full-text={text}>
+        <S.RecommendationText>{text}</S.RecommendationText>
       </S.RecommendationItem>
     );
   };
@@ -231,7 +299,15 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
   return (
     <S.Container>
       <BackButton onClick={handleBack} />
-      <Search onSearch={handleSearch} onSuggestionSelect={handleSearchPlaceSelect} />
+      <Search
+        value={searchValue}
+        onValueChange={setSearchValue}
+        showSuggestions={showSuggestions}
+        onShowSuggestionsChange={setShowSuggestions}
+        onSearch={handleSearch}
+        onPlaceSelect={handlePlaceSelect}
+        onEventSelect={handleEventSelect}
+      />
       <S.ButtonContainer>
         <S.SavedRoutesButton
           isActive={activeView === 'savedRoutes'}
@@ -255,6 +331,7 @@ const LeftContainer: React.FC<LeftContainerProps> = ({ onPlaceSelect, onFavorite
             key={index}
             search={search}
             onDelete={() => handleDeleteSearch(search)}
+            onClick={() => handleRecentSearchClick(search)}
           />
         ))}
       </S.RecentSearchList>

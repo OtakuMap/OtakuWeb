@@ -131,9 +131,9 @@ export const RecentSearchItem = styled.div`
 
 export const DeleteButton = styled.button`
   position: absolute;
-  left: 4px; // 5 * 0.8
-  width: 12px; // 15 * 0.8
-  height: 12px; // 15 * 0.8
+  left: 4px;
+  width: 12px;
+  height: 12px;
   border: none;
   outline: none;
   cursor: pointer;
@@ -141,12 +141,22 @@ export const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent; /* 배경 투명하게 설정 */
+  box-shadow: none; /* 그림자 제거 */
+
+  /* Safari에서 기본 버튼 스타일 제거 */
+  -webkit-appearance: none;
+
+  /* 자식 요소(X 아이콘)에 대한 그림자 효과 제거 */
+  & > * {
+    filter: none;
+    box-shadow: none;
+  }
 
   &:focus {
     outline: none;
   }
 `;
-
 export const SearchText = styled.span`
   margin-left: 20px; // 25 * 0.8
   font-family: 'Gothic A1';
@@ -160,75 +170,60 @@ export const SearchText = styled.span`
 
 export const RecommendationsContainer = styled.div`
   position: absolute;
-  width: 237px; // 296 * 0.8
-  left: 44px; // 55 * 0.8
-  top: 172px; // 215 * 0.8
+  width: 268px; // 컨테이너 너비 증가
+  left: 26px;
+  top: 172px;
   display: flex;
   flex-direction: column;
-  gap: 8px; // 10 * 0.8
+  gap: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+  overflow-x: hidden; // 가로 스크롤 방지
+  padding: 0 10px;
+
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(209, 193, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(209, 193, 255, 0.5);
+  }
 `;
 
 export const RecommendationItem = styled.div<RecommendationItemProps>`
   box-sizing: border-box;
-  width: 237px;
-  min-height: 25px;
+  width: 100%;
+  height: auto; // 높이를 자동으로
   border: 1px solid #d1c1ff;
-  border-radius: 16px;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
+  border-radius: 20px;
+  padding: 5px 12px;
+  display: flex; // 다시 flex로
+  align-items: center; // 세로 중앙 정렬
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-
-  &:hover {
-    background-color: rgba(209, 193, 255, 0.1);
-  }
-
-  &[data-show-tooltip='true']:hover::after {
-    content: attr(data-full-text);
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    top: auto;
-    bottom: 100%;
-    margin-bottom: 8px;
-    background: rgba(37, 38, 96, 0.95);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    white-space: normal;
-    max-width: 300px;
-    z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.2s,
-      visibility 0.2s;
-    pointer-events: none;
-  }
-
-  &[data-show-tooltip='true']:hover::after {
-    opacity: 1;
-    visibility: visible;
-  }
 `;
 
-export const RecommendationText = styled.span`
+export const RecommendationText = styled.div`
+  // span에서 div로 변경
+  width: 100%;
   font-family: 'Gothic A1';
-  font-style: normal;
   font-weight: 400;
   font-size: 13px;
-  line-height: 16px;
+  line-height: 20px;
   color: #ffffff;
   text-align: center;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 1px 0;
+  // 아래 세 줄이 핵심입니다
+  overflow-wrap: break-word;
+  white-space: normal;
   word-break: break-all;
-  max-height: 32px;
 `;

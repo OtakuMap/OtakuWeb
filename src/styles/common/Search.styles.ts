@@ -55,15 +55,86 @@ export const SuggestionsContainer = styled.div`
   overflow-y: auto;
   z-index: 1000;
   padding: 8px 0;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #e6dfff;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1c1ff;
+    border-radius: 3px;
+  }
 `;
 
+export const LoadingItem = styled.div`
+  padding: 8px 16px;
+  text-align: center;
+  color: #666;
+  font-family: 'Gothic A1';
+  font-size: 14px;
+  line-height: 18px;
+`;
+
+export const SuggestionContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; // 이것은 text-overflow: ellipsis가 작동하게 합니다
+`;
+
+export const SuggestionTitle = styled.div`
+  font-family: 'Gothic A1';
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+`;
+
+export const SuggestionAnime = styled.div`
+  font-family: 'Gothic A1';
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const SuggestionType = styled.small`
+  font-family: 'Gothic A1';
+  font-size: 12px;
+  color: #666;
+  background-color: #d1c1ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  white-space: nowrap;
+`;
+
+// SuggestionItem 스타일 수정
 export const SuggestionItem = styled.div`
   padding: 8px 16px;
   cursor: pointer;
-  font-size: 14px;
-  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:hover {
     background-color: #d1c1ff;
+
+    ${SuggestionType} {
+      background-color: #e6dfff;
+    }
   }
+`;
+
+export const LocationGroup = styled.div`
+  // 스타일 추가
 `;
