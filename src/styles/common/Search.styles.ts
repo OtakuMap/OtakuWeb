@@ -134,3 +134,7 @@ export const SuggestionItem = styled.div`
     }
   }
 `;
+
+export const LocationGroup = styled.div`
+  // 스타일 추가
+`;

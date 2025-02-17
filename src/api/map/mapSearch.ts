@@ -1,4 +1,5 @@
 import publicInstance from '../publicInstance';
+import instance from '../axios';
 
 export interface SearchResult {
   latitude: number;
@@ -37,16 +38,19 @@ export interface SearchResponse {
 }
 
 export const searchAPI = {
-  search: async (keyword: string) => {
-    console.log('API call with keyword:', keyword); // 디버깅 로그
+  search: async (keyword: string, isAuthenticated: boolean = false) => {
+    console.log('API call with keyword:', keyword);
+    console.log('Is authenticated:', isAuthenticated);
+
     try {
-      const response = await publicInstance.get<SearchResponse>('/map/search', {
+      const axiosInstance = isAuthenticated ? instance : publicInstance;
+      const response = await axiosInstance.get<SearchResponse>('/map/search', {
         params: { keyword },
       });
-      console.log('API response:', response.data); // 디버깅 로그
+      console.log('API response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('API error:', error); // 에러 로그
+      console.error('API error:', error);
       throw error;
     }
   },

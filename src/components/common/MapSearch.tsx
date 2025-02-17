@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, forwardRef } from 'react';
 import * as S from '../../styles/common/Search.styles';
-import { useSearch, SearchSuggestion } from '@/hooks/map/useMapSearch';
+import { useSearch } from '@/hooks/map/useMapSearch';
 import { debounce } from 'lodash';
+import { LocationGroup, SearchSuggestion } from '@/types/map/search';
 import searchIcon from '../../assets/search.png';
 
 interface SearchProps {
@@ -9,16 +10,18 @@ interface SearchProps {
   value?: string;
   onValueChange?: (value: string) => void;
   onSearch?: (value: string) => void;
-  onPlaceSelect?: (place: SearchSuggestion['data']) => void;
-  onEventSelect?: (event: SearchSuggestion['data']) => void;
+  onPlaceSelect?: (place: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
+  onEventSelect?: (event: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
   showSuggestions?: boolean;
   onShowSuggestionsChange?: (show: boolean) => void;
+  onLocationGroupSelect?: (locationGroup: LocationGroup) => void;
 }
 
 const Search = forwardRef<HTMLInputElement, SearchProps>((props, ref) => {
   const {
     placeholder = '이벤트나 작품명을 검색하세요',
     value,
+    onLocationGroupSelect,
     onValueChange,
     onSearch,
     onPlaceSelect,
@@ -35,7 +38,8 @@ const Search = forwardRef<HTMLInputElement, SearchProps>((props, ref) => {
   const inputValue = value ?? internalValue;
   const showSuggestions = externalShowSuggestions ?? internalShowSuggestions;
 
-  const { suggestions, isLoading, searchKeyword, saveRecentSearch } = useSearch();
+  // const { suggestions, isLoading, searchKeyword, saveRecentSearch } = useSearch();
+  const { groupedSuggestions, isLoading, searchKeyword, saveRecentSearch } = useSearch();
 
   // 외부에서 value가 변경될 때 검색 실행
   useEffect(() => {
@@ -81,49 +85,64 @@ const Search = forwardRef<HTMLInputElement, SearchProps>((props, ref) => {
   );
 
   const handleSuggestionClick = useCallback(
-    (suggestion: SearchSuggestion) => {
+    (suggestion: SearchSuggestion, locationGroup: LocationGroup) => {
       const newValue = suggestion.name;
 
-      // 입력값 업데이트
+      // Update input value and hide suggestions
       if (onValueChange) {
         onValueChange(newValue);
       } else {
         setInternalValue(newValue);
       }
 
-      // 검색 제안 숨기기
       if (onShowSuggestionsChange) {
         onShowSuggestionsChange(false);
       } else {
         setInternalShowSuggestions(false);
       }
 
-      // 최근 검색어 저장
+      // Save to recent searches
       const searchText = suggestion.animeName
         ? `${suggestion.animeName} - ${suggestion.name}`
         : suggestion.name;
       saveRecentSearch(searchText);
 
-      // 선택된 항목 처리
+      // Pass the entire location group
+      if (onLocationGroupSelect) {
+        onLocationGroupSelect(locationGroup);
+      }
+
+      console.log('Suggestion clicked:', suggestion);
+      console.log('Location group:', locationGroup);
+
+      // onPlaceSelect와 onEventSelect 사용
       if (suggestion.type === 'place' && onPlaceSelect) {
-        onPlaceSelect(suggestion.data);
+        onPlaceSelect(suggestion.data, locationGroup);
       } else if (suggestion.type === 'event' && onEventSelect) {
-        onEventSelect(suggestion.data);
+        onEventSelect(suggestion.data, locationGroup);
       }
     },
-    [onValueChange, onShowSuggestionsChange, onPlaceSelect, onEventSelect, saveRecentSearch],
+    [
+      onPlaceSelect,
+      onEventSelect,
+      onValueChange,
+      onShowSuggestionsChange,
+      onLocationGroupSelect,
+      saveRecentSearch,
+    ],
   );
 
   const handleSubmit = useCallback(() => {
     if (inputValue.trim()) {
-      if (suggestions.length > 0) {
-        handleSuggestionClick(suggestions[0]);
+      if (groupedSuggestions.length > 0) {
+        // 첫 번째 그룹의 첫 번째 아이템 선택
+        const firstGroup = groupedSuggestions[0];
+        handleSuggestionClick(firstGroup.items[0], firstGroup);
       } else if (onSearch) {
         saveRecentSearch(inputValue.trim());
         onSearch(inputValue.trim());
       }
 
-      // 검색 제안 숨기기
       if (onShowSuggestionsChange) {
         onShowSuggestionsChange(false);
       } else {
@@ -132,7 +151,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>((props, ref) => {
     }
   }, [
     inputValue,
-    suggestions,
+    groupedSuggestions,
     handleSuggestionClick,
     onSearch,
     saveRecentSearch,
@@ -171,26 +190,31 @@ const Search = forwardRef<HTMLInputElement, SearchProps>((props, ref) => {
       />
       <S.SearchLine />
 
-      {showSuggestions && (suggestions.length > 0 || isLoading) && (
+      {showSuggestions && (groupedSuggestions.length > 0 || isLoading) && (
         <S.SuggestionsContainer>
           {isLoading ? (
             <S.LoadingItem>검색 중...</S.LoadingItem>
           ) : (
-            suggestions.map((suggestion) => (
-              <S.SuggestionItem
-                key={suggestion.id}
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                <S.SuggestionContent>
-                  {suggestion.animeName && (
-                    <S.SuggestionAnime>{suggestion.animeName}</S.SuggestionAnime>
-                  )}
-                  <S.SuggestionTitle>{suggestion.name}</S.SuggestionTitle>
-                </S.SuggestionContent>
-                <S.SuggestionType>
-                  {suggestion.type === 'place' ? '장소' : '이벤트'}
-                </S.SuggestionType>
-              </S.SuggestionItem>
+            groupedSuggestions.map((group) => (
+              <S.LocationGroup key={`${group.latitude}-${group.longitude}`}>
+                {group.items.map((suggestion) => (
+                  <S.SuggestionItem
+                    key={suggestion.id}
+                    onClick={() => handleSuggestionClick(suggestion, group)}
+                  >
+                    <S.SuggestionContent>
+                      {suggestion.animeName && (
+                        <S.SuggestionAnime>{suggestion.animeName}</S.SuggestionAnime>
+                      )}
+                      <S.SuggestionTitle>{suggestion.name}</S.SuggestionTitle>
+                    </S.SuggestionContent>
+                    <S.SuggestionType>
+                      {suggestion.type === 'place' ? '장소' : '이벤트'}
+                      {group.items.length > 1 && ' +'}
+                    </S.SuggestionType>
+                  </S.SuggestionItem>
+                ))}
+              </S.LocationGroup>
             ))
           )}
         </S.SuggestionsContainer>

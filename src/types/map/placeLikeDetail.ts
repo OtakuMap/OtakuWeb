@@ -5,11 +5,13 @@ export interface HashTag {
 
 export interface PlaceLikeDetail {
   placeLikeId: number;
+  placeId: number;
   placeName: string;
   animationName: string;
   lat: number;
   lng: number;
   isFavorite: boolean;
+  isLiked: boolean;
   hashtags: HashTag[];
 }
 

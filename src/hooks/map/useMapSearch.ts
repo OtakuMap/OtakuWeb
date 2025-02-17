@@ -2,6 +2,12 @@ import { useState, useCallback } from 'react';
 import { searchAPI } from '@/api/map/mapSearch';
 import { useAppSelector } from '../reduxHooks';
 
+export interface LocationGroup {
+  latitude: number;
+  longitude: number;
+  items: SearchSuggestion[];
+}
+
 export interface SearchSuggestion {
   id: string;
   name: string;
@@ -12,7 +18,7 @@ export interface SearchSuggestion {
 
 export const useSearch = () => {
   const { isLoggedIn, userId } = useAppSelector((state) => state.auth);
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [groupedSuggestions, setGroupedSuggestions] = useState<LocationGroup[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -48,71 +54,97 @@ export const useSearch = () => {
     localStorage.removeItem(getStorageKey());
   }, [getStorageKey]);
 
-  const searchKeyword = useCallback(async (keyword: string) => {
-    if (!keyword.trim()) {
-      setSuggestions([]);
-      return;
-    }
+  const searchKeyword = useCallback(
+    async (keyword: string) => {
+      if (!keyword.trim()) {
+        setGroupedSuggestions([]);
+        return;
+      }
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await searchAPI.search(keyword);
-      console.log('Search response:', response);
+      try {
+        const response = await searchAPI.search(keyword, isLoggedIn);
+        console.log('Raw Search Response:', response);
 
-      if (response.isSuccess) {
-        const newSuggestions: SearchSuggestion[] = [];
+        if (response.isSuccess) {
+          // Group by location
+          const locationGroups = response.result.map((location) => {
+            const suggestions: SearchSuggestion[] = [];
 
-        response.result.forEach((location) => {
-          // 장소 처리 - 첫 번째 애니메이션만 사용
-          location.places.forEach((place) => {
-            // 장소당 하나의 suggestion만 생성
-            if (place.animations.length > 0) {
-              newSuggestions.push({
-                id: `place-${place.placeId}`,
-                name: place.name,
-                animeName: place.animations[0].animationName, // 첫 번째 애니메이션 사용
-                type: 'place',
+            // Process places
+            location.places.forEach((place) => {
+              if (place.animations?.length > 0) {
+                const selectedAnimation = place.animations[0];
+                suggestions.push({
+                  id: `place-${place.placeId}`,
+                  name: place.name,
+                  animeName: selectedAnimation.animationName,
+                  type: 'place',
+                  data: {
+                    id: place.placeId,
+                    placeId: place.placeId,
+                    name: place.name,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    animeName: selectedAnimation.animationName,
+                    hashtags: selectedAnimation.hashTags,
+                    isLiked: selectedAnimation.isLiked,
+                    animations: place.animations,
+                    selectedAnimation: {
+                      animationId: selectedAnimation.animationId,
+                      animationName: selectedAnimation.animationName,
+                      isLiked: selectedAnimation.isLiked,
+                      hashTags: selectedAnimation.hashTags,
+                    },
+                  },
+                });
+              }
+            });
+
+            // Process events
+            location.events.forEach((event) => {
+              suggestions.push({
+                id: `event-${event.eventId}`,
+                name: event.name,
+                animeName: event.animationTitle,
+                type: 'event',
                 data: {
-                  ...place,
+                  eventId: event.eventId,
+                  name: event.name,
+                  animationTitle: event.animationTitle,
+                  isLiked: event.isLiked,
+                  hashTags: event.hashTags,
                   latitude: location.latitude,
                   longitude: location.longitude,
-                  selectedAnimation: place.animations[0],
                 },
               });
-            }
-          });
-
-          // 이벤트 처리
-          location.events.forEach((event) => {
-            newSuggestions.push({
-              id: `event-${event.eventId}`,
-              name: event.name,
-              animeName: event.animationTitle,
-              type: 'event',
-              data: {
-                ...event,
-                latitude: location.latitude,
-                longitude: location.longitude,
-              },
             });
-          });
-        });
 
-        console.log('Processed suggestions:', newSuggestions);
-        setSuggestions(newSuggestions);
+            return {
+              latitude: location.latitude,
+              longitude: location.longitude,
+              items: suggestions,
+            };
+          });
+
+          console.log('Grouped suggestions:', locationGroups);
+          setGroupedSuggestions(locationGroups);
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+        setError(err instanceof Error ? err : new Error('Search failed'));
+        setGroupedSuggestions([]);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Search failed'));
-      setSuggestions([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [isLoggedIn],
+  );
 
   return {
-    suggestions,
+    groupedSuggestions,
     isLoading,
     error,
     searchKeyword,

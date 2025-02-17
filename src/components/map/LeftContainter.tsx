@@ -13,11 +13,12 @@ import { useSavedRoutes } from '@/hooks/map/useSavedRoutes';
 import { SearchSuggestion } from '@/hooks/map/useMapSearch';
 import { useSearch } from '@/hooks/map/useMapSearch';
 import searchDeleteIcon from '../../assets/search_delete.png';
+import { LocationGroup } from '@/types/map/search';
 
 interface LeftContainerProps {
-  onPlaceSelect?: (place: Place) => void;
-  onEventSelect?: (event: any) => void;
-  onFavoritePlaceClick?: (placeId: number) => void;
+  onPlaceSelect: (place: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
+  onEventSelect: (event: SearchSuggestion['data'], locationGroup: LocationGroup) => void;
+  onFavoritePlaceClick: (placeId: number) => void;
 }
 
 const LeftContainer: React.FC<LeftContainerProps> = ({
@@ -89,35 +90,26 @@ const LeftContainer: React.FC<LeftContainerProps> = ({
   // };
 
   // Search 컴포넌트에서 suggestion 클릭 시 호출될 핸들러
-  const handlePlaceSelect = (placeData: SearchSuggestion['data']) => {
+  const handlePlaceSelect = (
+    placeData: SearchSuggestion['data'],
+    locationGroup?: LocationGroup,
+  ) => {
     const searchText = `${placeData.selectedAnimation.animationName} - ${placeData.name}`;
     saveRecentSearch(searchText);
     setRecentSearches(loadRecentSearches());
 
-    const place: Place = {
-      id: placeData.placeId,
-      title: placeData.name, // 백엔드에서 받은 실제 장소 이름
-      name: placeData.name, // 백엔드에서 받은 실제 장소 이름
-      isSelected: false,
-      latitude: placeData.latitude,
-      longitude: placeData.longitude,
-      animeName: placeData.selectedAnimation.animationName,
-      address: '',
-      hashtags: placeData.selectedAnimation.hashTags.map((tag: any) => tag.name) || [],
-    };
-
     if (onPlaceSelect) {
-      onPlaceSelect(place);
+      onPlaceSelect(placeData, locationGroup);
     }
   };
 
-  const handleEventSelect = (eventData: SearchSuggestion['data']) => {
+  const handleEventSelect = (eventData: SearchSuggestion['data'], locationGroup: LocationGroup) => {
     const searchText = `${eventData.animationTitle} - ${eventData.name}`;
     saveRecentSearch(searchText);
     setRecentSearches(loadRecentSearches());
 
     if (onEventSelect) {
-      onEventSelect(eventData);
+      onEventSelect(eventData, locationGroup); // locationGroup 추가
     }
   };
 

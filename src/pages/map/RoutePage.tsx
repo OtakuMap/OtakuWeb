@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
@@ -47,6 +47,7 @@ const RoutePage = () => {
   const {
     locations,
     setLocations,
+    routeInfo,
     isLoading: isRoutesLoading,
   } = useRoute({
     routeId,
@@ -56,14 +57,14 @@ const RoutePage = () => {
   const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
 
   const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
-    console.log('Location selected:', location);
-    console.log('Place details:', placeDetails);
     setSelectedLocation(location);
-    setSelectedPlaceDetails(placeDetails);
+    if (placeDetails) {
+      setSelectedPlaceDetails(placeDetails);
+    }
 
-    if (routeId) {
+    if (routeId && routeInfo.animationId) {
       try {
-        await fetchRouteDetail(parseInt(routeId), location.id);
+        await fetchRouteDetail(parseInt(routeId), location.id, routeInfo.animationId);
       } catch (error) {
         console.error('Failed to fetch route detail:', error);
       }
@@ -133,6 +134,7 @@ const RoutePage = () => {
         onLocationsChange={setLocations}
         routeSource={routeSource}
         routeId={routeId ? parseInt(routeId) : undefined}
+        routeInfo={routeInfo}
       />
       <MapWrapper>
         <MapContainer
@@ -145,13 +147,17 @@ const RoutePage = () => {
           ref={mapInstance}
         />
         {selectedLocation && (
-          <LocationDetail
-            location={selectedLocation}
-            placeDetails={selectedPlaceDetails}
-            onClose={handleCloseDetail}
-            routeDetail={routeDetail}
-            isLoading={isDetailLoading}
-          />
+          <>
+            {console.log('RouteInfo being passed:', routeInfo)}
+            <LocationDetail
+              location={selectedLocation}
+              placeDetails={selectedPlaceDetails}
+              onClose={handleCloseDetail}
+              routeDetail={routeDetail}
+              isLoading={isDetailLoading}
+              routeAnimationId={routeInfo.animationId}
+            />
+          </>
         )}
       </MapWrapper>
     </PageContainer>

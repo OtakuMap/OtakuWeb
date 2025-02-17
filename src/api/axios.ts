@@ -39,7 +39,7 @@ instance.interceptors.request.use(
   },
 );
 
-// 응답 인터셉터 (토큰 만료 처리)
+//응답 인터셉터 (토큰 만료 처리)
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {

@@ -16,7 +16,7 @@ interface Review {
 
 interface ReviewSliderProps {
   reviews?: Review[];
-  onReviewClick: () => void;
+  onReviewClick: (reviewId: string) => void; // 타입 변경
 }
 
 const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick }) => {
@@ -72,7 +72,10 @@ const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick
           <S.SliderContent>
             <Slider ref={sliderRef} {...settings}>
               {reviews.map((review, index) => (
-                <S.SlideItem key={review?.id || index} onClick={onReviewClick}>
+                <S.SlideItem
+                  key={review?.id || index}
+                  onClick={() => review?.id && onReviewClick(review.id)} // 이 부분이 변경됨
+                >
                   <S.ImageContainer>
                     <S.Image
                       src={review?.reviewImage?.fileUrl || 'https://picsum.photos/200/300'}

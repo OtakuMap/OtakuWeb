@@ -21,39 +21,35 @@ export const Container = styled.div`
 
 export const PaginationButton = styled.button`
   position: absolute;
-  top: 81px;
-  right: 12px;
-  width: 25px;
-  height: 16px;
-  background: transparent;
+  top: 50%; // 중앙 정렬로 변경
+  transform: translateY(-50%); // 중앙 정렬
+  right: 20px; // 오른쪽 여백 증가
+  width: 30px; // 크기 증가
+  height: 30px; // 크기 증가
+  background: rgba(37, 38, 96, 0.8); // 배경색 추가
   border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1001;
+  z-index: 1002;
   padding: 0;
   transition: transform 0.2s ease;
 
   img {
-    width: 100%;
-    height: 100%;
+    width: 15px; // 이미지 크기 조정
+    height: 15px;
     object-fit: contain;
   }
 
   &:hover {
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1); // transform 수정
+    background: rgba(37, 38, 96, 1); // hover 시 배경색 진하게
   }
 
   &:focus {
     outline: none;
-  }
-
-  @media (max-width: 768px) {
-    top: 50%;
-    transform: translateY(-50%);
-    right: 8px;
   }
 `;
 

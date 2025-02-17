@@ -18,7 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import * as S from '../../styles/map/RouteLeftContainer.styles';
 import BackButton from '../common/BackButton';
-import { RouteLocation, RouteData } from '../../types/map/route';
+import { RouteLocation, RouteData, RouteInfo } from '../../types/map/route';
 import RouteDescriptionEditor from './RouteDescriptionEditor';
 import { useNavigate } from 'react-router-dom';
 import { RouteSource } from '@/types/map/routeSource';
@@ -35,6 +35,7 @@ interface RouteLeftContainerProps {
   onLocationsChange: (locations: RouteLocation[]) => void;
   routeSource: RouteSource;
   routeId?: number;
+  routeInfo: RouteInfo;
 }
 
 interface SortableItemProps {
@@ -79,17 +80,18 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   onLocationsChange,
   routeSource,
   routeId,
+  routeInfo,
 }) => {
+  const [routeData, setRouteData] = useState<RouteData>({
+    title: routeInfo.animationName,
+    description: routeInfo.routeName,
+    locations: initialLocations,
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [routeData, setRouteData] = useState<RouteData>({
-    title: '다이아몬드 에이스',
-    description: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-    locations: initialLocations,
-  });
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
