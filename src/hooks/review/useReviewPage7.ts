@@ -21,6 +21,14 @@ export interface UseReviewPageParams {
   };
 }
 
+//주소를 위해
+export interface Location {
+  latitude: number;
+  longitude: number;
+  name: string;
+  order: number;
+}
+
 export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   // Form state
   const [title, setTitle] = useState('');
@@ -50,6 +58,10 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     { id: 4, value: '' },
     { id: 5, value: '' },
   ]);
+
+  // 위치 관련 상태
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   useEffect(() => {
     setProfileData(initialProfileData);
@@ -116,6 +128,31 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     setIsVisibilityOpen(false);
   };
 
+  // 위치 관련 핸들러
+  const handleLocationSelect = (location: { lat: number; lng: number }) => {
+    const newLocation = {
+      latitude: location.lat,
+      longitude: location.lng,
+      name: '',
+      order: locations.length + 1,
+    };
+    setLocations([...locations, newLocation]);
+  };
+
+  const handleLocationNameChange = (order: number, newName: string) => {
+    setLocations(locations.map((loc) => (loc.order === order ? { ...loc, name: newName } : loc)));
+  };
+
+  const deleteLocation = (order: number) => {
+    const updatedLocations = locations
+      .filter((loc) => loc.order !== order)
+      .map((loc, idx) => ({
+        ...loc,
+        order: idx + 1,
+      }));
+    setLocations(updatedLocations);
+  };
+
   // Routes Handlers
   const handleRouteChange = (id: number, value: string) => {
     setRoutes(routes.map((route) => (route.id === id ? { ...route, value } : route)));
@@ -133,17 +170,35 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   };
 
   // Submit Handler
+  // const handleSubmit = () => {
+  //   const formData: ReviewFormData = {
+  //     title,
+  //     content,
+  //     selectedReviewType,
+  //     selectedAnimation,
+  //     selectedVisibility,
+  //     routes: routes.filter((route) => route.value).map((route) => route.value),
+  //   };
+
+  //   console.log(formData);
+  //   return formData;
+  // };
   const handleSubmit = () => {
-    const formData: ReviewFormData = {
+    const formData = {
       title,
       content,
       selectedReviewType,
       selectedAnimation,
       selectedVisibility,
-      routes: routes.filter((route) => route.value).map((route) => route.value),
+      locations: locations.map(({ name, latitude, longitude, order }) => ({
+        name,
+        latitude,
+        longitude,
+        order,
+      })),
     };
 
-    console.log(formData);
+    console.log('Form data with locations:', formData);
     return formData;
   };
 
@@ -185,5 +240,12 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     handleRouteChange,
     deleteRoute,
     handleSubmit,
+
+    locations,
+    isMapModalOpen,
+    setIsMapModalOpen,
+    handleLocationSelect,
+    handleLocationNameChange,
+    deleteLocation,
   };
 };

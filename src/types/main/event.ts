@@ -11,6 +11,7 @@ export interface Event {
   startDate: string;
   endDate: string;
   thumbnail: EventImage;
+  isLiked?: boolean;
 }
 
 export interface PopularEventsResponse {
@@ -18,4 +19,13 @@ export interface PopularEventsResponse {
   code: string;
   message: string;
   result: Event[];
+}
+
+export interface EventLikeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    isLiked: boolean;
+  };
 }
