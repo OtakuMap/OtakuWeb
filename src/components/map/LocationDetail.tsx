@@ -106,57 +106,86 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   routeAnimationId,
   placeLikeDetail,
 }) => {
+  // 컴포넌트 키 생성
+  const componentKey = useMemo(() => {
+    return `${location.id}-${isEvent ? 'event' : 'place'}-${placeLikeDetail?.placeId || ''}-${Date.now()}`;
+  }, [location.id, isEvent, placeLikeDetail?.placeId]);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
 
   const [currentIndex, setCurrentIndex] = useState(0); // 초기값은 0으로 설정
 
+  // const [localLocationItems, setLocalLocationItems] = useState<LocationItem[] | undefined>(
+  //   initialLocationItems,
+  // );
   const [localLocationItems, setLocalLocationItems] = useState<LocationItem[] | undefined>(
-    initialLocationItems,
+    undefined,
   );
 
   const [itemLikes, setItemLikes] = useState<Record<string, boolean>>({});
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
-  useEffect(() => {
-    if (initialLocationItems) {
-      // 선택된 아이템의 ID 찾기
-      const targetId = isEvent ? `event-${location.id}` : `place-${location.id}`;
+  // useEffect(() => {
+  //   if (initialLocationItems) {
+  //     // 선택된 아이템의 ID 찾기
+  //     const targetId = isEvent ? `event-${location.id}` : `place-${location.id}`;
 
-      // 먼저 선택된 아이템의 인덱스 찾기
+  //     // 먼저 선택된 아이템의 인덱스 찾기
+  //     const selectedIndex = initialLocationItems.findIndex((item) => item.id === targetId);
+
+  //     // 선택된 아이템이 첫번째로 오도록 재정렬
+  //     const reorderedItems = [
+  //       ...initialLocationItems.slice(selectedIndex, selectedIndex + 1),
+  //       ...initialLocationItems.slice(0, selectedIndex),
+  //       ...initialLocationItems.slice(selectedIndex + 1),
+  //     ];
+
+  //     setLocalLocationItems(reorderedItems);
+  //     setCurrentIndex(0); // 항상 0번 인덱스가 선택된 아이템
+
+  //     const initialLikes: Record<string, boolean> = {};
+  //     reorderedItems.forEach((item) => {
+  //       initialLikes[item.id] = item.data.isLiked;
+  //     });
+  //     setItemLikes(initialLikes);
+  //   }
+  // }, [initialLocationItems, location.id, isEvent]);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+    setImageLoadFailed(false);
+
+    if (initialLocationItems) {
+      const targetId = isEvent ? `event-${location.id}` : `place-${location.id}`;
       const selectedIndex = initialLocationItems.findIndex((item) => item.id === targetId);
 
-      // 선택된 아이템이 첫번째로 오도록 재정렬
+      if (selectedIndex === -1) {
+        console.warn('Selected item not found in initialLocationItems');
+        setLocalLocationItems(undefined);
+        setItemLikes({});
+        return;
+      }
+
       const reorderedItems = [
         ...initialLocationItems.slice(selectedIndex, selectedIndex + 1),
         ...initialLocationItems.slice(0, selectedIndex),
         ...initialLocationItems.slice(selectedIndex + 1),
-      ];
-
-      setLocalLocationItems(reorderedItems);
-      setCurrentIndex(0); // 항상 0번 인덱스가 선택된 아이템
+      ].filter(Boolean);
 
       const initialLikes: Record<string, boolean> = {};
       reorderedItems.forEach((item) => {
         initialLikes[item.id] = item.data.isLiked;
       });
+
+      setLocalLocationItems(reorderedItems);
       setItemLikes(initialLikes);
+    } else {
+      setLocalLocationItems(undefined);
+      setItemLikes({});
     }
   }, [initialLocationItems, location.id, isEvent]);
-
-  // useEffect(() => {
-  //   console.log('Received locationItems:', initialLocationItems);
-  //   if (initialLocationItems) {
-  //     setLocalLocationItems(initialLocationItems);
-  //     console.log('Setting localLocationItems:', initialLocationItems);
-  //     const initialLikes: Record<string, boolean> = {};
-  //     initialLocationItems.forEach((item) => {
-  //       initialLikes[item.id] = item.data.isLiked;
-  //     });
-  //     setItemLikes(initialLikes);
-  //   }
-  // }, [initialLocationItems]);
 
   const currentItem = useMemo(() => {
     if (localLocationItems && localLocationItems.length > 0) {
@@ -210,6 +239,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     eventId,
     location.id,
     routeAnimationId,
+    placeLikeDetail?.animation?.animationId,
   ]);
 
   const { isLiked, toggleLike } = useLike(likeProps);
@@ -231,13 +261,41 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     return [location];
   }, [location, localLocationItems]);
 
+  // const displayData = useMemo(() => {
+  //   if (localLocationItems && localLocationItems.length > 0) {
+  //     const item = localLocationItems[currentIndex];
+  //     console.log('Current item data:', item);
+  //     console.log('Hashtags from item:', item.data.hashTags);
+  //     console.log('Selected animation:', item.data.selectedAnimation);
+
+  //     return {
+  //       name: item.name,
+  //       animeName: item.type === 'event' ? item.data.animationTitle : item.data.animeName,
+  //       address: placeDetails?.address || '',
+  //       tags:
+  //         item.type === 'place'
+  //           ? item.data.selectedAnimation?.hashTags || []
+  //           : item.data.hashTags || [],
+  //     };
+  //   }
+
+  //   return {
+  //     name: originalName || routeDetail?.name || location?.name || '',
+  //     animeName:
+  //       routeDetail?.animationName ||
+  //       routeDetail?.animationListDTO?.placeAnimations[0]?.animationName ||
+  //       location?.animeName ||
+  //       placeLikeDetail?.animation?.name ||
+  //       '',
+  //     address: placeDetails?.address || '',
+  //     tags: (routeDetail?.hashtags || location?.hashtags || []).map((tag) =>
+  //       typeof tag === 'string' ? tag : tag.name,
+  //     ),
+  //   };
+  // }, [routeDetail, location, originalName, placeDetails, localLocationItems, currentIndex]);
   const displayData = useMemo(() => {
     if (localLocationItems && localLocationItems.length > 0) {
       const item = localLocationItems[currentIndex];
-      console.log('Current item data:', item);
-      console.log('Hashtags from item:', item.data.hashTags);
-      console.log('Selected animation:', item.data.selectedAnimation);
-
       return {
         name: item.name,
         animeName: item.type === 'event' ? item.data.animationTitle : item.data.animeName,
@@ -262,14 +320,29 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         typeof tag === 'string' ? tag : tag.name,
       ),
     };
-  }, [routeDetail, location, originalName, placeDetails, localLocationItems, currentIndex]);
+  }, [
+    localLocationItems,
+    currentIndex,
+    routeDetail,
+    location,
+    originalName,
+    placeDetails,
+    placeLikeDetail,
+  ]);
 
   const imageSource = useMemo(() => {
+    // 강제로 캐시를 무시하기 위한 타임스탬프 추가
+    const timestamp = Date.now();
     if (imageLoadFailed) {
       return logoRepeat;
     }
-    return placeDetails?.photoUrl || logoRepeat;
-  }, [placeDetails, imageLoadFailed]);
+    // placeDetails가 undefined거나 photoUrl이 없으면 기본 이미지 반환
+    if (!placeDetails?.photoUrl) {
+      return logoRepeat;
+    }
+    // URL에 타임스탬프와 id를 추가하여 캐시 방지
+    return `${placeDetails.photoUrl}&t=${timestamp}&id=${currentItem?.id || location.id}`;
+  }, [placeDetails?.photoUrl, imageLoadFailed, currentItem?.id, location.id]);
 
   useEffect(() => {
     const checkOverflow = (element: HTMLDivElement | null): boolean => {
@@ -351,7 +424,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   if (isDetailLoading) return <S.Container>Loading...</S.Container>;
 
   return (
-    <S.Container>
+    <S.Container key={componentKey}>
       {onClose && (
         <S.CloseButton onClick={onClose}>
           <X size={20} color="#FFFFFF" absoluteStrokeWidth />
@@ -361,7 +434,8 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         src={imageSource}
         alt={displayData.name}
         onError={handleImageError}
-        key={imageSource}
+        key={`image-${currentItem?.id || location.id}-${Date.now()}`} // key 수정
+        loading="eager" // 이미지 로딩 우선순위 높임
       />
       {allPlaces.length > 1 && (
         <S.PaginationButton onClick={handleNextLocation}>
