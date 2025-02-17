@@ -64,6 +64,29 @@ export const likesAPI = {
     }
   },
 
+  // 장소 좋아요 삭제 (새로운 방식 - 지도에서 삭제)
+  removePlaceLikeWithAnimation: async (placeId: number, animationId: number) => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await instance.delete<LikeResponse>(`/place-likes/${placeId}`, {
+        params: { animationId },
+      });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error('Place like removal error:', {
+        token: tokenStorage.getAccessToken(),
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+      });
+      throw error;
+    }
+  },
+
   // 이벤트 좋아요 추가
   addEventLike: async (eventId: number) => {
     try {

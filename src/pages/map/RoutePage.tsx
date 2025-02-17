@@ -147,17 +147,15 @@ const RoutePage = () => {
           ref={mapInstance}
         />
         {selectedLocation && (
-          <>
-            {console.log('RouteInfo being passed:', routeInfo)}
-            <LocationDetail
-              location={selectedLocation}
-              placeDetails={selectedPlaceDetails}
-              onClose={handleCloseDetail}
-              routeDetail={routeDetail}
-              isLoading={isDetailLoading}
-              routeAnimationId={routeInfo.animationId}
-            />
-          </>
+          <LocationDetail
+            location={selectedLocation}
+            placeDetails={selectedPlaceDetails}
+            onClose={handleCloseDetail}
+            routeDetail={routeDetail}
+            isLoading={isDetailLoading}
+            // 여기서 routeInfo.animationId가 좋아요 토글에 사용됨
+            routeAnimationId={routeInfo.animationId}
+          />
         )}
       </MapWrapper>
     </PageContainer>
