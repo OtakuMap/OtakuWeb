@@ -88,7 +88,6 @@ export const authAPI = {
     }
   },
 
-  // OAuth 로그인
   oauthLogin: async (
     provider: 'google' | 'kakao' | 'naver',
     oauthData: OAuthLoginRequest,

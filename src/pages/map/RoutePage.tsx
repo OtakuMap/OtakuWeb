@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import RouteLeftContainer from '../../components/map/RouteLeftContainer';
@@ -44,40 +44,77 @@ const RoutePage = () => {
     undefined,
   );
 
+  // placeDetails 로딩 상태
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
   const {
     locations,
     setLocations,
+    routeInfo,
     isLoading: isRoutesLoading,
   } = useRoute({
     routeId,
     initialLocations: state?.initialLocations,
   });
 
-  const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
+  // const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
+  const { routeDetail, fetchRouteDetail } = useRouteDetail();
 
+  // const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
+  //   setSelectedLocation(location);
+  //   if (placeDetails) {
+  //     setSelectedPlaceDetails(placeDetails);
+  //   }
+
+  //   if (routeId && routeInfo.animationId) {
+  //     try {
+  //       await fetchRouteDetail(parseInt(routeId), location.id, routeInfo.animationId);
+  //     } catch (error) {
+  //       console.error('Failed to fetch route detail:', error);
+  //     }
+  //   }
+  // };
   const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
-    console.log('Location selected:', location);
-    console.log('Place details:', placeDetails);
+    // 로딩 시작
+    setIsLoadingDetails(true);
     setSelectedLocation(location);
-    setSelectedPlaceDetails(placeDetails);
 
-    if (routeId) {
+    if (placeDetails) {
+      setSelectedPlaceDetails(placeDetails);
+      // placeDetails가 있으면 바로 로딩 완료
+      setIsLoadingDetails(false);
+    }
+
+    if (routeId && routeInfo.animationId) {
       try {
-        await fetchRouteDetail(parseInt(routeId), location.id);
+        await fetchRouteDetail(parseInt(routeId), location.id, routeInfo.animationId);
       } catch (error) {
         console.error('Failed to fetch route detail:', error);
       }
     }
+
+    // 모든 데이터 로딩 완료
+    setIsLoadingDetails(false);
   };
 
   const handleCloseDetail = () => {
     setSelectedLocation(null);
     setSelectedPlaceDetails(undefined);
+    setIsLoadingDetails(false); // 닫을 때 로딩 상태도 리셋
     if (mapInstance.current) {
       mapInstance.current.setZoom(mapSettings.zoom);
       mapInstance.current.panTo(mapSettings.center);
     }
   };
+
+  // const handleCloseDetail = () => {
+  //   setSelectedLocation(null);
+  //   setSelectedPlaceDetails(undefined);
+  //   if (mapInstance.current) {
+  //     mapInstance.current.setZoom(mapSettings.zoom);
+  //     mapInstance.current.panTo(mapSettings.center);
+  //   }
+  // };
 
   const mapSettings = useMemo(() => {
     if (locations.length === 0) {
@@ -133,6 +170,7 @@ const RoutePage = () => {
         onLocationsChange={setLocations}
         routeSource={routeSource}
         routeId={routeId ? parseInt(routeId) : undefined}
+        routeInfo={routeInfo}
       />
       <MapWrapper>
         <MapContainer
@@ -150,7 +188,9 @@ const RoutePage = () => {
             placeDetails={selectedPlaceDetails}
             onClose={handleCloseDetail}
             routeDetail={routeDetail}
-            isLoading={isDetailLoading}
+            isLoading={isLoadingDetails}
+            // isLoading={isLoadingDetails || isDetailLoading} // 두 로딩 상태 combined
+            routeAnimationId={routeInfo.animationId}
           />
         )}
       </MapWrapper>

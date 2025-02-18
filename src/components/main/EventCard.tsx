@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import HeartEmptyIcon from '../assets/heart-empty.png';
-import HeartFilledIcon from '../assets/heart-filled.png';
+import HeartEmptyIcon from '../../assets/heart-empty.png';
+import HeartFilledIcon from '../../assets/heart-filled.png';
+import { useLike } from '@/hooks/map/useLike';
+import { useAppSelector } from '@/hooks/reduxHooks';
 
 interface EventCardProps {
   id: number;
@@ -9,8 +11,8 @@ interface EventCardProps {
   title: string;
   startDate: string;
   endDate: string;
+  isLiked?: boolean;
   onClick: (id: number) => void;
-  onHeartClick?: (id: number) => void;
 }
 
 const EventCardContainer = styled.div`
@@ -48,6 +50,9 @@ const HeartButton = styled.button`
   &:hover {
     transform: scale(1.1);
   }
+  &:focus {
+    outline: none;
+  }
 `;
 
 const HeartImage = styled.img`
@@ -81,25 +86,31 @@ const EventCard: React.FC<EventCardProps> = ({
   title,
   startDate,
   endDate,
+  isLiked: initialIsLiked = false,
   onClick,
-  onHeartClick,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const { isLiked, toggleLike, isLoading } = useLike({
+    initialIsLiked,
+    id,
+    type: 'event',
+  });
 
   const handleHeartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    if (onHeartClick) {
-      onHeartClick(id);
-    }
+    toggleLike();
   };
 
   return (
     <EventCardContainer onClick={() => onClick(id)}>
       <EventPosterWrapper>
         <EventPoster src={thumbnail.fileUrl} alt={title} />
-        <HeartButton onClick={handleHeartClick}>
-          <HeartImage src={isFavorite ? HeartFilledIcon : HeartEmptyIcon} alt="Favorite" />
+        <HeartButton onClick={handleHeartClick} disabled={isLoading}>
+          <HeartImage
+            src={isLoggedIn && isLiked ? HeartFilledIcon : HeartEmptyIcon}
+            alt="Favorite"
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+          />
         </HeartButton>
       </EventPosterWrapper>
       <EventDetails>
