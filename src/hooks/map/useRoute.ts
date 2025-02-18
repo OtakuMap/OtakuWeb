@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RouteLocation } from '@/types/map/route';
+import { RouteLocation, RouteInfo, RouteApiResponse } from '@/types/map/route';
 import { getRouteById } from '@/api/map/route';
 import { toast } from 'react-toastify';
 
@@ -9,6 +9,7 @@ interface UseRouteProps {
 }
 
 interface UseRouteReturn {
+  routeInfo: RouteInfo;
   locations: RouteLocation[];
   setLocations: (locations: RouteLocation[]) => void;
   isLoading: boolean;
@@ -16,13 +17,17 @@ interface UseRouteReturn {
 }
 
 export const useRoute = ({ routeId, initialLocations }: UseRouteProps): UseRouteReturn => {
+  const [routeInfo, setRouteInfo] = useState<RouteInfo>({
+    routeName: '',
+    animationId: 0,
+    animationName: '',
+  });
   const [locations, setLocations] = useState<RouteLocation[]>(initialLocations || []);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchRouteData = async () => {
-      // If no routeId is provided and we have initialLocations, just use those
       if (!routeId) {
         setIsLoading(false);
         return;
@@ -34,14 +39,19 @@ export const useRoute = ({ routeId, initialLocations }: UseRouteProps): UseRoute
 
         const response = await getRouteById(parseInt(routeId));
 
-        // Transform API response to match RouteLocation interface
+        setRouteInfo({
+          routeName: response.result.routeName,
+          animationId: response.result.animationId,
+          animationName: response.result.animationName,
+        });
+
         const transformedLocations = response.result.places.map((place) => ({
           id: place.id,
           name: place.name,
           latitude: place.latitude,
           longitude: place.longitude,
           isSelected: false,
-          animeName: '',
+          animeName: response.result.animationName,
           hashtags: [],
         }));
 
@@ -60,6 +70,7 @@ export const useRoute = ({ routeId, initialLocations }: UseRouteProps): UseRoute
   }, [routeId]);
 
   return {
+    routeInfo,
     locations,
     setLocations,
     isLoading,
