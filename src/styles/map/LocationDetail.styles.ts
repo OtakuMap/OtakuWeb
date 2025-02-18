@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.div`
   position: absolute;
@@ -21,35 +21,39 @@ export const Container = styled.div`
 
 export const PaginationButton = styled.button`
   position: absolute;
-  top: 50%; // 중앙 정렬로 변경
-  transform: translateY(-50%); // 중앙 정렬
-  right: 20px; // 오른쪽 여백 증가
-  width: 30px; // 크기 증가
-  height: 30px; // 크기 증가
-  background: rgba(37, 38, 96, 0.8); // 배경색 추가
+  top: 81px;
+  right: 12px;
+  width: 25px;
+  height: 16px;
+  background: transparent;
   border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1002;
+  z-index: 1001;
   padding: 0;
   transition: transform 0.2s ease;
 
   img {
-    width: 15px; // 이미지 크기 조정
-    height: 15px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
 
   &:hover {
-    transform: translateY(-50%) scale(1.1); // transform 수정
-    background: rgba(37, 38, 96, 1); // hover 시 배경색 진하게
+    transform: scale(1.1);
   }
 
   &:focus {
     outline: none;
+  }
+
+  @media (max-width: 768px) {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 8px;
   }
 `;
 
@@ -412,4 +416,99 @@ export const CloseButton = styled.button`
     top: 8px;
     right: 8px;
   }
+`;
+
+//스켈레톤 UI
+const shimmer = keyframes`
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+`;
+
+export const Skeleton = styled.div`
+  background: linear-gradient(90deg, #303172 25%, #3a3c8c 50%, #303172 75%);
+  background-size: 200% 100%;
+  animation: ${shimmer} 1.5s infinite;
+`;
+
+export const SkeletonImage = styled(Skeleton)`
+  position: absolute;
+  width: 143px;
+  height: 158px;
+  left: 25px;
+  top: 22px;
+  border-radius: 7px;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 16px;
+    width: 120px;
+    height: 120px;
+  }
+`;
+
+export const SkeletonTitle = styled(Skeleton)`
+  position: absolute;
+  left: 188px;
+  top: 15px;
+  height: 34px;
+  width: 250px;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 24px;
+    width: 200px;
+  }
+`;
+
+export const SkeletonSubtitle = styled(Skeleton)`
+  position: absolute;
+  left: 188px;
+  top: 50px;
+  height: 34px;
+  width: 200px;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 32px;
+    width: 180px;
+  }
+`;
+
+export const SkeletonAddress = styled(Skeleton)`
+  position: absolute;
+  left: 188px;
+  top: 85px;
+  height: 54px;
+  width: 350px;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 16px;
+    top: 40px;
+    width: calc(100% - 32px);
+  }
+`;
+
+export const SkeletonTags = styled.div`
+  position: absolute;
+  left: 184px;
+  bottom: 22px;
+  display: flex;
+  gap: 7px;
+`;
+
+export const SkeletonTag = styled(Skeleton)`
+  width: 78px;
+  height: 23px;
+  border-radius: 23px;
 `;
