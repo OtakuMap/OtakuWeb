@@ -212,22 +212,12 @@ export const ContentTitle = styled.h2`
 `;
 
 export const AnimeGrid = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 30px;
-  margin-left: 180px;
-  width: 846px;
-`;
-
-export const GridRow = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 40px;
-  margin-bottom: 40px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-top: 30px;
+  margin-left: 180px;
+  width: 846px;
 `;
 
 export const AnimeCard = styled.div`
@@ -251,15 +241,21 @@ export const AnimeImage = styled.img`
 export const AnimeTitle = styled.p`
   color: white;
   width: 188px;
-  font-size: 14px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22.5px;
   text-align: center;
 `;
 
 export const EventDate = styled.p`
-  color: #8e8ea0;
-  font-size: 12px;
-  text-align: center;
+  color: white;
   margin-top: 4px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22.5px;
+  text-align: center;
 `;
 
 export const LoadMoreButton = styled.button`

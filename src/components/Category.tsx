@@ -25,7 +25,7 @@ const Category = () => {
       const params: any = {
         page: pageNumber,
         size: 12,
-        title: searchTerm || undefined, // 검색어 추가
+        title: searchTerm || undefined,
       };
 
       if (activeTab === '애니') {
@@ -87,6 +87,7 @@ const Category = () => {
     if (inputValue.trim()) {
       setSearchTerm(inputValue.trim());
       setShowSuggestions(false);
+      setPageNumber(0);
     }
   };
 
@@ -96,12 +97,18 @@ const Category = () => {
     setSearchTerm(event.title);
     setSuggestions([]);
     setShowSuggestions(false);
+    setPageNumber(0);
   };
 
   // 엔터키 핸들러
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearchSubmit();
+    } else if (e.key === 'Escape') {
+      setInputValue('');
+      setSearchTerm('');
+      setShowSuggestions(false);
+      setPageNumber(0);
     }
   };
 
@@ -152,8 +159,8 @@ const Category = () => {
     setActiveTab(tab);
     setActiveMainMenu(tab === '애니' ? '전체' : '진행중인 이벤트');
     setActiveSubMenu('');
-    setSearchTerm(''); // 검색어 초기화
-    setInputValue(''); // 입력값 초기화
+    setSearchTerm('');
+    setInputValue('');
   };
 
   // 서브 메뉴 렌더링
