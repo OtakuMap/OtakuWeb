@@ -26,9 +26,30 @@ const Main = () => {
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
 
-  const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
-  const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useTopReviews();
-  const { data: banner, isLoading: bannerLoading, error: bannerError } = useBanner();
+  // const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
+  // const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useTopReviews();
+  // const { data: banner, isLoading: bannerLoading, error: bannerError } = useBanner();
+  // 배너 데이터
+  const { data: banner, isLoading: bannerLoading, isSuccess: bannerSuccess } = useBanner();
+
+  // 이벤트 데이터 (배너 로드 완료 후)
+  const {
+    data: events,
+    isLoading: eventsLoading,
+    isSuccess: eventsSuccess,
+    error: eventsError,
+  } = usePopularEvents({
+    enabled: bannerSuccess, // 배너 로드 완료 후 실행
+  });
+
+  // 리뷰 데이터 (이벤트 로드 완료 후)
+  const {
+    data: reviews,
+    isLoading: reviewsLoading,
+    error: reviewsError,
+  } = useTopReviews({
+    enabled: eventsSuccess, // 이벤트 로드 완료 후 실행
+  });
 
   const handleMapClick = () => {
     navigate('/map');

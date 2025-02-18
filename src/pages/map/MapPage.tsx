@@ -39,127 +39,235 @@ const MapPage = () => {
   const [selectedLocationGroup, setSelectedLocationGroup] = useState<LocationGroup | null>(null);
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const fetchPlaceLikeDetails = async () => {
       if (selectedPlaceLikeId) {
         try {
+          setShowLocationDetail(false); // 데이터 로딩 중에는 hide
           await fetchPlaceLikeDetail(selectedPlaceLikeId);
+          setShowLocationDetail(true); // 데이터 로딩 완료 후 show
         } catch (error) {
           console.error('Failed to fetch place like detail:', error);
+          setShowLocationDetail(false);
         }
       }
     };
 
-    fetchDetails();
-  }, [selectedPlaceLikeId]);
+    fetchPlaceLikeDetails();
+  }, [selectedPlaceLikeId, fetchPlaceLikeDetail]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchDetails = async () => {
       if (!window.google?.maps || !mapInstance.current) {
         console.log('MapPage - Google Maps not initialized');
         return;
       }
 
-      try {
-        if (placeLikeDetail) {
-          console.log('MapPage - Fetching details for placeLikeDetail:', placeLikeDetail);
+      // 현재 선택된 위치의 좌표 결정
+      let currentLat: number | undefined;
+      let currentLng: number | undefined;
+
+      if (selectedPlace) {
+        currentLat = selectedPlace.latitude;
+        currentLng = selectedPlace.longitude;
+      } else if (selectedEvent) {
+        currentLat = selectedEvent.latitude;
+        currentLng = selectedEvent.longitude;
+      } else if (placeLikeDetail) {
+        currentLat = placeLikeDetail.lat;
+        currentLng = placeLikeDetail.lng;
+      }
+
+      if (currentLat && currentLng) {
+        try {
+          console.log('Fetching place details with coordinates:', { currentLat, currentLng });
+          setPlaceDetails(undefined); // 이전 데이터 초기화
+
           const details = await getPlaceDetails(
-            placeLikeDetail.lat,
-            placeLikeDetail.lng,
+            currentLat,
+            currentLng,
             import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
             mapInstance.current,
           );
-          console.log('MapPage - Fetched place details:', details);
-          setPlaceDetails(details);
-        } else if (selectedPlace) {
-          console.log('MapPage - Fetching details for selectedPlace:', selectedPlace);
-          const details = await getPlaceDetails(
-            selectedPlace.latitude,
-            selectedPlace.longitude,
-            import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-            mapInstance.current,
-          );
-          console.log('MapPage - Fetched place details:', details);
-          setPlaceDetails(details);
-        } else if (selectedEvent) {
-          console.log('MapPage - Fetching details for selectedEvent:', selectedEvent);
-          const details = await getPlaceDetails(
-            selectedEvent.latitude,
-            selectedEvent.longitude,
-            import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-            mapInstance.current,
-          );
-          console.log('MapPage - Fetched place details:', details);
-          setPlaceDetails(details);
+
+          if (isMounted) {
+            console.log('Received new place details:', details);
+            setPlaceDetails(details);
+          }
+        } catch (error) {
+          console.error('Failed to fetch place details:', error);
+          if (isMounted) {
+            setPlaceDetails(undefined);
+          }
         }
-      } catch (error) {
-        console.error('MapPage - Failed to fetch place details:', error);
       }
     };
 
-    fetchDetails();
-  }, [selectedPlace, selectedEvent, placeLikeDetail]);
+    // fetchDetails 호출 전에 약간의 지연 추가
+    const timeoutId = setTimeout(() => {
+      fetchDetails();
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [selectedPlace, selectedEvent, placeLikeDetail, mapInstance]);
 
   const handleFilterChange = (filter: 'spot' | 'event') => {
     console.log('Filter state:', filter);
   };
 
+  // const handlePlaceSelect = (place: SearchSuggestion['data'], locationGroup: LocationGroup) => {
+  //   console.log('Raw place data:', place);
+  //   console.log('Location group:', locationGroup);
+
+  //   // Place 타입에 맞게 데이터 변환
+  //   const placeData: Place = {
+  //     id: place.placeId || 0,
+  //     title: place.name,
+  //     name: place.name,
+  //     isSelected: true,
+  //     latitude: place.latitude,
+  //     longitude: place.longitude,
+  //     animeName: place.animeName || '',
+  //     address: '', // placeDetails에서 나중에 설정됨
+  //     hashtags: place.selectedAnimation?.hashTags?.map((tag) => tag.name) || [],
+  //     isLiked: place.selectedAnimation?.isLiked || false,
+  //     selectedAnimation: {
+  //       animationId: place.selectedAnimation?.animationId || 0,
+  //       animationName: place.selectedAnimation?.animationName || '',
+  //       isLiked: place.selectedAnimation?.isLiked || false,
+  //       hashTags: place.selectedAnimation?.hashTags || [],
+  //     },
+  //   };
+
+  //   setSelectedPlace(placeData);
+  //   setSelectedLocationGroup(locationGroup);
+  //   setSelectedEvent(null);
+  //   setSelectedPlaceLikeId(null);
+  //   setShowLocationDetail(true);
+  // };
+
+  // //이벤트 선택
+  // const handleEventSelect = (eventData: SearchSuggestion['data'], locationGroup: LocationGroup) => {
+  //   const event: Event = {
+  //     eventId: eventData.eventId!,
+  //     name: eventData.name,
+  //     isLiked: eventData.isLiked,
+  //     animationTitle: eventData.animationTitle!,
+  //     latitude: eventData.latitude,
+  //     longitude: eventData.longitude,
+  //     hashTags: eventData.hashTags, // 인터페이스에 맞춰서 대소문자 유지
+  //   };
+
+  //   console.log('Selected Event Data:', event);
+  //   console.log('Location Group:', locationGroup);
+
+  //   setSelectedEvent(event);
+  //   setSelectedLocationGroup(locationGroup);
+  //   setSelectedPlace(null);
+  //   setSelectedPlaceLikeId(null);
+  //   setShowLocationDetail(true);
+  // };
+
+  // const handleFavoritePlaceClick = (placeId: number) => {
+  //   setSelectedPlaceLikeId(placeId);
+  //   setSelectedPlace(null);
+  //   setShowLocationDetail(true);
+  // };
+
   const handlePlaceSelect = (place: SearchSuggestion['data'], locationGroup: LocationGroup) => {
-    console.log('Raw place data:', place);
-    console.log('Location group:', locationGroup);
-
-    // Place 타입에 맞게 데이터 변환
-    const placeData: Place = {
-      id: place.placeId || 0,
-      title: place.name,
-      name: place.name,
-      isSelected: true,
-      latitude: place.latitude,
-      longitude: place.longitude,
-      animeName: place.animeName || '',
-      address: '', // placeDetails에서 나중에 설정됨
-      hashtags: place.selectedAnimation?.hashTags?.map((tag) => tag.name) || [],
-      isLiked: place.selectedAnimation?.isLiked || false,
-      selectedAnimation: {
-        animationId: place.selectedAnimation?.animationId || 0,
-        animationName: place.selectedAnimation?.animationName || '',
-        isLiked: place.selectedAnimation?.isLiked || false,
-        hashTags: place.selectedAnimation?.hashTags || [],
-      },
-    };
-
-    setSelectedPlace(placeData);
-    setSelectedLocationGroup(locationGroup);
+    // 먼저 모든 상태 초기화
+    setShowLocationDetail(false);
     setSelectedEvent(null);
     setSelectedPlaceLikeId(null);
-    setShowLocationDetail(true);
+    // placeDetails를 명시적으로 초기화
+    setPlaceDetails(undefined);
+    // setSelectedLocationGroup(null);
+
+    // 약간의 딜레이 후 새 데이터 설정
+    setTimeout(() => {
+      const placeData: Place = {
+        id: place.placeId || 0,
+        title: place.name,
+        name: place.name,
+        isSelected: true,
+        latitude: place.latitude,
+        longitude: place.longitude,
+        animeName: place.animeName || '',
+        address: '',
+        hashtags: place.selectedAnimation?.hashTags?.map((tag) => tag.name) || [],
+        isLiked: place.selectedAnimation?.isLiked || false,
+        selectedAnimation: {
+          animationId: place.selectedAnimation?.animationId || 0,
+          animationName: place.selectedAnimation?.animationName || '',
+          isLiked: place.selectedAnimation?.isLiked || false,
+          hashTags: place.selectedAnimation?.hashTags || [],
+        },
+      };
+
+      setSelectedPlace(placeData);
+      setSelectedLocationGroup(locationGroup);
+      setShowLocationDetail(true);
+    }, 50);
   };
 
-  //이벤트 선택
+  // handleEventSelect 수정
   const handleEventSelect = (eventData: SearchSuggestion['data'], locationGroup: LocationGroup) => {
-    const event: Event = {
-      eventId: eventData.eventId!,
-      name: eventData.name,
-      isLiked: eventData.isLiked,
-      animationTitle: eventData.animationTitle!,
-      latitude: eventData.latitude,
-      longitude: eventData.longitude,
-      hashTags: eventData.hashTags, // 인터페이스에 맞춰서 대소문자 유지
-    };
-
-    console.log('Selected Event Data:', event);
-    console.log('Location Group:', locationGroup);
-
-    setSelectedEvent(event);
-    setSelectedLocationGroup(locationGroup);
+    // 먼저 모든 상태 초기화
+    setShowLocationDetail(false);
     setSelectedPlace(null);
     setSelectedPlaceLikeId(null);
-    setShowLocationDetail(true);
+    setPlaceDetails(undefined);
+    setSelectedLocationGroup(null);
+
+    setTimeout(() => {
+      const event: Event = {
+        eventId: eventData.eventId!,
+        name: eventData.name,
+        isLiked: eventData.isLiked,
+        animationTitle: eventData.animationTitle!,
+        latitude: eventData.latitude,
+        longitude: eventData.longitude,
+        hashTags: eventData.hashTags,
+      };
+
+      setSelectedEvent(event);
+      setSelectedLocationGroup(locationGroup);
+      setShowLocationDetail(true);
+    }, 50);
   };
 
   const handleFavoritePlaceClick = (placeId: number) => {
-    setSelectedPlaceLikeId(placeId);
+    // 모든 상태 리셋
+    setShowLocationDetail(false);
     setSelectedPlace(null);
-    setShowLocationDetail(true);
+    setSelectedEvent(null);
+    setPlaceDetails(undefined);
+    setSelectedLocationGroup(null);
+    setSelectedPlaceLikeId(null); // 이전 id도 초기화
+
+    // 새로운 데이터 설정
+    const setNewLocation = async () => {
+      try {
+        // 먼저 placeLikeDetail 데이터를 가져옴
+        await fetchPlaceLikeDetail(placeId);
+        // 이제 새 placeId 설정
+        setSelectedPlaceLikeId(placeId);
+
+        // placeDetails를 undefined로 설정하여 강제로 새로운 Google API 호출 유도
+        setPlaceDetails(undefined);
+
+        setShowLocationDetail(true);
+      } catch (error) {
+        console.error('Error fetching place like detail:', error);
+        setShowLocationDetail(false);
+      }
+    };
+
+    setNewLocation();
   };
 
   const handleCloseDetail = () => {
@@ -304,6 +412,22 @@ const MapPage = () => {
         <FilterButton onFilterChange={handleFilterChange} />
         {showLocationDetail && (selectedPlace || selectedEvent || placeLikeDetail) && (
           <LocationDetail
+            key={`location-detail-${selectedPlace?.id || selectedEvent?.eventId || placeLikeDetail?.placeId}-${Date.now()}`}
+            location={mapLocations[0]}
+            placeDetails={placeDetails}
+            onClose={handleCloseDetail}
+            routeDetail={null}
+            isLoading={false}
+            originalName={selectedPlace?.name || selectedEvent?.name || placeLikeDetail?.placeName}
+            isEvent={!!selectedEvent}
+            eventId={selectedEvent?.eventId}
+            initialIsLiked={initialIsLiked}
+            locationItems={selectedLocationGroup?.items}
+            placeLikeDetail={placeLikeDetail}
+          />
+        )}
+        {/* {showLocationDetail && (selectedPlace || selectedEvent || placeLikeDetail) && (
+          <LocationDetail
             location={mapLocations[0]}
             placeDetails={placeDetails}
             onClose={handleCloseDetail}
@@ -316,7 +440,7 @@ const MapPage = () => {
             locationItems={selectedLocationGroup?.items}
             placeLikeDetail={placeLikeDetail} // 추가
           />
-        )}
+        )} */}
       </MapWrapper>
     </PageContainer>
   );
