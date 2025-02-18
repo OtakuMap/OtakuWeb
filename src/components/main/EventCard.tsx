@@ -15,12 +15,19 @@ interface EventCardProps {
   onClick: (id: number) => void;
 }
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 const EventCardContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
 `;
 
 const EventPosterWrapper = styled.div`
@@ -28,6 +35,11 @@ const EventPosterWrapper = styled.div`
   width: 199px;
   height: 208px;
   margin-bottom: 0.5rem;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 160px;
+  }
 `;
 
 const EventPoster = styled.img`
@@ -47,6 +59,11 @@ const HeartButton = styled.button`
   z-index: 1;
   transition: transform 0.2s;
 
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    top: 5px;
+    right: 5px;
+  }
+
   &:hover {
     transform: scale(1.1);
   }
@@ -58,10 +75,20 @@ const HeartButton = styled.button`
 const HeartImage = styled.img`
   width: 24px;
   height: 24px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 const EventDetails = styled.div`
   text-align: center;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    padding: 0 5px;
+  }
 `;
 
 const EventName = styled.h4`
@@ -70,6 +97,12 @@ const EventName = styled.h4`
   font-family: 'Gothic A1';
   font-size: 18px;
   font-weight: 600;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    margin-bottom: 0.1rem;
+    word-break: break-word;
+  }
 `;
 
 const EventDates = styled.p`
@@ -78,6 +111,10 @@ const EventDates = styled.p`
   font-family: 'Gothic A1';
   font-size: 16px;
   font-weight: 600;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 12px;
+  }
 `;
 
 const EventCard: React.FC<EventCardProps> = ({
