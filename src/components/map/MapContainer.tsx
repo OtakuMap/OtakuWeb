@@ -26,6 +26,7 @@ interface MapContainerProps {
   locations?: RouteLocation[];
   selectedLocation?: RouteLocation | null;
   onMarkerClick?: (location: RouteLocation, placeDetails?: PlaceDetails) => void;
+  isRoute?: boolean; // 추가
 }
 
 declare global {
@@ -94,6 +95,7 @@ const MapContainer = forwardRef<google.maps.Map | null, MapContainerProps>(
       locations = [],
       selectedLocation,
       onMarkerClick,
+      isRoute = false,
     },
     ref,
   ) => {
@@ -244,14 +246,25 @@ const MapContainer = forwardRef<google.maps.Map | null, MapContainerProps>(
           mapInstance.current = new window.google.maps.Map(mapContainer, {
             center,
             zoom,
-            mapId,
+            disableDefaultUI: true,
+            mapTypeControl: true,
+            // isRoute가 true일 때만 스타일 적용
+            ...(isRoute && {
+              styles: [
+                {
+                  featureType: 'all',
+                  elementType: 'all',
+                  stylers: [{ saturation: -20 }, { lightness: 10 }, { weight: 1.2 }],
+                },
+              ],
+            }),
           });
           updateMarkers();
         }
       } catch (error) {
         console.error('Error initializing map:', error);
       }
-    }, [center, zoom, mapId, updateMarkers]);
+    }, [center, zoom, isRoute, updateMarkers]);
 
     useEffect(() => {
       const setupMap = async () => {
