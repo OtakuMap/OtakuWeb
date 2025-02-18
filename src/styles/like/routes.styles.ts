@@ -198,3 +198,30 @@ export const Span = styled.img`
   color: #464654;
   font-size: 16px;
 `;
+
+export const LoadMoreButton = styled.button`
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+export const LoadingIndicator = styled.div`
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+`;
+
+export const Divider = styled.span`
+  color: #464654;
+  margin: 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+`;

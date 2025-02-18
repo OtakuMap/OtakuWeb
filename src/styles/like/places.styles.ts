@@ -157,6 +157,29 @@ export const RouteAddress = styled.span`
   font-weight: 500;
   color: #000;
   margin-top: 4px;
+  margin-bottom: 8px; // 추가: 아래 여백 추가
+`;
+
+export const RouteFooter = styled.div`
+  display: flex;
+  align-items: center; // 변경
+  margin-left: 36px; // RadioButton의 width + margin-right와 동일하게 맞춤
+`;
+
+export const ViewMapButton = styled.button`
+  padding: 4px 0; // 수정: 상하 패딩만 적용
+  background: none; // 배경 제거
+  border: none;
+  font-family: 'Gothic A1';
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(0, 0, 0); // 버튼 텍스트 색상 추가
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: rgb(0, 0, 0); // hover 시 색상 변경
+  }
 `;
 
 export const StarIcon = styled.img``;

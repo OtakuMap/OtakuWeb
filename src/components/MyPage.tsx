@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../api/userInfo';
 import { updateNickname } from '../api/userInfo/nickname';
+import { updateEmail } from '../api/userInfo/email';
 import { reportEvent } from '../api/userInfo/report-event';
 import { updateNotificationSettings } from '../api/userInfo/notification-settings';
-// import { logout } from '../api/userInfo/logout';
 import { updateProfileImage } from '../api/userInfo/profile_image';
+import { resetPassword } from '../api/userInfo/reset-password';
 import { uploadImage } from '../api/common/upload-image';
 import { UserInfo } from '../types/userInfo/userType';
 import { deleteAllReviews } from '../api/userInfo/deleteReviews';
@@ -31,11 +32,12 @@ const MyPage = () => {
     nickname: '',
     email: '',
     password: 'xxxxxxxxxxxxx',
+    passwordCheck: 'xxxxxxxxxxxxx',
   });
   const [eventForm, setEventForm] = useState({
-    event_name: '',
-    animation_name: '',
-    additional_info: '',
+    eventName: '',
+    animationName: '',
+    additionalInfo: '',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,31 +67,26 @@ const MyPage = () => {
     fetchUserInfo();
   }, []);
 
-  // 수정된 이미지 변경 핸들러
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // 파일 크기 체크 (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('파일 크기는 5MB 이하여야 합니다.');
       return;
     }
 
-    // 이미지 파일 타입 체크
     if (!file.type.startsWith('image/')) {
       alert('이미지 파일만 업로드 가능합니다.');
       return;
     }
 
     try {
-      // 1. 먼저 이미지 업로드
       const uploadResponse = await uploadImage('profile', file);
       if (!uploadResponse.isSuccess) {
         throw new Error('이미지 업로드에 실패했습니다.');
       }
 
-      // 2. 업로드된 이미지 URL로 프로필 이미지 업데이트
       const updateResponse = await updateProfileImage(uploadResponse.result);
       if (updateResponse.isSuccess) {
         const userResponse = await getUserInfo();
@@ -107,21 +104,20 @@ const MyPage = () => {
 
   const handleLogout = async () => {
     try {
-      await logout(); // useAuth의 logout 사용
+      await logout();
     } catch (error) {
       alert('로그아웃 처리 중 예기치 않은 오류가 발생했습니다.');
     }
   };
 
+  // 기존 handleSave 함수를 수정
   const handleSave = async () => {
     try {
-      if (isEditing.nickname) {
+      // 닉네임 수정
+      if (isEditing.nickname && formData.nickname !== userInfo?.nickname) {
         const response = await updateNickname(formData.nickname);
         if (response.isSuccess) {
-          // Redux 상태 업데이트 (Navbar용)
           dispatch(updateProfile({ nickname: formData.nickname }));
-
-          // 로컬 상태 업데이트 (MyPage용)
           setUserInfo((prev) =>
             prev
               ? {
@@ -130,17 +126,84 @@ const MyPage = () => {
                 }
               : null,
           );
-
           setIsEditing((prev) => ({ ...prev, nickname: false }));
           alert('닉네임이 성공적으로 수정되었습니다.');
         }
+        return;
+      }
+
+      // 이메일 수정
+      if (isEditing.email && formData.email !== userInfo?.email) {
+        const response = await updateEmail(formData.email);
+        if (response.isSuccess) {
+          setUserInfo((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  email: formData.email,
+                }
+              : null,
+          );
+          setIsEditing((prev) => ({ ...prev, email: false }));
+          alert('이메일이 성공적으로 수정되었습니다.');
+        }
+        return;
+      }
+
+      // 비밀번호 변경
+      if (isEditing.password) {
+        if (formData.password !== formData.passwordCheck) {
+          alert('비밀번호가 일치하지 않습니다.');
+          return;
+        }
+
+        if (!userInfo?.id) {
+          alert('사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const passwordResponse = await resetPassword({
+          userId: userInfo.id,
+          password: formData.password,
+          passwordCheck: formData.passwordCheck,
+        });
+
+        if (passwordResponse.isSuccess) {
+          setIsEditing((prev) => ({ ...prev, password: false }));
+          alert('비밀번호가 성공적으로 변경되었습니다.');
+          setFormData((prev) => ({
+            ...prev,
+            password: 'xxxxxxxxxxxxx',
+            passwordCheck: 'xxxxxxxxxxxxx',
+          }));
+        }
+        return;
       }
     } catch (error) {
-      alert('닉네임 수정에 실패했습니다.');
+      if (isEditing.nickname) {
+        alert('닉네임 수정에 실패했습니다.');
+      } else if (isEditing.email) {
+        alert('이메일 수정에 실패했습니다.');
+      } else if (isEditing.password) {
+        alert('비밀번호 변경에 실패했습니다.');
+      }
     }
   };
 
   const handleEdit = (field: string) => {
+    // 다른 필드 편집 중이면 먼저 저장하도록 알림
+    if (Object.values(isEditing).some((value) => value)) {
+      alert('현재 편집 중인 항목을 먼저 저장해주세요.');
+      return;
+    }
+
+    if (field === 'password') {
+      setFormData((prev) => ({
+        ...prev,
+        password: '',
+        passwordCheck: '',
+      }));
+    }
     setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
@@ -152,7 +215,7 @@ const MyPage = () => {
     alert('닉네임 중복 확인이 완료되었습니다.');
   };
 
-  const handleEventFormChange = (field: string, value: string) => {
+  const handleEventFormChange = (field: keyof typeof eventForm, value: string) => {
     setEventForm((prev) => ({
       ...prev,
       [field]: value,
@@ -165,7 +228,7 @@ const MyPage = () => {
 
   const handleEventSubmit = async () => {
     try {
-      if (!eventForm.event_name || !eventForm.animation_name) {
+      if (!eventForm.eventName || !eventForm.animationName) {
         alert('이벤트명과 애니메이션명은 필수 입력사항입니다.');
         return;
       }
@@ -174,9 +237,9 @@ const MyPage = () => {
       if (response.isSuccess) {
         alert('이벤트가 성공적으로 제보되었습니다.');
         setEventForm({
-          event_name: '',
-          animation_name: '',
-          additional_info: '',
+          eventName: '',
+          animationName: '',
+          additionalInfo: '',
         });
       }
     } catch (error) {
@@ -304,11 +367,20 @@ const MyPage = () => {
           <S.Label>비밀번호 변경</S.Label>
           <S.InputContainer>
             {isEditing.password ? (
-              <S.InputField
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
-              />
+              <>
+                <S.InputField
+                  type="password"
+                  placeholder="새 비밀번호"
+                  value={formData.password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                />
+                <S.InputField
+                  type="password"
+                  placeholder="비밀번호 확인"
+                  value={formData.passwordCheck}
+                  onChange={(e) => handleChange('passwordCheck', e.target.value)}
+                />
+              </>
             ) : (
               <S.Text>{formData.password}</S.Text>
             )}
@@ -357,8 +429,8 @@ const MyPage = () => {
           <S.EventInputField
             type="text"
             placeholder="입력해주세요"
-            value={eventForm.event_name}
-            onChange={(e) => handleEventFormChange('event_name', e.target.value)}
+            value={eventForm.eventName}
+            onChange={(e) => handleEventFormChange('eventName', e.target.value)}
           />
         </S.FormRow>
         <S.FormRow>
@@ -366,8 +438,8 @@ const MyPage = () => {
           <S.EventInputField
             type="text"
             placeholder="입력해주세요"
-            value={eventForm.animation_name}
-            onChange={(e) => handleEventFormChange('animation_name', e.target.value)}
+            value={eventForm.animationName}
+            onChange={(e) => handleEventFormChange('animationName', e.target.value)}
           />
         </S.FormRow>
         <S.FormRow>
@@ -375,8 +447,8 @@ const MyPage = () => {
           <S.EventInputField
             type="text"
             placeholder="입력해주세요"
-            value={eventForm.additional_info}
-            onChange={(e) => handleEventFormChange('additional_info', e.target.value)}
+            value={eventForm.additionalInfo}
+            onChange={(e) => handleEventFormChange('additionalInfo', e.target.value)}
           />
         </S.FormRow>
         <S.Button onClick={handleEventSubmit}>제출하기</S.Button>
