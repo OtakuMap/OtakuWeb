@@ -4,6 +4,8 @@ interface ImageWrapperProps {
   src: string;
 }
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -36,19 +38,31 @@ export const Header = styled.header`
     font-size: 2.5rem;
     font-weight: bold;
     margin-top: 1rem;
+
+    @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+      font-size: 1.8rem;
+    }
   }
 
   h2 {
     font-size: 1.5rem;
     font-weight: normal;
     margin-top: 0.5rem;
+
+    @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+      font-size: 1.2rem;
+    }
   }
 
   img {
     width: 100%;
-    height: 500px; /* 로고 이미지의 높이로 고정 */
+    height: 500px;
     object-fit: cover;
     object-position: center;
+
+    @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+      height: 200px;
+    }
   }
 `;
 
@@ -56,6 +70,10 @@ export const EventSection = styled.section`
   margin-bottom: 2rem;
   width: 100%;
   padding: 0 20px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 0 10px;
+  }
 `;
 
 export const EventContainer = styled.div`
@@ -63,6 +81,12 @@ export const EventContainer = styled.div`
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 1rem;
   padding: 0 95px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 10px;
+    grid-gap: 0.5rem;
+  }
 `;
 
 export const EventCard = styled.div`
@@ -76,6 +100,11 @@ export const EventPoster = styled.img`
   height: 208px;
   margin-bottom: 0.5rem;
   object-fit: cover;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 150px;
+    height: 160px;
+  }
 `;
 
 export const EventDetails = styled.div`
@@ -88,6 +117,10 @@ export const EventName = styled.h4`
   font-family: 'Gothic A1';
   font-size: 18px;
   font-weight: 600;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+  }
 `;
 
 export const EventDates = styled.p`
@@ -96,10 +129,18 @@ export const EventDates = styled.p`
   font-family: 'Gothic A1';
   font-size: 16px;
   font-weight: 600;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 12px;
+  }
 `;
 
 export const DetailsSection = styled.section`
   margin-bottom: 2rem;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-bottom: 1rem;
+  }
 `;
 
 export const DetailsItem = styled.div`
@@ -117,6 +158,19 @@ export const DetailsItem = styled.div`
   span {
     font-size: 0.9rem;
     text-align: center;
+  }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 0.3rem;
+
+    span {
+      font-size: 0.8rem;
+    }
+
+    img {
+      width: 40px;
+      height: auto;
+    }
   }
 `;
 
@@ -136,13 +190,26 @@ export const DetailsContainer = styled.div`
     height: 85px;
     background-color: #b8effd;
   }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 1rem;
+
+    & > div:not(:last-child)::after {
+      right: -0.5rem;
+      width: 2px;
+      height: 60px;
+    }
+  }
 `;
 
 export const TopReviews = styled.div`
   width: 100%;
-  //   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 0 10px;
+  }
 `;
 
 export const ReviewSlider = styled.div`
@@ -156,7 +223,6 @@ export const ReviewSlider = styled.div`
 
   .slick-slide {
     padding-left: 57px;
-    // padding: 0 10px;
   }
 
   .slick-dots {
@@ -178,10 +244,15 @@ export const ReviewSlider = styled.div`
     }
   }
 
-  // Hide arrows
   .slick-prev,
   .slick-next {
     display: none !important;
+  }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    .slick-slide {
+      padding-left: 20px;
+    }
   }
 `;
 
@@ -190,6 +261,11 @@ export const ReviewGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   width: 100%;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 `;
 
 export const ReviewCard = styled.div`
@@ -197,6 +273,10 @@ export const ReviewCard = styled.div`
   height: 268px;
   flex: none;
   position: relative;
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 150px;
+    height: 180px;
+  }
 `;
 
 export const Rank = styled.div`
@@ -210,6 +290,13 @@ export const Rank = styled.div`
   line-height: 106px;
   color: #101148;
   z-index: 2;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 50px;
+    line-height: 60px;
+    left: 10px;
+    bottom: -3px;
+  }
 `;
 
 export const Description = styled.p`
@@ -224,6 +311,12 @@ export const Description = styled.p`
   color: #ffffff;
   word-wrap: break-word;
   overflow-wrap: break-word;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 20px;
+  }
 `;
 
 export const ImageWrapper = styled.div<ImageWrapperProps>`
@@ -246,6 +339,10 @@ export const ImageWrapper = styled.div<ImageWrapperProps>`
     background: linear-gradient(90deg, #ffffff 0%, rgba(115, 115, 115, 0) 100%);
     border-radius: 15px;
   }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    height: 120px;
+  }
 `;
 
 export const SectionTitle = styled.h2`
@@ -261,6 +358,12 @@ export const SectionTitle = styled.h2`
   font-family: 'Gothic A1';
   font-weight: 800;
   width: 100%;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 20px;
+    margin-left: 20px;
+    margin-bottom: 30px;
+  }
 `;
 
 export const Image = styled.img`
@@ -270,6 +373,11 @@ export const Image = styled.img`
   vertical-align: middle;
   display: inline-block;
   align-self: center;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 20px;
+    margin-right: 10px;
+  }
 `;
 
 export const Footer = styled.footer`
@@ -293,6 +401,20 @@ export const Footer = styled.footer`
     line-height: 19px;
     margin: 5px 0;
   }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 16px 20px;
+
+    p:first-child {
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    p:not(:first-child) {
+      font-size: 13px;
+      line-height: 17px;
+    }
+  }
 `;
 
 export const Divider = styled.div`
@@ -300,6 +422,11 @@ export const Divider = styled.div`
   height: 1px;
   background-color: #464654;
   margin-top: 40px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 95%;
+    margin-top: 20px;
+  }
 `;
 
 export const HeartButton = styled.button`
@@ -311,9 +438,20 @@ export const HeartButton = styled.button`
   cursor: pointer;
   padding: 5px;
   z-index: 1;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    top: 5px;
+    right: 5px;
+    padding: 3px;
+  }
 `;
 
 export const HeartImage = styled.img`
   width: 24px;
   height: 24px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 20px;
+    height: 20px;
+  }
 `;

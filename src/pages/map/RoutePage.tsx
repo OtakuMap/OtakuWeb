@@ -60,20 +60,6 @@ const RoutePage = () => {
   // const { routeDetail, isLoading: isDetailLoading, fetchRouteDetail } = useRouteDetail();
   const { routeDetail, fetchRouteDetail } = useRouteDetail();
 
-  // const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
-  //   setSelectedLocation(location);
-  //   if (placeDetails) {
-  //     setSelectedPlaceDetails(placeDetails);
-  //   }
-
-  //   if (routeId && routeInfo.animationId) {
-  //     try {
-  //       await fetchRouteDetail(parseInt(routeId), location.id, routeInfo.animationId);
-  //     } catch (error) {
-  //       console.error('Failed to fetch route detail:', error);
-  //     }
-  //   }
-  // };
   const handleMarkerClick = async (location: RouteLocation, placeDetails?: PlaceDetails) => {
     // 로딩 시작
     setIsLoadingDetails(true);
@@ -181,6 +167,7 @@ const RoutePage = () => {
           selectedLocation={selectedLocation}
           onMarkerClick={handleMarkerClick}
           ref={mapInstance}
+          isRoute={true}
         />
         {selectedLocation && (
           <LocationDetail
