@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 import Backgroundimg from '../../assets/logorepeat.png';
 import '../font.css';
 
@@ -18,20 +18,20 @@ export const SignupBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 806PX;
+  width: 806px;
   max-height: 90%;
   background: #101148;
   border-radius: 20px;
-  overflow-y: auto; 
-  scrollbar-width: none; 
+  overflow-y: auto;
+  scrollbar-width: none;
 `;
 
 export const Title = styled.div`
   text-align: center;
   font-family: 'Gothic A1';
-  font-size:24px;
-  font-weight:600;
-  line-height:30px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
   color: #ffffff;
   margin-top: 30px;
   margin-bottom: 37px;
@@ -123,7 +123,7 @@ export const InputShort = styled.input`
     color: #999797;
     font-size: 18px;
   }
-    &:-webkit-autofill {
+  &:-webkit-autofill {
     background-color: #101148 !important;
     -webkit-text-fill-color: #ffffff !important;
     -webkit-box-shadow: 0 0 0px 1000px #101148 inset !important;
@@ -206,7 +206,7 @@ export const Openbutton = styled.a`
 `;
 
 export const Divider = styled.hr`
-  margin-bottom:22px;
+  margin-bottom: 22px;
   height: 1px;
   background-color: #ffffff;
   width: 700px;
@@ -221,14 +221,28 @@ export const ActionLink = styled.a`
 `;
 
 export const CheckIcon1 = styled.img`
-position: absolute;
-margin-left: 423px;
+  position: absolute;
+  margin-left: 423px;
 `;
-
 
 export const CheckIcon2 = styled.img`
-position: absolute;
-margin-right: 17px;
-margin-top: 22px;
+  position: absolute;
+  margin-right: 17px;
+  margin-top: 22px;
 `;
 
+export const TermsContent = styled.div`
+  width: 395px;
+  font-family: 'Gothic A1';
+  color: #999797;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+`;
+
+export const Terms = styled.img`
+  margin-top: 2px;
+  width: 487px;
+`;
