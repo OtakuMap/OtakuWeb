@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 export const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -21,6 +23,14 @@ export const ModalContent = styled.div`
   height: 152px;
   display: flex;
   flex-direction: column;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    height: auto;
+    min-height: 130px;
+    padding: 20px;
+    border-radius: 16px;
+  }
 `;
 
 export const ModalTitle = styled.div`
@@ -32,6 +42,11 @@ export const ModalTitle = styled.div`
   font-family: 'Gothic A1';
   font-weight: 600;
   word-wrap: break-word;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 18px;
+    padding-bottom: 12px;
+  }
 `;
 
 export const ButtonGroup = styled.div`
@@ -39,6 +54,11 @@ export const ButtonGroup = styled.div`
   justify-content: center;
   gap: 150px;
   margin-top: 15px;
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 80px;
+    margin-top: 12px;
+  }
 `;
 
 export const ModalButton = styled.button`
@@ -54,5 +74,10 @@ export const ModalButton = styled.button`
 
   &:focus {
     outline: none;
+  }
+
+  @media screen and (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    padding: 8px;
   }
 `;
