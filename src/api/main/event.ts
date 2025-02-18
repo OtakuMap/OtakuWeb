@@ -1,69 +1,41 @@
 import publicInstance from '@/api/publicInstance';
+import instance from '@/api/axios';
 import { PopularEventsResponse } from '@/types/main/event';
-import { AxiosError } from 'axios';
+import { tokenStorage } from '@/utils/token';
 
-export const getPopularEvents = async () => {
+export const getPopularEvents = async (): Promise<PopularEventsResponse> => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 딜레이
-    const response = await publicInstance.get<PopularEventsResponse>('/events/popular');
+    const accessToken = tokenStorage.getAccessToken();
+    const userId = tokenStorage.getUserId();
+    const isAuthenticated = !!(accessToken && userId);
+
+    // 인증된 사용자는 instance를 통해 자동으로 Authorization 헤더가 포함됨
+    const axiosInstance = isAuthenticated ? instance : publicInstance;
+
+    const response = await axiosInstance.get<PopularEventsResponse>('/events/popular');
 
     if (!response.data || !response.data.result) {
-      // 임시 더미 데이터 반환
-      return {
-        isSuccess: true,
-        code: 'COMMON200',
-        message: '성공입니다.',
-        result: Array(8)
-          .fill(null)
-          .map((_, index) => ({
-            id: index + 1,
-            title: `이벤트 ${index + 1}`,
-            startDate: '2024-01-01',
-            endDate: '2024-12-31',
-            thumbnail: {
-              id: index + 1,
-              uuid: `event-${index + 1}`,
-              fileName: `event-${index + 1}.jpg`,
-              fileUrl: `https://picsum.photos/300/400?random=${index + 1}`,
-            },
-          })),
-      };
+      throw new Error('No data available');
     }
 
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<{
-      isSuccess: boolean;
-      code: string;
-      message: string;
-      result: string;
-    }>;
-
-    console.error('Failed to fetch popular events:', {
-      status: axiosError.response?.status,
-      statusText: axiosError.response?.statusText,
-      data: axiosError.response?.data,
-    });
-
-    // 에러 발생시 더미 데이터 반환
-    return {
-      isSuccess: true,
-      code: 'COMMON200',
-      message: '성공입니다.',
-      result: Array(8)
-        .fill(null)
-        .map((_, index) => ({
-          id: index + 1,
-          title: `이벤트 ${index + 1}`,
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          thumbnail: {
-            id: index + 1,
-            uuid: `event-${index + 1}`,
-            fileName: `event-${index + 1}.jpg`,
-            fileUrl: `https://picsum.photos/300/400?random=${index + 1}`,
-          },
-        })),
-    };
+    console.error('Popular events fetch error:', error);
+    throw error;
   }
 };
+
+// export const toggleEventLike = async (eventId: number): Promise<EventLikeResponse> => {
+//   try {
+//     const userId = tokenStorage.getUserId();
+//     if (!userId) {
+//       throw new Error('User not authenticated');
+//     }
+
+//     const response = await instance.post<EventLikeResponse>(`/events/${eventId}/like`);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Event like toggle error:', error);
+//     throw error;
+//   }
+// };

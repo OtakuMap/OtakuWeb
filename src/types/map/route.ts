@@ -3,14 +3,46 @@ export interface HashTag {
   name: string;
 }
 
+export interface Animation {
+  animationId: number;
+  animationName: string;
+  isLiked: boolean;
+}
+
 export interface RouteLocation {
   id: number;
   name: string;
   isSelected: boolean;
   latitude: number;
   longitude: number;
-  animeName?: string;
-  hashtags?: string[];
+  animeName: string;
+  hashtags: (string | HashTag)[];
+  selectedAnimation?: Animation;
+  type: 'place' | 'event';
+}
+
+export interface RouteInfo {
+  routeName: string;
+  animationId: number;
+  animationName: string;
+}
+
+export interface RouteApiResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    routeId: number;
+    routeName: string;
+    animationId: number;
+    animationName: string;
+    places: {
+      id: number;
+      name: string;
+      latitude: number;
+      longitude: number;
+    }[];
+  };
 }
 
 export interface RouteData {
