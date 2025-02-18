@@ -13,13 +13,14 @@ import sectionImage from '../../assets/1.png';
 import EventCard from './EventCard';
 import { useTopReviews } from '@/hooks/main/useTopReviews';
 import { usePopularEvents } from '@/hooks/main/usePopularEvents';
-import { useBanner } from '@/hooks/main/useBanner';
+// import { useBanner } from '@/hooks/main/useBanner';
 import ReviewSlider from './ReviewSlider';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { getRandomBanner } from '@/constants/banner';
 
 const Main = () => {
   const navigate = useNavigate();
@@ -29,18 +30,23 @@ const Main = () => {
   // const { data: events, isLoading: eventsLoading, error: eventsError } = usePopularEvents();
   // const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useTopReviews();
   // const { data: banner, isLoading: bannerLoading, error: bannerError } = useBanner();
-  // 배너 데이터
-  const { data: banner, isLoading: bannerLoading, isSuccess: bannerSuccess } = useBanner();
 
-  // 이벤트 데이터 (배너 로드 완료 후)
+  // 컴포넌트 마운트 시 랜덤 배너 선택
+  const [currentBanner, setCurrentBanner] = useState(getRandomBanner());
+
+  // 에러 핸들링을 위한 상태
+  const [bannerError, setBannerError] = useState(false);
+
+  // 배너 데이터
+  // const { data: banner, isLoading: bannerLoading, isSuccess: bannerSuccess } = useBanner();
+
+  // 이벤트 데이터
   const {
     data: events,
     isLoading: eventsLoading,
     isSuccess: eventsSuccess,
     error: eventsError,
-  } = usePopularEvents({
-    enabled: bannerSuccess, // 배너 로드 완료 후 실행
-  });
+  } = usePopularEvents();
 
   // 리뷰 데이터 (이벤트 로드 완료 후)
   const {
@@ -48,7 +54,7 @@ const Main = () => {
     isLoading: reviewsLoading,
     error: reviewsError,
   } = useTopReviews({
-    enabled: eventsSuccess, // 이벤트 로드 완료 후 실행
+    enabled: eventsSuccess,
   });
 
   const handleMapClick = () => {
@@ -83,6 +89,16 @@ const Main = () => {
     <S.Container>
       <S.Wrapper>
         <S.Header>
+          <img
+            src={bannerError ? Logo : currentBanner.fileUrl}
+            alt="Banner"
+            onError={() => {
+              setBannerError(true);
+              console.error('Banner image failed to load:', currentBanner.fileUrl);
+            }}
+          />
+        </S.Header>
+        {/* <S.Header>
           {bannerLoading ? (
             <img src={Logo} alt="Logo" /> // 로딩 중에는 기본 로고 표시
           ) : banner?.result?.fileUrl ? (
@@ -90,7 +106,7 @@ const Main = () => {
           ) : (
             <img src={Logo} alt="Logo" /> // API 응답이 없거나 실패한 경우 기본 로고 표시
           )}
-        </S.Header>
+        </S.Header> */}
 
         <S.DetailsSection>
           <S.DetailsContainer>
