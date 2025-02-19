@@ -1,7 +1,5 @@
 export interface ResetPasswordRequest {
-  userId: string;
   password: string;
-  passwordCheck: string;
 }
 
 export interface ResetPasswordResponse {

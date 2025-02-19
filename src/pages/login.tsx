@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     oauthLogin(provider as 'kakao' | 'naver' | 'google', code).catch(() => {
-      setError('OAuth 로그인에 실패했습니다.');
+      /*setError('OAuth 로그인에 실패했습니다.');*/
     });
   }, [location, oauthLogin]);
 
@@ -110,7 +110,7 @@ const LoginPage: React.FC = () => {
       setError(null);
       await login(userId, password);
       console.log('Login form submission successful');
-    } catch (err) {
+    } catch (error: unknown) {
       console.error('Login form submission failed');
       setError('로그인에 실패했습니다.');
     }

@@ -13,6 +13,14 @@ export const Container = styled.div`
   position: relative;
 `;
 
+export const Divider = styled.hr`
+  border: 0;
+  height: 1px;
+  background-color: #d1c1ff;
+  width: 100%;
+  margin-top: 51px;
+`;
+
 export const Mypage = styled.h1`
   color: white;
   font-size: 25px;
@@ -43,15 +51,20 @@ export const ProfileContainer = styled.div`
   margin-bottom: 30px;
 `;
 
-export const Avatar = styled.div<{ imageUrl?: string }>`
-  width: 116px;
-  height: 116px;
+export const Avatar = styled.div<{ $imageUrl?: string }>`
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background-color: #ddd;
-  margin-bottom: 25px;
-  background-image: ${(props) => (props.imageUrl ? `url(${props.imageUrl})` : 'none')};
+  background-image: ${({ $imageUrl }) => ($imageUrl ? `url(${$imageUrl})` : 'none')};
   background-size: cover;
   background-position: center;
+  background-color: ${({ $imageUrl }) => ($imageUrl ? 'transparent' : '#f0f0f0')};
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export const Nickname = styled.h1`

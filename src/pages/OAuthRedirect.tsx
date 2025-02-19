@@ -26,7 +26,7 @@ const OAuthRedirectHandler = () => {
           navigate('/main');
         } catch (error) {
           console.error('OAuth Login failed:', error);
-          alert('로그인에 실패했습니다. 다시 시도해주세요.');
+          // 에러 alert 있었으나 삭제
           navigate('/');
         }
       }
