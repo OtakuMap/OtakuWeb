@@ -1,17 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 export interface RouteItem {
   id: number;
   value: string;
 }
 
-export interface ReviewFormData {
-  title: string;
-  content: string;
-  selectedReviewType: string;
-  selectedAnimation: string;
-  selectedVisibility: string;
-  routes: string[];
+export interface Location {
+  latitude: number;
+  longitude: number;
+  name: string;
+  order: number;
 }
 
 export interface UseReviewPageParams {
@@ -21,15 +19,7 @@ export interface UseReviewPageParams {
   };
 }
 
-//주소를 위해
-export interface Location {
-  latitude: number;
-  longitude: number;
-  name: string;
-  order: number;
-}
-
-export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
+export const useReviewPage = () => {
   // Form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -37,8 +27,6 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   const [selectedAnimation, setSelectedAnimation] =
     useState('어떤 애니메이션과 관련된 후기인가요?');
   const [selectedVisibility, setSelectedVisibility] = useState('게시글 열람범위 설정');
-
-  const [profileData, setProfileData] = useState(initialProfileData);
 
   // Dropdown states
   const [isReviewTypeOpen, setIsReviewTypeOpen] = useState(false);
@@ -50,22 +38,32 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   const [isTypingCustom, setIsTypingCustom] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Routes state
-  const [routes, setRoutes] = useState<RouteItem[]>([
-    { id: 1, value: '' },
-    { id: 2, value: '' },
-    { id: 3, value: '' },
-    { id: 4, value: '' },
-    { id: 5, value: '' },
-  ]);
-
   // 위치 관련 상태
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [locations, setLocations] = useState<Location[]>(
+    Array.from({ length: 5 }, (_, index) => ({
+      order: index + 1,
+      name: '',
+      latitude: 0,
+      longitude: 0,
+    })),
+  );
 
-  useEffect(() => {
-    setProfileData(initialProfileData);
-  }, [initialProfileData]);
+  const addLocation = () => {
+    if (locations.length < 10) {
+      const newOrder = locations.length + 1;
+      setLocations([
+        ...locations,
+        {
+          order: newOrder,
+          name: '',
+          latitude: 0,
+          longitude: 0,
+        },
+      ]);
+    } else {
+      alert('최대 10개의 장소까지만 추가할 수 있습니다.');
+    }
+  };
 
   // Review Type Handlers
   const toggleReviewType = () => setIsReviewTypeOpen(!isReviewTypeOpen);
@@ -129,14 +127,30 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   };
 
   // 위치 관련 핸들러
+  // const handleLocationSelect = (location: { lat: number; lng: number }) => {
+  //   const newLocation = {
+  //     latitude: location.lat,
+  //     longitude: location.lng,
+  //     name: '',
+  //     order: locations.length + 1,
+  //   };
+  //   setLocations([...locations, newLocation]);
+  // };
+
   const handleLocationSelect = (location: { lat: number; lng: number }) => {
-    const newLocation = {
-      latitude: location.lat,
-      longitude: location.lng,
-      name: '',
-      order: locations.length + 1,
-    };
-    setLocations([...locations, newLocation]);
+    const emptyLocationIndex = locations.findIndex((loc) => !loc.name.trim());
+
+    if (emptyLocationIndex !== -1) {
+      const updatedLocations = [...locations];
+      updatedLocations[emptyLocationIndex] = {
+        ...updatedLocations[emptyLocationIndex],
+        latitude: location.lat,
+        longitude: location.lng,
+      };
+      setLocations(updatedLocations);
+    } else {
+      alert('더 이상 위치를 추가할 수 없습니다.');
+    }
   };
 
   const handleLocationNameChange = (order: number, newName: string) => {
@@ -153,36 +167,6 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     setLocations(updatedLocations);
   };
 
-  // Routes Handlers
-  const handleRouteChange = (id: number, value: string) => {
-    setRoutes(routes.map((route) => (route.id === id ? { ...route, value } : route)));
-  };
-
-  const deleteRoute = (idToDelete: number) => {
-    setRoutes(
-      routes
-        .filter((route) => route.id !== idToDelete)
-        .map((route, index) => ({
-          ...route,
-          id: index + 1,
-        })),
-    );
-  };
-
-  // Submit Handler
-  // const handleSubmit = () => {
-  //   const formData: ReviewFormData = {
-  //     title,
-  //     content,
-  //     selectedReviewType,
-  //     selectedAnimation,
-  //     selectedVisibility,
-  //     routes: routes.filter((route) => route.value).map((route) => route.value),
-  //   };
-
-  //   console.log(formData);
-  //   return formData;
-  // };
   const handleSubmit = () => {
     const formData = {
       title,
@@ -203,7 +187,6 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
   };
 
   return {
-    profileData,
     // Form State
     title,
     setTitle,
@@ -223,9 +206,6 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     isTypingCustom,
     inputRef,
 
-    // Routes
-    routes,
-
     // Handlers
     toggleReviewType,
     handleReviewTypeSelect,
@@ -237,15 +217,13 @@ export const useReviewPage = ({ initialProfileData }: UseReviewPageParams) => {
     handleInputClick,
     toggleVisibility,
     handleVisibilitySelect,
-    handleRouteChange,
-    deleteRoute,
     handleSubmit,
 
+    // Locations
     locations,
-    isMapModalOpen,
-    setIsMapModalOpen,
     handleLocationSelect,
     handleLocationNameChange,
     deleteLocation,
+    addLocation,
   };
 };
