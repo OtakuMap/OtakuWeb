@@ -156,41 +156,42 @@ export const pointAPI = {
   },
 
   // 포인트 사용 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
-transactionsusages: async (
-  page: number = 1,
-  size: number = 10,
-): Promise<TransactionsUsagesResponse> => {
-  try {
-    console.log('Request URL:', '/points/transactions/usages', 'Page:', page, 'Size:', size);
+  transactionsusages: async (
+    page: number = 1,
+    size: number = 10,
+  ): Promise<TransactionsUsagesResponse> => {
+    try {
+      console.log('Request URL:', '/points/transactions/usages', 'Page:', page, 'Size:', size);
 
-    const response = await instance.get<TransactionsUsagesResponse>(
-      '/points/transactions/usages',
-      { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
-    );
-    console.log('Response:', response);
-    return response.data;
-  } catch (error: unknown) {
-    console.error('Error during transactionsusages:', error);
-    return handleError<TransactionsUsagesResponse>(error);
-  }
-},
+      const response = await instance.get<TransactionsUsagesResponse>(
+        '/points/transactions/usages',
+        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
+      );
+      console.log('Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during transactionsusages:', error);
+      return handleError<TransactionsUsagesResponse>(error);
+    }
+  },
 
-// 포인트 수익 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
-transactionsearning: async (
-  page: number = 1,
-  size: number = 10,
-): Promise<TransactionsEarningsResponse> => {
-  try {
-    console.log('Request URL:', '/points/transactions/earnings', 'Page:', page, 'Size:', size);
+  // 포인트 수익 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
+  transactionsearning: async (
+    page: number = 1,
+    size: number = 10,
+  ): Promise<TransactionsEarningsResponse> => {
+    try {
+      console.log('Request URL:', '/points/transactions/earnings', 'Page:', page, 'Size:', size);
 
-    const response = await instance.get<TransactionsEarningsResponse>(
-      '/points/transactions/earnings',
-      { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
-    );
-    console.log('Response:', response);
-    return response.data;
-  } catch (error: unknown) {
-    console.error('Error during transactionsearning:', error);
-    return handleError<TransactionsEarningsResponse>(error);
-  }
-},
+      const response = await instance.get<TransactionsEarningsResponse>(
+        '/points/transactions/earnings',
+        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
+      );
+      console.log('Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error during transactionsearning:', error);
+      return handleError<TransactionsEarningsResponse>(error);
+    }
+  },
+};
