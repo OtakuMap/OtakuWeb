@@ -174,6 +174,7 @@ const RouteManagement: React.FC = () => {
 
   return (
     <S.Container>
+      <S.HorizontalDivider />
       <S.ContentWrapper>
         <S.IconContainer>
           <S.IconImage src={spaceIcon} alt="Space Icon" />
@@ -194,11 +195,15 @@ const RouteManagement: React.FC = () => {
             </S.ListTitle>
             <S.HeaderDivider />
             <S.ListActions>
-              <button onClick={handleDeleteSelected} disabled={selectedRoutes.length === 0}>
+              <button
+                onClick={handleDeleteSelected}
+                disabled={selectedRoutes.length === 0}
+                data-active={selectedRoutes.length > 0}
+              >
                 선택 삭제
               </button>
               <span>/</span>
-              <button onClick={handleShowStarredOnly}>
+              <button onClick={handleShowStarredOnly} data-active={showStarredOnly}>
                 {showStarredOnly ? '전체 보기' : '즐겨찾기'}
               </button>
             </S.ListActions>
@@ -224,7 +229,7 @@ const RouteManagement: React.FC = () => {
                   <span>지도에서 보기</span>
                 </S.ViewButton>
                 <S.Divider>|</S.Divider>
-                <S.ViewButton>
+                <S.ViewButton onClick={() => navigate(`/review/${route.id}`)}>
                   <span>후기에서 보기</span>
                 </S.ViewButton>
               </S.RouteContent>
