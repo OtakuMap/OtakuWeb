@@ -1,4 +1,4 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useCallback, useRef, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -95,6 +95,10 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
+  const [isExpanded, setIsExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile] = useState(window.innerWidth <= 430);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -166,6 +170,46 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
     });
     setSelectedId(null);
   }, [selectedId, onLocationsChange]);
+
+  const handleDragStart = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      const startY = touch.clientY;
+      let currentY = startY;
+
+      const handleMove = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        const deltaY = touch.clientY - currentY;
+        currentY = touch.clientY;
+
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          if (deltaY > 0 && !isExpanded) return;
+          if (deltaY < 0 && rect.top <= 0) return;
+          containerRef.current.style.transform = `translateY(${deltaY}px)`;
+        }
+      };
+
+      const handleEnd = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const threshold = window.innerHeight * 0.3;
+
+          setIsExpanded(rect.top <= threshold);
+        }
+        document.removeEventListener('touchmove', handleMove);
+        document.removeEventListener('touchend', handleEnd);
+      };
+
+      document.addEventListener('touchmove', handleMove);
+      document.addEventListener('touchend', handleEnd);
+    },
+    [isExpanded],
+  );
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const handleSaveRoute = useCallback(async () => {
     if (!isLoggedIn) {
@@ -243,7 +287,8 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
   };
 
   return (
-    <S.Container>
+    <S.Container ref={containerRef} className={isExpanded ? 'expanded' : ''}>
+      {isMobile && <S.HandleBar onClick={toggleExpand} />}
       <BackButton onClick={handleBack} />
       <S.Title>{routeData.title}</S.Title>
       {isEditing ? (
