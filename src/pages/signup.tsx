@@ -26,7 +26,7 @@ import {
   TermsContent,
   Terms,
 } from '../styles/login/signup.style';
-import { debounce } from '@/utils/debounce';
+/*import { debounce } from '@/utils/debounce';*/
 import { authAPI } from '../api/login/authAPI';
 import Eyeopen from '../assets/img/eye-open.png';
 import Eyeclose from '../assets/img/eye-close.png';
@@ -71,13 +71,6 @@ const SignupPage: React.FC = () => {
   const toggleTerms = (key: 'terms' | 'privacy') => {
     setExpandedTerms((prev) => ({ ...prev, [key]: !prev[key] }));
   };
-
-  const debouncedSetUserId = useCallback(
-    debounce((value: string) => {
-      setUserId(value);
-    }, 500),
-    [],
-  );
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -206,7 +199,7 @@ const SignupPage: React.FC = () => {
             <InputShort
               type="text"
               value={userId}
-              onChange={(e) => debouncedSetUserId(e.target.value)} // 디바운스된 함수 사용
+              onChange={(e) => setUserId(e.target.value)} // 디바운스된 함수 사용
               placeholder="ID를 입력해주세요"
             />
             <VerifyButton
