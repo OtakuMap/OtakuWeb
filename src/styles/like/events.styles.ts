@@ -5,15 +5,23 @@ export const Container = styled.div`
   flex-direction: column;
   background-color: #0c004b;
   min-height: 100vh;
-  padding: 40px;
+  padding: 20px; // 전체 패딩 줄임
   width: 100vw;
   position: relative;
 `;
 
+export const Divider = styled.hr`
+  border: 0;
+  height: 1px;
+  background-color: #d1c1ff;
+  width: 100%;
+  margin-top: 31px;
+`;
+
 export const IconContainer = styled.div`
   position: absolute;
-  top: 75px;
-  right: 430px;
+  top: 105px;
+  right: 80px; // 오른쪽 여백 조정
   display: flex;
   align-items: center;
   gap: 12px;
@@ -23,8 +31,8 @@ export const IconImage = styled.img``;
 
 export const ContentWrapper = styled.div`
   width: 100%;
-  max-width: 960px;
-  margin: 0 208px;
+  max-width: 1100px;
+  margin: 0 60px; // 좌우 여백 줄임
 `;
 
 export const Title = styled.h1`
@@ -38,7 +46,7 @@ export const Title = styled.h1`
 export const TabContainer = styled.div`
   display: flex;
   gap: 8px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 `;
 
 export const Tab = styled.button<{ active?: boolean }>`
@@ -57,9 +65,10 @@ export const Tab = styled.button<{ active?: boolean }>`
 
 export const EventListContainer = styled.div`
   background: white;
-  width: 1197px;
+  width: 1550px; // 넓이 조정
   border-radius: 0px 20px 20px 20px;
   padding: 45px 72px;
+  margin-top: -1px;
 `;
 
 export const ListHeader = styled.div`
@@ -87,7 +96,7 @@ export const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
-  margin-left: 900px;
+  margin-left: 1250px;
 
   button {
     background: none;
@@ -97,44 +106,54 @@ export const ListActions = styled.div`
     padding: 0;
 
     &:hover {
-      color: #333;
+      color: #black;
     }
   }
 `;
 
 export const CategoryFilter = styled.div`
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 16px;
+  color: #666;
 `;
 
 export const CategoryButton = styled.button<{ active: boolean }>`
   padding: 8px 16px;
   border: none;
   background: none;
-  color: ${(props) => (props.active ? '#333' : '#999')};
-  font-weight: ${(props) => (props.active ? '600' : '400')};
+  color: ${(props) => (props.active ? '#000000' : '#666666')};
+  font-family: Gothic A1;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: #333;
+    color: #000000;
   }
+`;
+
+export const CategoryDivider = styled.span`
+  color: #666666;
+  font-size: 16px;
+  font-weight: 500;
 `;
 
 export const EventGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  gap: 53px;
 `;
 
 export const EventCard = styled.div<{ isSelected: boolean }>`
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
   position: relative;
   cursor: pointer;
+  width: 250px;
 
   ${(props) =>
     props.isSelected &&
@@ -153,8 +172,10 @@ export const EventImageWrapper = styled.div`
 `;
 
 export const EventImage = styled.img`
-  width: 212px;
-  height: 206px;
+  width: 250px;
+  height: 250px;
+  border-radius: 15px;
+  object-fit: cover;
 `;
 
 export const Controls = styled.div`
@@ -179,10 +200,14 @@ export const EventDetails = styled.div`
 `;
 
 export const EventTitle = styled.h3`
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  color: #000000;
   margin-bottom: 8px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22.5px;
+  letter-spacing: 0%;
+  text-align: center;
 `;
 
 export const EventCategory = styled.span`
@@ -191,9 +216,13 @@ export const EventCategory = styled.span`
 `;
 
 export const EventDate = styled.div`
-  font-size: 12px;
-  color: #999;
+  color: #000000;
   margin-top: 4px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
 `;
 
 export const LoadMoreButton = styled.button`

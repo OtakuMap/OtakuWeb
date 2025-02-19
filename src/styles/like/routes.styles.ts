@@ -5,22 +5,29 @@ export const Container = styled.div`
   flex-direction: column;
   background-color: #0c004b;
   min-height: 100vh;
-  padding: 40px;
+  padding: 20px; // 전체 패딩 줄임
   width: 100vw;
   position: relative;
 `;
 
-export const ContentWrapper = styled.div`
-  max-width: 960px;
-  margin: 0 auto;
+export const HorizontalDivider = styled.hr`
+  border: 0;
+  height: 1px;
+  background-color: #d1c1ff;
   width: 100%;
-  margin: 0 208px;
+  margin-top: 31px;
+`;
+
+export const ContentWrapper = styled.div`
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 60px; // 좌우 여백 줄임
 `;
 
 export const IconContainer = styled.div`
   position: absolute;
-  top: 75px;
-  right: 430px;
+  top: 105px;
+  right: 80px; // 오른쪽 여백 조정
   display: flex;
   align-items: center;
   gap: 12px;
@@ -39,7 +46,7 @@ export const Title = styled.h1`
 export const TabContainer = styled.div`
   display: flex;
   gap: 8px;
-  position: relative;
+  margin-bottom: 0;
 `;
 
 export const Tab = styled.button<{ active?: boolean }>`
@@ -53,16 +60,16 @@ export const Tab = styled.button<{ active?: boolean }>`
   text-align: center;
   font-family: 'Gothic A1';
   font-size: 20px;
-  font-style: normal;
   font-weight: 600;
-  line-height: normal;
 `;
 
 export const RouteListContainer = styled.div`
   background: white;
-  width: 1197px;
+  background: white;
+  width: 1550px; // 넓이 조정
   border-radius: 0px 20px 20px 20px;
   padding: 45px 72px;
+  margin-top: -1px;
 `;
 
 export const ListHeader = styled.div`
@@ -90,7 +97,7 @@ export const ListActions = styled.div`
   gap: 8px;
   color: #666;
   font-size: 14px;
-  margin-left: 900px;
+  margin-left: 1250px;
 
   button {
     background: none;
@@ -99,9 +106,18 @@ export const ListActions = styled.div`
     color: inherit;
     padding: 0;
 
-    &:hover {
-      color: #333;
+    &[disabled] {
+      cursor: default;
+      color: #666;
     }
+
+    &:not([disabled]):hover {
+      color: black;
+    }
+  }
+
+  button[data-active='true'] {
+    color: black;
   }
 `;
 

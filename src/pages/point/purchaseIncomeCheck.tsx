@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { pointAPI } from '@/api/point/pointAPI';
+import { TransactionsUsagesResponse, TransactionsEarningsResponse } from '@/types/point/point';
+import Dimg from '../../assets/img/purpledivider.png';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
+  width: 100%;
   position: relative;
   max-height: 90%;
   justify-content: center;
@@ -16,24 +19,27 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  width: 1197px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
   background-color: #101148;
 `;
 
 const Title = styled.h1`
   font-family: 'Gothic A1';
-  margin-top: 121px;
+  margin-top: 32px;
   font-size: 38px;
   font-weight: 600;
   color: #fff;
   margin-bottom: 25px;
+  margin-left: 77px;
 `;
 
 const TabContainer = styled.div`
   display: flex;
-  gap: 28px;
   margin-bottom: 0px;
+  margin-left: 77px;
 `;
 
 const Tab = styled.button<{ $active?: boolean }>`
@@ -48,30 +54,33 @@ const Tab = styled.button<{ $active?: boolean }>`
   font-family: 'Gothic A1';
   font-size: 20px;
   font-weight: 600;
+  margin-right: 28px;
 `;
 
 const EventListContainer = styled.div`
   background: white;
   border-radius: 0px 20px 20px 20px;
   padding: 24px 80px;
+  width: 1350px;
+  margin-left: 77px;
+  align-items: center;
 `;
 
 const PurchaseTitle = styled.div`
-  display: flex;
   font-family: 'Gothic A1';
   font-size: 30px;
   font-weight: 700;
-  color: #000000; /* font-color -> color로 수정 */
+  color: #000;
   margin-bottom: 10px;
 `;
 
-const IncomeTitle = styled.div`
+const IncomeTitle = styled(PurchaseTitle)``;
+
+const PointRow = styled.div`
   display: flex;
-  font-family: 'Gothic A1';
-  font-size: 30px;
-  font-weight: 700;
-  color: #000000; /* font-color -> color로 수정 */
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 `;
 
 const LeftGroup = styled.div`
@@ -91,175 +100,25 @@ const RightGroup = styled.div`
 `;
 
 const DateTime = styled.div`
-  display: flex;
   font-family: 'Gothic A1';
   font-size: 20px;
   font-weight: 600;
-  color: #000000;
-`;
-
-const PointRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-const Divider = styled.hr`
-  border: 1px solid #000;
-  width: 1053px;
-  position: relative;
+  color: #000;
 `;
 
 const Listname = styled.div`
-  display: flex;
   font-family: 'Gothic A1';
   font-size: 16px;
   font-weight: 500;
-  color: #000000;
+  color: #000;
 `;
-const RemainBalance = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 16px;
-  font-weight: 500;
-  color: #605f5f;
-`;
+
 const Used = styled.div`
-  display: flex;
   font-family: 'Gothic A1';
   font-size: 30px;
   font-weight: 500;
   color: #1e68f0;
 `;
-
-const PurchaseIncomeCheck: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const purchaseItems = [
-    { date: '2024-02-10', listname: '구매한 게시글 1', status: '-500' },
-    { date: '2024-02-11', listname: '구매한 게시글 2', status: '-500' },
-    { date: '2024-02-11', listname: '구매한 게시글 2', status: '-500' },
-    { date: '2024-02-11', listname: '구매한 게시글 2', status: '-500' },
-    { date: '2024-02-11', listname: '구매한 게시글 2', status: '-500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-  ];
-
-  const incomeItems = [
-    { date: '2024-02-10', listname: '수익난 게시글 1', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-    { date: '2024-02-11', listname: '수익난 게시글 2', status: '+500' },
-  ];
-
-  const dataList = activeTab === 'purchase' ? purchaseItems : incomeItems;
-
-  // 총 페이지 수 계산
-  const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
-
-  // 현재 페이지에 해당하는 아이템 가져오기
-  const displayedItems = dataList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const handlePageChange = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === 'next' && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // 탭 변경 시 페이지를 1로 리셋
-  const handleTabChange = (tab: 'purchase' | 'income') => {
-    setActiveTab(tab);
-    setCurrentPage(1);
-  };
-
-  return (
-    <Container>
-      <ContentWrapper>
-        <Title>구매/수익 확인하기</Title>
-        <TabContainer>
-          <Tab $active={activeTab === 'purchase'} onClick={() => setActiveTab('purchase')}>
-            구매 내역 확인
-          </Tab>
-          <Tab $active={activeTab === 'income'} onClick={() => setActiveTab('income')}>
-            수익 내역 확인
-          </Tab>
-        </TabContainer>
-        <EventListContainer>
-          {activeTab === 'purchase' ? (
-            <>
-              <PurchaseTitle>구매 내역</PurchaseTitle>
-              <Divider />
-              {displayedItems.length > 0 ? (
-                displayedItems.map((item, index) => (
-                  <PointRow key={index}>
-                    <LeftGroup>
-                      <DateTime>{item.date}</DateTime>
-                      <Listname>{item.listname}</Listname>
-                      <RemainBalance>최종 남은 포인트</RemainBalance>
-                    </LeftGroup>
-                    <RightGroup>
-                      <Used>{item.status}</Used>
-                    </RightGroup>
-                  </PointRow>
-                ))
-              ) : (
-                <p>구매 내역이 없습니다.</p>
-              )}
-            </>
-          ) : (
-            <>
-              <IncomeTitle>수익 내역</IncomeTitle>
-              <Divider />
-              {displayedItems.length > 0 ? (
-                displayedItems.map((item, index) => (
-                  <PointRow key={index}>
-                    <LeftGroup>
-                      <DateTime>{item.date}</DateTime>
-                      <Listname>{item.listname}</Listname>
-                      <RemainBalance>최종 남은 포인트</RemainBalance>
-                    </LeftGroup>
-                    <RightGroup>
-                      <Used>{item.status}</Used>
-                    </RightGroup>
-                  </PointRow>
-                ))
-              ) : (
-                <p>수익 내역이 없습니다.</p>
-              )}
-            </>
-          )}
-
-          <PaginationContainer>
-            <PaginationButton onClick={() => handlePageChange('prev')} disabled={currentPage === 1}>
-              {'<'}
-            </PaginationButton>
-            <PageNumber>
-              {currentPage} / {totalPages}
-            </PageNumber>
-            <PaginationButton
-              onClick={() => handlePageChange('next')}
-              disabled={currentPage === totalPages}
-            >
-              {'>'}
-            </PaginationButton>
-          </PaginationContainer>
-        </EventListContainer>
-      </ContentWrapper>
-    </Container>
-  );
-};
-
-export default PurchaseIncomeCheck;
 
 const PaginationContainer = styled.div`
   display: flex;
@@ -281,12 +140,128 @@ const PaginationButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
 const PageNumber = styled.div`
-  display: flex;
   font-family: 'Gothic A1';
-  align-self: flex-start;
   font-size: 20px;
   font-weight: 600;
-  line-height: 25px;
-  color: #000000;
+  color: #000;
 `;
+
+const DividerFirst = styled.img`
+  width: 1450px;
+  margin-top: 70px;
+`;
+
+const PurchaseIncomeCheck: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
+  const [purchaseData, setPurchaseData] = useState<TransactionsUsagesResponse | null>(null);
+  const [incomeData, setIncomeData] = useState<TransactionsEarningsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (activeTab === 'purchase') {
+          const response = await pointAPI.transactionsusages();
+          if (response.isSuccess) setPurchaseData(response);
+        } else {
+          const response = await pointAPI.transactionsearning();
+          if (response.isSuccess) setIncomeData(response);
+        }
+      } catch (err) {
+        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeTab]);
+
+  const dataList =
+    activeTab === 'purchase'
+      ? purchaseData?.result?.transactions.map(({ purchasedAt, title, point }) => ({
+          date: purchasedAt,
+          listname: title,
+          status: `${point > 0 ? '+' : ''}${point}`,
+        })) || []
+      : incomeData?.result?.transactions.map(({ earnedAt, title, point }) => ({
+          date: earnedAt,
+          listname: title,
+          status: `+${point}`,
+        })) || [];
+
+  const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
+  const displayedItems = dataList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <Container>
+      <DividerFirst src={Dimg} />
+      <ContentWrapper>
+        <Title>구매/수익 확인하기</Title>
+        <TabContainer>
+          <Tab $active={activeTab === 'purchase'} onClick={() => setActiveTab('purchase')}>
+            구매 내역 확인
+          </Tab>
+          <Tab $active={activeTab === 'income'} onClick={() => setActiveTab('income')}>
+            수익 내역 확인
+          </Tab>
+        </TabContainer>
+        <EventListContainer>
+          {activeTab === 'purchase' ? (
+            <PurchaseTitle>구매 내역</PurchaseTitle>
+          ) : (
+            <IncomeTitle>수익 내역</IncomeTitle>
+          )}
+          {displayedItems.length > 0 ? (
+            displayedItems.map((item, index) => (
+              <PointRow key={index}>
+                <LeftGroup>
+                  <DateTime>{item.date}</DateTime>
+                  <Listname>{item.listname}</Listname>
+                </LeftGroup>
+                <RightGroup>
+                  <Used>{item.status}</Used>
+                </RightGroup>
+              </PointRow>
+            ))
+          ) : (
+            <p>{activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}</p>
+          )}
+          <PaginationContainer>
+            <PaginationButton
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              {'<'}
+            </PaginationButton>
+            <PageNumber>
+              {currentPage} / {totalPages}
+            </PageNumber>
+            <PaginationButton
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              {'>'}
+            </PaginationButton>
+          </PaginationContainer>
+        </EventListContainer>
+      </ContentWrapper>
+    </Container>
+  );
+};
+
+export default PurchaseIncomeCheck;

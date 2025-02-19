@@ -125,6 +125,7 @@ const SavedEvents: React.FC = () => {
 
   return (
     <S.Container>
+      <S.Divider />
       <S.IconContainer>
         <S.IconImage src={spaceIcon} alt="Space Icon" />
       </S.IconContainer>
@@ -171,26 +172,22 @@ const SavedEvents: React.FC = () => {
 
           <S.CategoryFilter>
             <S.CategoryButton
-              active={!selectedCategory}
-              onClick={() => setSelectedCategory(undefined)}
-            >
-              전체
-            </S.CategoryButton>
-            <S.CategoryButton
               active={selectedCategory === 1}
-              onClick={() => setSelectedCategory(1)}
+              onClick={() => setSelectedCategory(selectedCategory === 1 ? undefined : 1)}
             >
               팝업 스토어
             </S.CategoryButton>
+            <S.CategoryDivider>/</S.CategoryDivider>
             <S.CategoryButton
               active={selectedCategory === 2}
-              onClick={() => setSelectedCategory(2)}
+              onClick={() => setSelectedCategory(selectedCategory === 2 ? undefined : 2)}
             >
               전시회
             </S.CategoryButton>
+            <S.CategoryDivider>/</S.CategoryDivider>
             <S.CategoryButton
               active={selectedCategory === 3}
-              onClick={() => setSelectedCategory(3)}
+              onClick={() => setSelectedCategory(selectedCategory === 3 ? undefined : 3)}
             >
               콜라보 카페
             </S.CategoryButton>
