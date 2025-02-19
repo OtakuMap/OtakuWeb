@@ -4,6 +4,7 @@ import { getSavedPlaces } from '../api/like/saved-places';
 import type { SavedPlace } from '../types/like/saved-places';
 import { deletePlaces } from '../api/like/delete-places';
 import { togglePlaceFavorite } from '../api/like/favorite-places';
+import { getPlaceMapDetail } from '../api/like/place-map';
 import spaceIcon from '../assets/space-icon.png';
 import starIcon from '../assets/white-star.png';
 import starFilledIcon from '../assets/star-filled.png';
@@ -131,6 +132,26 @@ const SavedPlaces: React.FC = () => {
     }
   };
 
+  const handleViewMap = async (placeLikeId: number) => {
+    try {
+      const response = await getPlaceMapDetail(placeLikeId);
+      if (response.isSuccess) {
+        navigate(`/map`, {
+          state: {
+            placeName: response.result.placeName,
+            lat: response.result.lat,
+            lng: response.result.lng,
+            animation: response.result.animation,
+            hashtags: response.result.hashtags,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch place details:', error);
+      alert('장소 정보를 불러오는데 실패했습니다.');
+    }
+  };
+
   const handleNavigateToRouteManagement = () => {
     navigate('/route-management');
   };
@@ -207,6 +228,9 @@ const SavedPlaces: React.FC = () => {
                 />
               </S.RouteDetails>
               <S.RouteAddress>{place.detail}</S.RouteAddress>
+              <S.RouteFooter>
+                <S.ViewMapButton onClick={() => handleViewMap(place.id)}>지도 보기</S.ViewMapButton>
+              </S.RouteFooter>
             </S.RouteItem>
           ))}
 

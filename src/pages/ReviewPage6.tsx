@@ -1,99 +1,72 @@
-import { useState } from 'react';
-import profile from '../assets/profile.png';
-import baseballImage from '../assets/baseball.png';
-import vector from '../assets/Vector.png';
-import diamondLeft from '../assets/3.png';
-import diamondRight from '../assets/2.png';
+// ReviewPage6.tsx
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BackPage from '../assets/BackPage.png';
-import NextPage from '../assets/NextPage.png';
-import * as S from '../styles/review/ReviewPage.style';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { openLoginModal } from '@/store/slices/modalSlice';
+import { getUserProfile, getUserReviews } from '@/api/review/user';
+import { UserProfile, UserReview } from '@/types/review/user';
+import * as S from '../styles/review/ReviewPage.style';
+
+// Assets
+import vector from '../assets/Vector.png';
+import diamondLeft from '../assets/3.png';
+import diamondRight from '../assets/2.png';
+import BackPage from '../assets/BackPage.png';
+import NextPage from '../assets/NextPage.png';
 
 const ReviewPage6 = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 3;
-  const profileData = {
-    profileImage: profile,
-    name: 'Otkkk011',
-  };
-  const reviewData = [
-    {
-      id: 1,
-      title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 2,
-      title:
-        '키스톤 콤비가 아름다운 이유 다이에이 act2 32화, 거기 다 있다. 말 걸고 싶으면 그거 보고와라.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 3,
-      title: '2025년 드래프트 기아타이거즈 1차지명 하겠습니다. 세이도 고등학교 포수 미우키 카즈야.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 4,
-      title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 5,
-      title:
-        '키스톤 콤비가 아름다운 이유 다이에이 act2 32화, 거기 다 있다. 말 걸고 싶으면 그거 보고와라.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 6,
-      title: '2025년 드래프트 기아타이거즈 1차지명 하겠습니다. 세이도 고등학교 포수 미우키 카즈야.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 7,
-      title: '아니 그니까 지금 내가 KBO보다가 고시엔까지 왔다고',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 8,
-      title:
-        '키스톤 콤비가 아름다운 이유 다이에이 act2 32화, 거기 다 있다. 말 걸고 싶으면 그거 보고와라.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-    {
-      id: 9,
-      title: '2025년 드래프트 기아타이거즈 1차지명 하겠습니다. 세이도 고등학교 포수 미우키 카즈야.',
-      content:
-        "대개의 교과이구구 만화는 천재급 주인공이 특별한 학교에서 어중이떠중이들과 굴러모여 강호를 '열파한다'는 패턴인데, 이 만화에서는 주인공이 예초부터 전통의 강호로 이름난 아구면문하교교에 '스카웃'되어 입학해 3류급 선수에서 후보, 주전급으로 차츰 성장해나가는 괜찮히 현실에 가까운 스토리를 취하고 있다.",
-      image: baseballImage,
-    },
-  ];
-  const indexOfLastReview = currentPage * reviewsPerPage;
-  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
-  const currentReviews = reviewData.slice(indexOfFirstReview, indexOfLastReview);
-  const totalPages = Math.ceil(reviewData.length / reviewsPerPage);
+  const [sortOption, setSortOption] = useState<'createdAt' | 'views'>('createdAt');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userReviews, setUserReviews] = useState<UserReview[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await getUserProfile();
+        if (response.isSuccess) {
+          setUserProfile(response.result);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setError('프로필 정보를 불러오는데 실패했습니다.');
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUserProfile();
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      setLoading(true);
+      try {
+        const response = await getUserReviews(currentPage, sortOption);
+        if (response.isSuccess) {
+          setUserReviews(response.result.reviews);
+          setTotalPages(response.result.totalPages);
+        }
+      } catch (error) {
+        console.error('Error fetching user reviews:', error);
+        setError('후기를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUserReviews();
+    }
+  }, [currentPage, sortOption, isLoggedIn]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -101,6 +74,11 @@ const ReviewPage6 = () => {
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handleSortChange = (newSort: 'createdAt' | 'views') => {
+    setSortOption(newSort);
+    setCurrentPage(1); // 정렬 변경 시 첫 페이지로 이동
   };
 
   const handleWriteReviewClick = () => {
@@ -111,18 +89,26 @@ const ReviewPage6 = () => {
     navigate('/review7');
   };
 
+  if (!isLoggedIn) {
+    return <div>로그인이 필요합니다.</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
     <S.Container>
       <S.ProfileSection>
-        <S.BackButton>
+        <S.BackButton onClick={() => navigate(-1)}>
           <img src={vector} alt="뒤로가기 아이콘" />
         </S.BackButton>
         <S.DiamondLeft src={diamondLeft} alt="Left Diamond" />
         <S.ProfileImage6>
-          <img src={profileData.profileImage} alt={`${profileData.name}의 프로필`} />
+          <img src={userProfile?.profileImageUrl} alt="프로필" />
         </S.ProfileImage6>
         <S.DiamondRight src={diamondRight} alt="Right Diamond" />
-        <S.Username6>{profileData.name}</S.Username6>
+        <S.Username6>{userProfile?.nickname}</S.Username6>
         <S.WriteReviewButton onClick={handleWriteReviewClick}>후기 쓰기</S.WriteReviewButton>
       </S.ProfileSection>
 
@@ -131,23 +117,47 @@ const ReviewPage6 = () => {
           <S.BTitle>내 후기</S.BTitle>
         </S.Header>
         <S.SortOptionsWrapper>
-          <S.SortOptions>최신순 / 조회순</S.SortOptions>
+          <S.SortOptions>
+            <span
+              onClick={() => handleSortChange('createdAt')}
+              style={{
+                cursor: 'pointer',
+                fontWeight: sortOption === 'createdAt' ? 'bold' : 'normal',
+              }}
+            >
+              최신순
+            </span>
+            {' / '}
+            <span
+              onClick={() => handleSortChange('views')}
+              style={{ cursor: 'pointer', fontWeight: sortOption === 'views' ? 'bold' : 'normal' }}
+            >
+              조회순
+            </span>
+          </S.SortOptions>
         </S.SortOptionsWrapper>
 
         <S.BSectionTitle>후기 전체 &gt;</S.BSectionTitle>
-        <S.ReviewList>
-          {currentReviews.map((review) => (
-            <S.ReviewItem key={review.id}>
-              <S.ReviewContent>
-                <S.ReviewTitle>{review.title}</S.ReviewTitle>
-                <S.ReviewText>{review.content}</S.ReviewText>
-              </S.ReviewContent>
-              <S.ReviewImageWrapper>
-                <S.ReviewImage src={review.image} alt={review.title} />
-              </S.ReviewImageWrapper>
-            </S.ReviewItem>
-          ))}
-        </S.ReviewList>
+        {loading ? (
+          <div>로딩 중...</div>
+        ) : (
+          <S.ReviewList>
+            {userReviews.map((review) => (
+              <S.ReviewItem
+                key={review.reviewId}
+                onClick={() => navigate(`/review/${review.reviewId}`)}
+              >
+                <S.ReviewContent>
+                  <S.ReviewTitle>{review.title}</S.ReviewTitle>
+                  <S.ReviewText>{review.content}</S.ReviewText>
+                </S.ReviewContent>
+                <S.ReviewImageWrapper>
+                  <S.ReviewImage src={review.thumbnail} alt={review.title} />
+                </S.ReviewImageWrapper>
+              </S.ReviewItem>
+            ))}
+          </S.ReviewList>
+        )}
       </S.WhiteContainer>
 
       <S.Pagination>

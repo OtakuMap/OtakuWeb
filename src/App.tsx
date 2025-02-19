@@ -98,7 +98,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/review/:reviewId" element={<ReviewPage5 />} />
         <Route path="/review6" element={<ReviewPage6 />} />
         <Route path="/review7" element={<ReviewPage7 />} />
-        <Route path="/event" element={<EventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />
         <Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
         <Route path="/point-charge" element={<PointCharge />} />

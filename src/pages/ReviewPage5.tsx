@@ -9,7 +9,7 @@ import * as S from '../styles/review/ReviewPage.style';
 import { ReviewDetail, ReviewType } from '@/types/review/review';
 import { RouteData } from '@/types/review/route';
 import { RouteSource } from '@/types/map/routeSource';
-// import axios from 'axios';
+//import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const ReviewPage5 = () => {

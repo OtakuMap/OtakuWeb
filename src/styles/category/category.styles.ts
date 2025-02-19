@@ -128,8 +128,72 @@ export const SubMenuItem = styled.button<{ $active: boolean }>`
 `;
 
 export const SearchContainer = styled.div`
-  flex: 1;
-  margin-right: 998px;
+  position: relative;
+  width: 272px;
+  margin-left: 40px;
+  padding-top: 16px;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  height: 28px;
+  padding-left: 36px;
+  background: transparent;
+  border: none;
+  color: #999797;
+  font-family: 'Gothic A1';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  outline: none;
+
+  &::placeholder {
+    color: #999797;
+  }
+`;
+
+export const SearchIcon = styled.img`
+  position: absolute;
+  left: 8px;
+  top: 20px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+`;
+
+export const SearchLine = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #d1c1ff;
+  bottom: -8px;
+`;
+
+export const SuggestionsContainer = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #e6dfff;
+  border-radius: 6px;
+  margin-top: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 8px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+export const SuggestionItem = styled.div`
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+
+  &:hover {
+    background-color: #d1c1ff;
+  }
 `;
 
 export const MainContent = styled.div`
@@ -148,34 +212,27 @@ export const ContentTitle = styled.h2`
 `;
 
 export const AnimeGrid = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 30px;
-  margin-left: 180px;
-  width: 846px; // 188px * 4 (cards) + 33px * 3 (gaps) = 846px
-`;
-
-export const GridRow = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 40px;
-  padding-bottom: 33px;
-  border-bottom: 1px solid #2d2f63;
-  margin-bottom: 33px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-top: 30px;
+  margin-left: 180px;
+  width: 846px;
 `;
 
 export const AnimeCard = styled.div`
   cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
-export const AnimeImage = styled.div`
+export const AnimeImage = styled.img`
   width: 200px;
   height: 200px;
-  aspect-ratio: 1;
+  object-fit: cover;
   background-color: #2d2f63;
   border-radius: 4px;
   margin-bottom: 10px;
@@ -184,6 +241,46 @@ export const AnimeImage = styled.div`
 export const AnimeTitle = styled.p`
   color: white;
   width: 188px;
-  font-size: 14px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22.5px;
   text-align: center;
+`;
+
+export const EventDate = styled.p`
+  color: white;
+  margin-top: 4px;
+  font-family: Gothic A1;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22.5px;
+  text-align: center;
+`;
+
+export const LoadMoreButton = styled.button`
+  width: 846px;
+  height: 48px;
+  margin-top: 40px;
+  margin-left: 180px;
+  background-color: transparent;
+  border: 1px solid #2d2f63;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #2d2f63;
+  }
+`;
+
+export const LoadingIndicator = styled.div`
+  width: 846px;
+  text-align: center;
+  margin-top: 40px;
+  margin-left: 180px;
+  color: #8e8ea0;
+  font-size: 14px;
 `;

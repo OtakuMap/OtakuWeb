@@ -10,9 +10,14 @@ export interface AuthState {
   error: string | null;
 }
 
+// userId 유효성 검사
+const storedUserId = tokenStorage.getUserId();
+const validUserId = storedUserId && storedUserId !== 'undefined' ? storedUserId : null;
+
 const initialState: AuthState = {
   isLoggedIn: !!tokenStorage.getAccessToken(),
-  userId: tokenStorage.getUserId(),
+  // userId: tokenStorage.getUserId(),
+  userId: validUserId, // 여기만 수정
   accessToken: tokenStorage.getAccessToken(),
   refreshToken: tokenStorage.getRefreshToken(),
   provider: null,
