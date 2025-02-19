@@ -23,13 +23,27 @@ import {
   Openbutton,
   CheckIcon1,
   CheckIcon2,
+  TermsContent,
+  Terms,
 } from '../styles/login/signup.style';
-import { debounce } from '@/utils/debounce';
+/*import { debounce } from '@/utils/debounce';*/
 import { authAPI } from '../api/login/authAPI';
 import Eyeopen from '../assets/img/eye-open.png';
 import Eyeclose from '../assets/img/eye-close.png';
 import O from '../assets/img/O.png';
 import X from '../assets/img/X.png';
+import terms3 from '../assets/img/term3.png';
+import terms4 from '../assets/img/term4.png';
+import terms5 from '../assets/img/term5.png';
+import terms6 from '../assets/img/terms6.png';
+import terms7 from '../assets/img/terms7.png';
+import terms8 from '../assets/img/terms8.png';
+import terms9 from '../assets/img/terms9.png';
+import terms10 from '../assets/img/terms10.png';
+import terms11 from '../assets/img/terms11.png';
+import terms12 from '../assets/img/terms12.png';
+import terms13 from '../assets/img/terms13.png';
+import terms14 from '../assets/img/terms14.png';
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,19 +57,27 @@ const SignupPage: React.FC = () => {
   const [isEmailAvailable, setIsEmailAvailable] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isChecked1, setIsChecked1] = useState(false);
+  const [isChecked2, setIsChecked2] = useState(false);
+  const [isChecked3, setIsChecked3] = useState(false);
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const isAllChecked = isChecked1 && isChecked2 && isChecked3;
 
-  const debouncedSetUserId = useCallback(
-    debounce((value: string) => {
-      setUserId(value);
-    }, 500),
-    [],
-  );
+  const [expandedTerms, setExpandedTerms] = useState({
+    terms: false,
+    privacy: false,
+  });
+
+  const toggleTerms = (key: 'terms' | 'privacy') => {
+    setExpandedTerms((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
   const handleEmailVerificationCodeRequest = async () => {
+    setIsEmailChecked(true);
     if (!email) {
       alert('이메일을 입력해주세요.');
       return;
@@ -95,6 +117,7 @@ const SignupPage: React.FC = () => {
       code: verificationCode,
       email,
     };
+
     if (!email) {
       alert('이메일을 입력해주세요.');
       return;
@@ -125,6 +148,11 @@ const SignupPage: React.FC = () => {
       if (!emailCheckResponse.isSuccess) {
         alert('이 이메일은 이미 사용 중입니다.');
         setIsEmailAvailable(false); // 이메일이 중복되면 X 표시
+        return;
+      }
+
+      if (!isAllChecked) {
+        alert('모든 약관에 동의해야 합니다.');
         return;
       }
 
@@ -171,7 +199,7 @@ const SignupPage: React.FC = () => {
             <InputShort
               type="text"
               value={userId}
-              onChange={(e) => debouncedSetUserId(e.target.value)} // 디바운스된 함수 사용
+              onChange={(e) => setUserId(e.target.value)} // 디바운스된 함수 사용
               placeholder="ID를 입력해주세요"
             />
             <VerifyButton
@@ -193,10 +221,12 @@ const SignupPage: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="otaku@gmail.com"
             />
-            <CheckIcon1
-              src={isEmailAvailable ? O : X} // 이메일이 사용 가능한지 여부에 따라 O 또는 X 표시
-              alt={isEmailAvailable ? 'Available' : 'Unavailable'}
-            />
+            {isEmailChecked && (
+              <CheckIcon1
+                src={isEmailAvailable ? O : X}
+                alt={isEmailAvailable ? 'Available' : 'Unavailable'}
+              />
+            )}
             <VerifyButtonShort onClick={handleEmailVerificationCodeRequest}>
               인증번호 받기
             </VerifyButtonShort>
@@ -242,17 +272,54 @@ const SignupPage: React.FC = () => {
 
         <CheckboxGroup>
           <CheckboxItem>
-            <Checkbox id="check1" />
+            <Checkbox
+              id="check1"
+              checked={isChecked1}
+              onChange={() => setIsChecked1(!isChecked1)}
+            />
             <CheckboxLabel>이용 약관 동의</CheckboxLabel>
-            <Openbutton>펼치기</Openbutton>
+            <Openbutton onClick={() => toggleTerms('terms')}>
+              {expandedTerms.terms ? '접기' : '펼치기'}
+            </Openbutton>
           </CheckboxItem>
+          {expandedTerms.terms && (
+            <TermsContent>
+              <Terms src={terms5} />
+              <Terms src={terms6} />
+              <Terms src={terms7} />
+              <Terms src={terms8} />
+              <Terms src={terms9} />
+              <Terms src={terms10} />
+              <Terms src={terms11} />
+              <Terms src={terms12} />
+              <Terms src={terms13} />
+              <Terms src={terms14} />
+            </TermsContent>
+          )}
+
           <CheckboxItem>
-            <Checkbox id="check2" />
+            <Checkbox
+              id="check2"
+              checked={isChecked2}
+              onChange={() => setIsChecked2(!isChecked2)}
+            />
             <CheckboxLabel>개인정보 수집 이용 동의</CheckboxLabel>
-            <Openbutton>펼치기</Openbutton>
+            <Openbutton onClick={() => toggleTerms('privacy')}>
+              {expandedTerms.privacy ? '접기' : '펼치기'}
+            </Openbutton>
           </CheckboxItem>
+          {expandedTerms.privacy && (
+            <TermsContent>
+              <Terms src={terms3} />
+              <Terms src={terms4} />
+            </TermsContent>
+          )}
           <CheckboxItem>
-            <Checkbox id="check3" />
+            <Checkbox
+              id="check3"
+              checked={isChecked3}
+              onChange={() => setIsChecked3(!isChecked3)}
+            />
             <CheckboxLabel>만 14세 이상입니다</CheckboxLabel>
           </CheckboxItem>
         </CheckboxGroup>
