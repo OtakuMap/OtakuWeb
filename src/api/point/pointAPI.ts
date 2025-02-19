@@ -104,14 +104,20 @@ export const pointAPI = {
   },
 
   // 결제 검증
+
   verify: async (credentials: PointverifyRequest): Promise<PointverifyResponse> => {
     try {
       console.log('point verify Request:', {
-        url: '/payment/verify',
+        url: `/payments/verify`,
         data: credentials,
         headers: instance.defaults.headers,
       });
-      const response = await instance.post<PointverifyResponse>('/payment/verify', credentials);
+
+      const response = await instance.post<PointverifyResponse>(
+        `/payments/verify`, // 쿼리 스트링 제거
+        credentials, // 데이터를 request body에 포함
+      );
+
       console.log('Raw Response:', response);
       return response.data;
     } catch (error: unknown) {
