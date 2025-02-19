@@ -39,15 +39,16 @@ export interface PointchargeResponse {
 
 // 포인트 결제 검증
 export interface PointverifyRequest {
-  imp_uid: string;
-  merchant_uid: string;
-  amount: string;
+  impUid: string;
+  merchantUid: string;
+  amount: number;
 }
 
 export interface PointverifyResponse {
   isSuccess: boolean;
   code: string;
   message: string;
+  result: string;
 }
 
 // 포인트 충전 내역 확인 /api/points/transactions/charges (get)

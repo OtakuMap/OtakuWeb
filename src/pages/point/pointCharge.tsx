@@ -91,14 +91,25 @@ const PointCharge: React.FC = () => {
   const callback = async (response: PortOneResponse) => {
     console.log('callback 호출', response);
     const { success, error_msg, imp_uid, merchant_uid } = response;
+
     if (success) {
       alert('결제 성공!');
       try {
-        const verifyData = { imp_uid, merchant_uid, amount: selectedPoint.toString() };
+        // verifyData 객체 확인
+        const verifyData = {
+          impUid: imp_uid, // imp_uid 확인
+          merchantUid: merchant_uid, // merchant_uid 확인
+          amount: selectedPoint,
+        };
+
+        console.log('보낼 verifyData:', verifyData); // verifyData 확인
+
         const verifyResponse = await pointAPI.verify(verifyData);
+
         if (verifyResponse.isSuccess) {
           const chargeData = { point: selectedPoint.toString() };
           const chargeResponse = await pointAPI.charge(chargeData);
+
           if (chargeResponse.isSuccess) {
             alert('포인트 충전 성공!');
           } else {
@@ -112,7 +123,7 @@ const PointCharge: React.FC = () => {
         alert('결제 검증 중 오류가 발생했습니다.');
       }
     } else {
-      alert('결제실패');
+      alert(`결제 실패: ${error_msg}`);
     }
   };
 
