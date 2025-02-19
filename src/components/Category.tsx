@@ -3,6 +3,13 @@ import * as S from '../styles/category/category.styles';
 import { getEventsByCategory } from '@/api/category/category';
 import { Event, Genre, EventType, EventStatus } from '@/types/category/category';
 import searchIcon from '../assets/search.png';
+import { searchEvents } from '@/api/category/events-search'; // 추가
+
+const chunk = (arr: any[], size: number) => {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
+};
 
 const Category = () => {
   const [activeTab, setActiveTab] = useState('애니');
@@ -82,33 +89,62 @@ const Category = () => {
     setShowSuggestions(true);
   };
 
-  // 검색 제출 핸들러
-  const handleSearchSubmit = () => {
+  // handleSearchSubmit 함수 수정
+  const handleSearchSubmit = async () => {
     if (inputValue.trim()) {
       setSearchTerm(inputValue.trim());
       setShowSuggestions(false);
       setPageNumber(0);
+      try {
+        const response = await searchEvents({
+          keyword: inputValue.trim(),
+          page: 0,
+          size: 12,
+        });
+
+        if (response.isSuccess) {
+          setEvents(response.result.events);
+          setIsLast(response.result.isLast);
+        }
+      } catch (error) {
+        console.error('Failed to search events:', error);
+      }
     }
   };
 
-  // 제안 항목 클릭 핸들러
-  const handleSuggestionClick = (event: Event) => {
-    setInputValue(event.title);
-    setSearchTerm(event.title);
-    setSuggestions([]);
-    setShowSuggestions(false);
-    setPageNumber(0);
-  };
-
-  // 엔터키 핸들러
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // handleKeyPress 함수 수정
+  const handleKeyPress = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSearchSubmit();
+      await handleSearchSubmit();
     } else if (e.key === 'Escape') {
       setInputValue('');
       setSearchTerm('');
       setShowSuggestions(false);
       setPageNumber(0);
+      fetchEvents(); // 검색 취소시 원래 목록으로 돌아가기
+    }
+  };
+
+  const handleSuggestionClick = async (event: Event) => {
+    setInputValue(event.title);
+    setSearchTerm(event.title);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setPageNumber(0);
+
+    try {
+      const response = await searchEvents({
+        keyword: event.title,
+        page: 0,
+        size: 12,
+      });
+
+      if (response.isSuccess) {
+        setEvents(response.result.events);
+        setIsLast(response.result.isLast);
+      }
+    } catch (error) {
+      console.error('Failed to search events:', error);
     }
   };
 
@@ -290,12 +326,16 @@ const Category = () => {
           )}
         </S.SearchContainer>
         <S.AnimeGrid>
-          {events.map((event) => (
-            <S.AnimeCard key={event.id}>
-              <S.AnimeImage src={event.thumbnail.fileUrl} alt={event.title} />
-              <S.AnimeTitle>{event.title}</S.AnimeTitle>
-              <S.EventDate>{`${event.startDate} ~ ${event.endDate}`}</S.EventDate>
-            </S.AnimeCard>
+          {chunk(events, 4).map((rowEvents, rowIndex) => (
+            <S.AnimeRow key={rowIndex}>
+              {rowEvents.map((event) => (
+                <S.AnimeCard key={event.id}>
+                  <S.AnimeImage src={event.thumbnail.fileUrl} alt={event.title} />
+                  <S.AnimeTitle>{event.title}</S.AnimeTitle>
+                  <S.EventDate>{`${event.startDate} ~ ${event.endDate}`}</S.EventDate>
+                </S.AnimeCard>
+              ))}
+            </S.AnimeRow>
           ))}
         </S.AnimeGrid>
         {!isLast && !isLoading && (

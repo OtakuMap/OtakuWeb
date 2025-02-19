@@ -298,6 +298,7 @@ const MyPage = () => {
 
   return (
     <S.Container>
+      <S.Divider />
       <S.Mypage>마이 페이지</S.Mypage>
       <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
 

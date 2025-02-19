@@ -212,12 +212,35 @@ export const ContentTitle = styled.h2`
 `;
 
 export const AnimeGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 40px;
   margin-top: 30px;
   margin-left: 180px;
   width: 846px;
+`;
+
+export const AnimeRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
+  position: relative; // 추가
+
+  &::after {
+    // border-bottom 대신 after 가상요소 사용
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -5px; // 왼쪽으로 더 확장
+    right: -58px; // 오른쪽으로 더 확장
+    height: 1px;
+    background-color: #a09797;
+  }
+
+  &:last-child::after {
+    display: none; // 마지막 행에는 선 없음
+  }
 `;
 
 export const AnimeCard = styled.div`

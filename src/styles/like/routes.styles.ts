@@ -15,7 +15,7 @@ export const HorizontalDivider = styled.hr`
   height: 1px;
   background-color: #d1c1ff;
   width: 100%;
-  margin-top: 31px;
+  margin-top: 51px;
 `;
 
 export const ContentWrapper = styled.div`
