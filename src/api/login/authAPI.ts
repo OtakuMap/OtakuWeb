@@ -210,6 +210,7 @@ export const authAPI = {
       return handleError<SearchPwSendEmailVerifyCodeResponse>(error);
     }
   },
+
   // 비밀번호 변경
   newsetPw: async (userData: resetPwRequest): Promise<resetPwResponse> => {
     try {
