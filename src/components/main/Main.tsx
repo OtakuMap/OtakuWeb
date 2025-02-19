@@ -30,26 +30,26 @@ const Main = () => {
   // const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useTopReviews();
   // const { data: banner, isLoading: bannerLoading, error: bannerError } = useBanner();
   // 배너 데이터
-  const { data: banner, isLoading: bannerLoading, isSuccess: bannerSuccess } = useBanner();
+  // const { data: banner, isLoading: bannerLoading, isSuccess: bannerSuccess } = useBanner();
 
-  // 이벤트 데이터 (배너 로드 완료 후)
-  const {
-    data: events,
-    isLoading: eventsLoading,
-    isSuccess: eventsSuccess,
-    error: eventsError,
-  } = usePopularEvents({
-    enabled: bannerSuccess, // 배너 로드 완료 후 실행
-  });
+  // // 이벤트 데이터 (배너 로드 완료 후)
+  // const {
+  //   data: events,
+  //   isLoading: eventsLoading,
+  //   isSuccess: eventsSuccess,
+  //   error: eventsError,
+  // } = usePopularEvents({
+  //   enabled: bannerSuccess, // 배너 로드 완료 후 실행
+  // });
 
-  // 리뷰 데이터 (이벤트 로드 완료 후)
-  const {
-    data: reviews,
-    isLoading: reviewsLoading,
-    error: reviewsError,
-  } = useTopReviews({
-    enabled: eventsSuccess, // 이벤트 로드 완료 후 실행
-  });
+  // // 리뷰 데이터 (이벤트 로드 완료 후)
+  // const {
+  //   data: reviews,
+  //   isLoading: reviewsLoading,
+  //   error: reviewsError,
+  // } = useTopReviews({
+  //   enabled: eventsSuccess, // 이벤트 로드 완료 후 실행
+  // });
 
   const handleMapClick = () => {
     navigate('/map');
@@ -83,13 +83,13 @@ const Main = () => {
     <S.Container>
       <S.Wrapper>
         <S.Header>
-          {bannerLoading ? (
+          {/* {bannerLoading ? (
             <img src={Logo} alt="Logo" /> // 로딩 중에는 기본 로고 표시
           ) : banner?.result?.fileUrl ? (
             <img src={banner.result.fileUrl} alt="Banner" />
           ) : (
             <img src={Logo} alt="Logo" /> // API 응답이 없거나 실패한 경우 기본 로고 표시
-          )}
+          )} */}
         </S.Header>
 
         <S.DetailsSection>
@@ -117,7 +117,7 @@ const Main = () => {
             진행중인 인기 이벤트
           </S.SectionTitle>
           <S.EventContainer>
-            {eventsLoading ? (
+            {/* {eventsLoading ? (
               <div>Loading...</div>
             ) : eventsError ? (
               <div>Error loading events</div>
@@ -136,7 +136,7 @@ const Main = () => {
                   onClick={handleEventCardClick}
                 />
               ))
-            )}
+            )} */}
           </S.EventContainer>
         </S.EventSection>
 
@@ -147,7 +147,7 @@ const Main = () => {
             <S.Image src={sectionImage} alt="Section Icon" />
             조회수 TOP 7 여행 후기
           </S.SectionTitle>
-          {reviewsLoading ? (
+          {/* {reviewsLoading ? (
             <div>Loading...</div>
           ) : reviewsError ? (
             <div>Error loading reviews</div>
@@ -156,7 +156,7 @@ const Main = () => {
               reviews={reviews}
               onReviewClick={handleReviewItemClick} // 이 부분이 변경됨
             />
-          )}
+          )} */}
         </S.TopReviews>
 
         <S.Divider />

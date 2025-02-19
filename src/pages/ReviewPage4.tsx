@@ -29,7 +29,13 @@ const ReviewPage4 = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const userId = useAppSelector((state) => state.auth.userId);
+  // const userId = useAppSelector((state) => state.auth.userId);
+  const userId = useAppSelector((state) => {
+    const id = state.auth.userId;
+    return id && id !== 'undefined' ? id : null;
+  });
+  // 현재 사용자 프로필 정보 가져오기
+  const userProfile = useAppSelector((state) => state.user.profile);
   const { placeId } = useParams<{ placeId: string }>();
   const selectedAnimation = location.state?.selectedAnimation;
 
@@ -47,49 +53,78 @@ const ReviewPage4 = () => {
   const [editRating, setEditRating] = useState(0);
 
   // 데이터 로드 함수
+  // const loadData = useCallback(async () => {
+  //   if (!placeId) return;
+
+  //   try {
+  //     // 토큰 체크를 loadData 시작할 때가 아닌, API 호출 직전에 수행
+  //     const placeResponse = await getPlaceDetail(Number(placeId));
+  //     console.log('Place Response:', placeResponse);
+
+  //     if (placeResponse.isSuccess) {
+  //       setPlaceName(placeResponse.result.name);
+  //     }
+
+  //     // 토큰이 필요한 API 호출 전에 토큰 체크
+  //     const token = tokenStorage.getAccessToken();
+  //     if (!token && !isLoggedIn) {
+  //       console.log('Token check failed');
+  //       return; // 토큰이 없을 때는 리뷰 목록을 가져오지 않음
+  //     }
+
+  //     const reviewResponse = await getShortReviewList(Number(placeId), currentPage - 1);
+  //     console.log('Review Response:', reviewResponse);
+
+  //     if (reviewResponse.isSuccess) {
+  //       setReviews(reviewResponse.result.shortReviews);
+  //       setTotalPages(reviewResponse.result.totalPages);
+  //     }
+  //   } catch (error) {
+  //     console.error('LoadData Error:', error);
+
+  //     if (axios.isAxiosError(error)) {
+  //       // 401 에러일 때 무조건 로그인 모달을 띄우지 않고,
+  //       // 실제로 로그인이 되어있지 않을 때만 모달 표시
+  //       if (error.response?.status === 401 && !isLoggedIn) {
+  //         dispatch(openLoginModal());
+  //       }
+  //     }
+  //   }
+  // }, [placeId, currentPage, dispatch, isLoggedIn]);
   const loadData = useCallback(async () => {
     if (!placeId) return;
 
     try {
-      // 토큰 체크를 loadData 시작할 때가 아닌, API 호출 직전에 수행
-      const placeResponse = await getPlaceDetail(Number(placeId));
-      console.log('Place Response:', placeResponse);
-
-      if (placeResponse.isSuccess) {
-        setPlaceName(placeResponse.result.name);
-      }
-
-      // 토큰이 필요한 API 호출 전에 토큰 체크
-      const token = tokenStorage.getAccessToken();
-      if (!token && !isLoggedIn) {
-        console.log('Token check failed');
-        return; // 토큰이 없을 때는 리뷰 목록을 가져오지 않음
-      }
-
+      // 직접 short-review API 호출
       const reviewResponse = await getShortReviewList(Number(placeId), currentPage - 1);
-      console.log('Review Response:', reviewResponse);
 
       if (reviewResponse.isSuccess) {
+        setPlaceName(reviewResponse.result.placeName); // API 응답에서 장소 이름을 가져옴
         setReviews(reviewResponse.result.shortReviews);
         setTotalPages(reviewResponse.result.totalPages);
       }
     } catch (error) {
       console.error('LoadData Error:', error);
-
       if (axios.isAxiosError(error)) {
-        // 401 에러일 때 무조건 로그인 모달을 띄우지 않고,
-        // 실제로 로그인이 되어있지 않을 때만 모달 표시
-        if (error.response?.status === 401 && !isLoggedIn) {
+        if (error.response?.status === 401) {
           dispatch(openLoginModal());
         }
       }
     }
-  }, [placeId, currentPage, dispatch, isLoggedIn]);
+  }, [placeId, currentPage, dispatch]);
 
   // useEffect 수정
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    console.log('Current user profile:', {
+      userProfile,
+      profileImageUrl: userProfile?.profileImageUrl,
+      fallbackImage: profile,
+    });
+  }, [userProfile]);
 
   // 페이지네이션 핸들러
   const handlePrevPage = useCallback(() => {
@@ -285,17 +320,31 @@ const ReviewPage4 = () => {
     },
     [isLoggedIn, placeId, dispatch, loadData],
   );
+
   // 리뷰 아이템 렌더링
   const renderReviewItem = useCallback(
     (review: ShortReviewItem) => {
       const isEditing = editingReviewId === review.id;
-      const isOwner = userId !== null && Number(userId) === review.user.id;
+      // const isOwner = userId !== null && Number(userId) === review.user.id;
+      // userId가 존재할 때만 Number로 변환하여 비교
+      const isOwner = userId !== null && review.user.userId === Number(userId);
+
+      // 프로필 이미지가 없는 경우 기본 이미지를 사용
+      const profileImageSrc = review.user.profileImage || profile;
+
+      console.log('Review ownership check:', {
+        currentUserId: userId,
+        reviewUserId: review.user.userId,
+        isOwner,
+        userIdType: typeof userId,
+        review,
+      });
 
       if (isEditing) {
         return (
           <S.ReviewItem4 key={review.id}>
             <S.ReviewProfileContainer>
-              <S.ReviewProfileImage src={profile} alt="프로필 이미지" />
+              <S.ReviewProfileImage src={profileImageSrc} alt="프로필 이미지" />
               <S.ReviewProfileInfo>
                 <S.ReviewProfileName>{review.user.nickname}</S.ReviewProfileName>
                 <S.ReviewStarRating>
@@ -318,8 +367,10 @@ const ReviewPage4 = () => {
               placeholder="리뷰를 수정하세요"
             />
             <S.EditDeleteButtons>
-              <S.ActionButton onClick={() => handleEditSubmit(review.id)}>수정 완료</S.ActionButton>
-              <S.ActionButton onClick={handleEditCancel}>취소</S.ActionButton>
+              <S.ActionButton onClick={() => handleEditSubmit(review.id)}>
+                수정 완료 |
+              </S.ActionButton>
+              <S.ActionButton onClick={handleEditCancel}> 취소</S.ActionButton>
             </S.EditDeleteButtons>
             <S.FeedbackButtonsWrapper>
               <S.FeedbackButton
@@ -352,7 +403,13 @@ const ReviewPage4 = () => {
       return (
         <S.ReviewItem4 key={review.id}>
           <S.ReviewProfileContainer>
-            <S.ReviewProfileImage src={profile} alt="프로필 이미지" />
+            <S.ReviewProfileImage
+              src={review.user.profileImage || profile}
+              alt="프로필 이미지"
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                e.currentTarget.src = profile;
+              }}
+            />
             <S.ReviewProfileInfo>
               <S.ReviewProfileName>{review.user.nickname}</S.ReviewProfileName>
               <S.ReviewStarRating>
@@ -371,11 +428,10 @@ const ReviewPage4 = () => {
           </S.ReviewProfileContainer>
 
           <S.ReviewContent4>{review.content}</S.ReviewContent4>
-
           {isOwner && (
             <S.EditDeleteButtons>
-              <S.ActionButton onClick={() => handleEditClick(review)}>수정</S.ActionButton>
-              <S.ActionButton onClick={() => handleDeleteReview(review.id)}>삭제</S.ActionButton>
+              <S.ActionButton onClick={() => handleEditClick(review)}>수정 |</S.ActionButton>
+              <S.ActionButton onClick={() => handleDeleteReview(review.id)}> 삭제</S.ActionButton>
             </S.EditDeleteButtons>
           )}
           <S.FeedbackButtonsWrapper>
@@ -434,9 +490,15 @@ const ReviewPage4 = () => {
         <S.WhiteContainer4>
           <S.FeedbackSection>
             <S.ProfileContainer>
-              <S.ProfileImage src={profile} alt="프로필 이미지" />
+              <S.ProfileImage
+                src={userProfile?.profileImageUrl ? userProfile.profileImageUrl : profile}
+                alt="프로필 이미지"
+                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  e.currentTarget.src = profile;
+                }}
+              />
               <S.ProfileInfo>
-                <S.ProfileName>닉네임</S.ProfileName>
+                <S.ProfileName>{userProfile?.nickname || '닉네임'}</S.ProfileName>
                 <div style={{ marginBottom: '10px' }}>
                   <S.StarRatingInput>
                     {[1, 2, 3, 4].map((star) => (

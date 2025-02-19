@@ -8,6 +8,7 @@ import {
   UpdateShortReviewRequest,
   UpdateShortReviewResponse,
   DeleteShortReviewResponse,
+  UserResponse,
 } from '@/types/review/short-review';
 
 export const getPlaceDetail = async (placeId: number): Promise<PlaceResponse> => {

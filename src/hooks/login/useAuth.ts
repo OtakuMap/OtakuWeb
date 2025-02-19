@@ -19,28 +19,97 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  // const login = async (userId: string, password: string) => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await authAPI.login({ userId, password });
+  //     console.log('Login response:', response);
+
+  //     if (response.isSuccess && response.result) {
+  //       tokenStorage.setTokens(
+  //         response.result.accessToken,
+  //         response.result.refreshToken,
+  //         String(response.result.id),
+  //       );
+  //       dispatch(loginSuccess(response.result));
+  //       navigate('/');
+  //       console.log('Login successful');
+  //     } else {
+  //       dispatch(loginFailure(response.message));
+  //       console.log('Login failed:', response.message);
+  //       throw new Error(response.message);
+  //     }
+  //   } catch (error) {
+  //     console.error('Login error in useAuth:', error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const login = async (userId: string, password: string) => {
     setLoading(true);
     try {
       const response = await authAPI.login({ userId, password });
-      console.log('Login response:', response);
+      console.log('Raw login response:', response);
 
       if (response.isSuccess && response.result) {
+        // 응답의 id가 0인지 확인
+        if (response.result.id === 0) {
+          console.error('Server returned id as 0');
+          throw new Error('Invalid user ID received');
+        }
+
+        const userIdString = String(response.result.id);
+
+        console.log('Login process debug:', {
+          rawId: response.result.id,
+          userIdString,
+          tokenCheck: {
+            accessToken: !!response.result.accessToken,
+            refreshToken: !!response.result.refreshToken,
+          },
+        });
+
+        // localStorage에 직접 값이 제대로 저장되는지 확인
+        localStorage.setItem('userId', userIdString);
+
+        // tokenStorage를 통한 저장
         tokenStorage.setTokens(
           response.result.accessToken,
           response.result.refreshToken,
-          String(response.result.id),
+          userIdString,
         );
-        dispatch(loginSuccess(response.result));
+
+        // Redux 상태 업데이트 전 값 확인
+        console.log('Before Redux update:', {
+          userId: userIdString,
+          type: typeof userIdString,
+        });
+
+        // Redux store 업데이트
+        dispatch(
+          loginSuccess({
+            id: response.result.id,
+            accessToken: response.result.accessToken,
+            refreshToken: response.result.refreshToken,
+          }),
+        );
+
+        // 모든 저장 후 값들 확인
+        console.log('After login process:', {
+          localStorage: localStorage.getItem('userId'),
+          tokenStorage: tokenStorage.getUserId(),
+          originalId: response.result.id,
+        });
+
         navigate('/');
-        console.log('Login successful');
       } else {
         dispatch(loginFailure(response.message));
-        console.log('Login failed:', response.message);
+        console.error('Login failed:', response.message);
         throw new Error(response.message);
       }
     } catch (error) {
-      console.error('Login error in useAuth:', error);
+      console.error('Login error details:', error);
       throw error;
     } finally {
       setLoading(false);

@@ -1,5 +1,3 @@
-// types/review/short-review.ts
-
 // Place types
 export interface PlaceData {
   id: number;
@@ -56,8 +54,10 @@ export interface ShortReviewItem {
   content: string;
   rating: number;
   user: {
-    id: number;
+    userId: number;
+    // id: number;
     nickname: string;
+    profileImage: string;
   };
   likes: number;
   dislikes: number;
