@@ -103,6 +103,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/purchase-income-check" element={<PurchaseIncomeCheck />} />
         <Route path="/point-charge" element={<PointCharge />} />
         <Route path="/my-point" element={<MyPoint />} />
+        <Route path="/payment-success" element={<PointCharge />} />
 
         {/* 보호된 라우트 - 로그인한 사용자만 접근 가능 */}
         <Route
