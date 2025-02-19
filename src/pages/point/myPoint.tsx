@@ -24,6 +24,8 @@ const MyPoint: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (chargeHistory.length > 0) return; // 기존 데이터가 있으면 API 요청 안 함
+
         setLoading(true);
         setError(null);
 
@@ -46,37 +48,14 @@ const MyPoint: React.FC = () => {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : '데이터 로딩 실패');
+        console.error('HTTP 상태 코드:', err.response?.status);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  const handlePageChange = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === 'next' && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Container>
-        <Title>내 포인트 로딩</Title>
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container>
-        <Title>내 포인트 에러</Title>
-      </Container>
-    );
-  }
+  }, [chargeHistory]);
 
   return (
     <Container>
@@ -86,7 +65,7 @@ const MyPoint: React.FC = () => {
       <MyPointContainer>
         <PointContainer>
           <Name>보유 포인트</Name>
-          <Point>{balance} P</Point>
+          {balance === 0 ? <Point>포인트가 없습니다.</Point> : <Point>{balance} P</Point>}
         </PointContainer>
         <ButtonContainer>
           <ChargeButton onClick={() => navigate('/point-charge')}>Ⓟ 포인트 충전하기</ChargeButton>
@@ -100,18 +79,22 @@ const MyPoint: React.FC = () => {
       <PointChargeListContainer>
         <Name>포인트 충전내역</Name>
 
-        {displayedItems.map((item, index) => (
-          <PointRow key={index}>
-            <LeftGroup>
-              <DateTime>{item.chargedAt}</DateTime>
-              <Payment>{item.chargedBy}</Payment>
-            </LeftGroup>
-            <RightGroup>
-              <Name2>{item.point} P</Name2>
-              <Used>사용 완료</Used>
-            </RightGroup>
-          </PointRow>
-        ))}
+        {chargeHistory.length === 0 ? (
+          <div>충전 내역이 없습니다.</div>
+        ) : (
+          displayedItems.map((item, index) => (
+            <PointRow key={index}>
+              <LeftGroup>
+                <DateTime>{item.chargedAt}</DateTime>
+                <Payment>{item.chargedBy}</Payment>
+              </LeftGroup>
+              <RightGroup>
+                <Name2>{item.point} P</Name2>
+                <Used>사용 완료</Used>
+              </RightGroup>
+            </PointRow>
+          ))
+        )}
 
         <Divider />
 
@@ -137,8 +120,8 @@ const MyPoint: React.FC = () => {
 export default MyPoint;
 
 const DividerFirst = styled.img`
-  width: 1193px;
-  margin-top: 130px;
+  width: 1450px;
+  margin-top: 70px;
 `;
 
 const PageNumber = styled.div`
@@ -154,13 +137,24 @@ const PageNumber = styled.div`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: auto;
+  width: 100%;
+  max-height: 90%;
   justify-content: center;
   align-items: center;
-  overflow: visible; /* 스크롤 숨김이 아니라 표시되도록 */
+  overflow-y: auto; /* 세로 스크롤이 가능하도록 설정 */
+  overflow-x: hidden; /* 가로 스크롤 숨기기 */
+  scrollbar-width: thin; /* Firefox에서 스크롤바를 얇게 설정 */
   position: relative;
   background-color: #101148;
+
+  /* Webkit 브라우저에서 스크롤바 숨기기 */
+  ::-webkit-scrollbar {
+    width: 0; /* 세로 스크롤바 숨기기 */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent; /* 스크롤바 핸들을 투명으로 설정 */
+  }
 `;
 
 const Title = styled.div`
@@ -172,7 +166,7 @@ const Title = styled.div`
   font-weight: 600;
   line-height: 47.5px;
   color: #ffffff;
-  margin-top: 121px;
+  margin-top: 32px;
   margin-left: 56px;
   flex-shrink: 0;
 `;
@@ -183,7 +177,7 @@ const MyPointContainer = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  width: 1196px;
+  width: 1450px;
   height: 138px;
   background: #ffffff;
   border-radius: 20px;
@@ -203,11 +197,12 @@ const PointChargeListContainer = styled.div`
   flex-direction: column;
   align-items: center;
   position: relative;
-  width: 1196px;
+  width: 1450px;
   height: 895px;
   background: #ffffff;
   border-radius: 20px;
   margin-top: 32px;
+  margin-bottom: 67px;
 `;
 
 const Name = styled.div`
@@ -324,7 +319,7 @@ const Used = styled.div`
 
 const Divider = styled.hr`
   border: 1px solid #464654;
-  width: 1100px;
+  width: 1300px;
   position: relative;
 `;
 

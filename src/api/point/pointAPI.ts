@@ -25,6 +25,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getAccessToken();
+    console.log('🔹 현재 accessToken:', token); // ✅ 로그 추가
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -36,6 +37,14 @@ instance.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error),
+);
+
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('Response Error:', error.response);
+    return Promise.reject(error);
+  },
 );
 
 // 공통 에러 처리 함수 (제네릭 사용)
@@ -128,13 +137,15 @@ export const pointAPI = {
     }
   },
 
-  // 포인트 충전 내역 조회
-  transactionscharge: async (): Promise<TransactionsChargeResponse> => {
+  // 포인트 충전 내역 조회 (POST 방식, page 쿼리 파라미터 포함)
+  transactionscharge: async (page: number = 1): Promise<TransactionsChargeResponse> => {
     try {
-      console.log('Request URL:', '/points/transactions/charges');
+      console.log('Request URL:', '/points/transactions/charges', 'Page:', page);
 
-      const response = await instance.get<TransactionsChargeResponse>(
+      const response = await instance.post<TransactionsChargeResponse>(
         '/points/transactions/charges',
+        {}, // 본문은 비워두고
+        { params: { page } }, // 쿼리 파라미터로 page를 전송
       );
       console.log('Response:', response);
       return response.data;
@@ -144,13 +155,17 @@ export const pointAPI = {
     }
   },
 
-  // 포인트 사용 내역 조회
-  transactionsusages: async (): Promise<TransactionsUsagesResponse> => {
+  // 포인트 사용 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
+  transactionsusages: async (
+    page: number = 1,
+    size: number = 10,
+  ): Promise<TransactionsUsagesResponse> => {
     try {
-      console.log('Request URL:', '/points/transactions/usages');
+      console.log('Request URL:', '/points/transactions/usages', 'Page:', page, 'Size:', size);
 
       const response = await instance.get<TransactionsUsagesResponse>(
         '/points/transactions/usages',
+        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
       );
       console.log('Response:', response);
       return response.data;
@@ -160,13 +175,17 @@ export const pointAPI = {
     }
   },
 
-  // 포인트 수익 내역 조회
-  transactionsearning: async (): Promise<TransactionsEarningsResponse> => {
+  // 포인트 수익 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
+  transactionsearning: async (
+    page: number = 1,
+    size: number = 10,
+  ): Promise<TransactionsEarningsResponse> => {
     try {
-      console.log('Request URL:', '/points/transactions/earnings');
+      console.log('Request URL:', '/points/transactions/earnings', 'Page:', page, 'Size:', size);
 
       const response = await instance.get<TransactionsEarningsResponse>(
         '/points/transactions/earnings',
+        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
       );
       console.log('Response:', response);
       return response.data;
