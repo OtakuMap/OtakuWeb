@@ -1,12 +1,16 @@
 import styled from 'styled-components';
 
+export const DividerFirst = styled.img`
+  width: 1450px;
+  margin-top: 70px;
+`;
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: auto; /* Set to 100vh to ensure it takes up the full screen */
-  max-height: 90%; /* Ensure no height limitation */
-  justify-content: flex-start; /* Align content from the top */
+  width: 100%;
+  height: auto;
+  max-height: 90%;
+  justify-content: flex-start;
   align-items: center;
   overflow: hidden;
   scrollbar-width: none;
@@ -22,9 +26,10 @@ export const Title = styled.div`
   font-weight: 600;
   line-height: 38px;
   color: #ffffff;
-  margin-top: 121px;
+  margin-top: 32px;
   margin-left: 56px;
   flex-shrink: 0;
+  margin-bottom: 42px;
 `;
 export const PointChargeBox = styled.div`
   display: flex;
@@ -34,10 +39,9 @@ export const PointChargeBox = styled.div`
   position: relative;
   width: 854px;
   height: auto;
-  max-height: 90%;
   background: #ffffff;
   border-radius: 20px;
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
 `;
 
@@ -61,10 +65,9 @@ export const DetailTitle = styled.div`
   width: 656px;
   font-family: 'Gothic A1';
   color: #464654;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 20px;
-  cursor: pointer;
+  line-height: 25px;
   align-items: flex-start;
   margin-bottom: 13px;
 `;
@@ -93,7 +96,8 @@ export const ChargeButton = styled.button`
   text-align: center;
   margin-top: 64px;
   margin-bottom: 60px;
-  padding: 16px 41px;
+  justify-content: center; /* 가로 정렬 */
+  align-items: center; /* 세로 정렬 */
 `;
 
 export const CheckboxGroup = styled.div`
@@ -127,18 +131,32 @@ export const Pagebutton = styled.div`
   width: 16px;
   height: 37px;
   margin-right: 20px;
+  align-self: flex-start;
+  margin-left: 85px;
+  margin-top: 63px;
 `;
 
 export const SubTitle = styled.div`
   font-size: 24px;
   font-weight: 600;
   color: #101148;
+  align-self: flex-start;
+  margin-top: 68px;
+  line-height: 30px;
+`;
+export const SubTitle2 = styled.div`
+  font-size: 24px;
+  font-weight: 600;
+  color: #101148;
+  align-self: flex-start;
+  line-height: 30px;
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
   margin-bottom: 20px;
   flex-direction: column;
+  margin-right: 86px;
 `;
 
 export const PointGroup = styled.div`
@@ -226,6 +244,7 @@ export const Button = styled.button`
   font-family: 'Gothic A1';
   font-size: 20px;
   font-weight: 500;
+  align-items: center;
 `;
 
 export const Purchase = styled.div`
@@ -234,12 +253,11 @@ export const Purchase = styled.div`
   margin-bottom: 37px;
   color: #101148;
   font-family: 'Gothic A1';
-  margin-left:98px;
+  margin-left: 130px;
 `;
 
 export const Header = styled.div`
   align-items: center;
-  gap: 10px;
   display: flex;
 `;
 

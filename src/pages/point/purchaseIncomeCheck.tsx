@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { pointAPI } from '@/api/point/pointAPI';
-import { TransactionsUsagesResponse, TransactionsEarningsResponse } from '@/types/point';
+import { TransactionsUsagesResponse, TransactionsEarningsResponse } from '@/types/point/point';
+import Dimg from '../../assets/img/purpledivider.png';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
+  width: 100%;
   position: relative;
   max-height: 90%;
   justify-content: center;
@@ -18,24 +19,27 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  width: 1197px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
   background-color: #101148;
 `;
 
 const Title = styled.h1`
   font-family: 'Gothic A1';
-  margin-top: 121px;
+  margin-top: 32px;
   font-size: 38px;
   font-weight: 600;
   color: #fff;
   margin-bottom: 25px;
+  margin-left: 77px;
 `;
 
 const TabContainer = styled.div`
   display: flex;
-  gap: 28px;
   margin-bottom: 0px;
+  margin-left: 77px;
 `;
 
 const Tab = styled.button<{ $active?: boolean }>`
@@ -50,12 +54,16 @@ const Tab = styled.button<{ $active?: boolean }>`
   font-family: 'Gothic A1';
   font-size: 20px;
   font-weight: 600;
+  margin-right: 28px;
 `;
 
 const EventListContainer = styled.div`
   background: white;
   border-radius: 0px 20px 20px 20px;
   padding: 24px 80px;
+  width: 1350px;
+  margin-left: 77px;
+  align-items: center;
 `;
 
 const PurchaseTitle = styled.div`
@@ -140,6 +148,11 @@ const PageNumber = styled.div`
   color: #000;
 `;
 
+const DividerFirst = styled.img`
+  width: 1450px;
+  margin-top: 70px;
+`;
+
 const PurchaseIncomeCheck: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
   const [purchaseData, setPurchaseData] = useState<TransactionsUsagesResponse | null>(null);
@@ -196,6 +209,7 @@ const PurchaseIncomeCheck: React.FC = () => {
 
   return (
     <Container>
+      <DividerFirst src={Dimg} />
       <ContentWrapper>
         <Title>구매/수익 확인하기</Title>
         <TabContainer>

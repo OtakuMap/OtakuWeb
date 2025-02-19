@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Prepage from '../../assets/img/prepage.svg';
+import Dimg from '../../assets/img/purpledivider.png';
 import {
   Container,
   Title,
@@ -25,6 +26,8 @@ import {
   Button,
   PointGroup,
   PurchaseGroup,
+  DividerFirst,
+  SubTitle2,
 } from '../../styles/point/pointCharge.style';
 import { pointAPI } from '@/api/point/pointAPI';
 
@@ -115,6 +118,7 @@ const PointCharge: React.FC = () => {
 
   return (
     <Container>
+      <DividerFirst src={Dimg} />
       <Title>포인트 충전하기</Title>
       <PointChargeBox>
         <Header>
@@ -137,7 +141,7 @@ const PointCharge: React.FC = () => {
         </Header>
 
         <PurchaseGroup>
-          <SubTitle>결제 금액</SubTitle>
+          <SubTitle2>결제 금액</SubTitle2>
           <Purchase>{selectedPoint.toLocaleString()}원</Purchase>
         </PurchaseGroup>
 
