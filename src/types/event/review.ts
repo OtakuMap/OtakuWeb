@@ -1,13 +1,13 @@
 // types/event/review.ts
 
-interface ReviewPhotoUrl {
+export interface ReviewPhotoUrl {
   id: number;
   uuid: string;
   fileName: string;
   fileUrl: string;
 }
 
-interface EventReview {
+export interface EventReview {
   id: number;
   title: string;
   reviewPhotoUrl: ReviewPhotoUrl;
