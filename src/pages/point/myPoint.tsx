@@ -20,7 +20,17 @@ const MyPoint: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+  // 날짜 포맷 변환 함수
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1)
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
 
+    return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -85,8 +95,8 @@ const MyPoint: React.FC = () => {
           displayedItems.map((item, index) => (
             <PointRow key={index}>
               <LeftGroup>
-                <DateTime>{item.chargedAt}</DateTime>
-                <Payment>{item.chargedBy}</Payment>
+                <DateTime>{formatDate(item.chargedAt)}</DateTime> {/* 날짜 변환 후 출력 */}
+                <Payment>{item.chargedBy}</Payment> {/* 결제 수단 표시 */}
               </LeftGroup>
               <RightGroup>
                 <Name2>{item.point} P</Name2>
