@@ -131,6 +131,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [isDetailsLoading, setIsDetailsLoading] = useState(true);
 
+  const [isMobile] = useState(window.innerWidth <= 430);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // placeDetails가 변경될 때 로딩 상태 업데이트
   useEffect(() => {
     setIsDetailsLoading(true);
@@ -439,7 +442,9 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
 
   if (isDetailLoading) return <S.Container>Loading...</S.Container>;
   return (
-    <S.Container key={componentKey}>
+    <S.Container ref={containerRef} key={componentKey}>
+      {/* 모바일에서만 보이는 드래그 핸들 */}
+      {isMobile && <S.DragHandle />}
       {onClose && (
         <S.CloseButton onClick={onClose}>
           <X size={20} color="#FFFFFF" absoluteStrokeWidth />
@@ -447,71 +452,76 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
       )}
 
       {/* 이미지 스켈레톤 */}
-      {isImageLoading && <S.SkeletonImage />}
-      <S.LocationImage
-        src={imageSource}
-        alt={displayData.name}
-        onError={handleImageError}
-        onLoad={handleImageLoad}
-        key={`image-${currentItem?.id || location.id}-${Date.now()}`}
-        loading="eager"
-        style={{ display: isImageLoading ? 'none' : 'block' }}
-      />
-
-      {allPlaces.length > 1 && (
-        <S.PaginationButton onClick={handleNextLocation}>
-          <img src={nextIcon} alt="next" />
-        </S.PaginationButton>
-      )}
+      <S.ImageSection>
+        {isImageLoading && <S.SkeletonImage />}
+        <S.LocationImage
+          src={imageSource}
+          alt={displayData.name}
+          onError={handleImageError}
+          onLoad={handleImageLoad}
+          key={`image-${currentItem?.id || location.id}-${Date.now()}`}
+          loading="eager"
+          style={{ display: isImageLoading ? 'none' : 'block' }}
+        />
+        {allPlaces.length > 1 && (
+          <S.PaginationButton onClick={handleNextLocation}>
+            <img src={nextIcon} alt="next" />
+          </S.PaginationButton>
+        )}
+      </S.ImageSection>
 
       {/* 콘텐츠 스켈레톤 */}
-      {isDetailsLoading ? (
-        <>
-          <S.SkeletonTitle />
-          <S.SkeletonSubtitle />
-          <S.SkeletonAddress />
-          <S.SkeletonTags>
-            <S.SkeletonTag />
-            <S.SkeletonTag />
-            <S.SkeletonTag />
-          </S.SkeletonTags>
-        </>
-      ) : (
-        <>
-          <S.Title ref={titleRef} title={displayData.name}>
-            {displayData.name}
-          </S.Title>
-          <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
-            {displayData.animeName}
-          </S.Subtitle>
-          <S.Address ref={addressRef} title={displayData.address} className="address">
-            {displayData.address}
-          </S.Address>
-          <S.TagContainer>
-            {displayData.tags.slice(0, MAX_TAGS).map((tag) => (
-              <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
-            ))}
-          </S.TagContainer>
-        </>
-      )}
+      <S.ContentWrapper>
+        {isDetailsLoading ? (
+          <S.InfoSection>
+            <S.SkeletonTitle />
+            <S.SkeletonSubtitle />
+            <S.SkeletonAddress />
+            <S.SkeletonTags>
+              <S.SkeletonTag />
+              <S.SkeletonTag />
+              <S.SkeletonTag />
+            </S.SkeletonTags>
+          </S.InfoSection>
+        ) : (
+          <S.InfoSection>
+            <S.Title ref={titleRef} title={displayData.name}>
+              {displayData.name}
+            </S.Title>
+            <S.Subtitle ref={subtitleRef} title={displayData.animeName}>
+              {displayData.animeName}
+            </S.Subtitle>
+            <S.Address ref={addressRef} title={displayData.address} className="address">
+              {displayData.address}
+            </S.Address>
+            <S.TagContainer>
+              {displayData.tags.slice(0, MAX_TAGS).map((tag) => (
+                <Tag key={typeof tag === 'string' ? tag : tag.hashTagId} tag={tag} />
+              ))}
+            </S.TagContainer>
+          </S.InfoSection>
+        )}
 
-      <S.FavButton onClick={handleFavClick}>
-        <img
-          src={
-            currentItem
-              ? itemLikes[currentItem.id]
-                ? favActiveIcon
-                : favIcon
-              : isLiked
-                ? favActiveIcon
-                : favIcon
-          }
-          alt="favorite"
-        />
-      </S.FavButton>
-      <S.ReviewButton onClick={handleReviewClick}>
-        {isCurrentEvent ? '이벤트 후기' : '명소 후기'}
-      </S.ReviewButton>
+        <S.ButtonContainer>
+          <S.FavButton onClick={handleFavClick}>
+            <img
+              src={
+                currentItem
+                  ? itemLikes[currentItem.id]
+                    ? favActiveIcon
+                    : favIcon
+                  : isLiked
+                    ? favActiveIcon
+                    : favIcon
+              }
+              alt="favorite"
+            />
+          </S.FavButton>
+          <S.ReviewButton onClick={handleReviewClick}>
+            {isCurrentEvent ? '이벤트 후기' : '명소 후기'}
+          </S.ReviewButton>
+        </S.ButtonContainer>
+      </S.ContentWrapper>
     </S.Container>
   );
 };

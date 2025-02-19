@@ -1,24 +1,81 @@
 import styled from 'styled-components';
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 interface RecommendationItemProps {
   $isSelected?: boolean;
 }
 
 export const Container = styled.div`
   position: relative;
-  width: 320px; // 400 * 0.8
+  width: 320px;
   height: 100vh;
   background: #101148;
-  padding: 16px; // 20 * 0.8
+  padding: 16px;
   flex-shrink: 0;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60vh;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(calc(100% - 60px));
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    padding: 12px;
+
+    &.expanded {
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const HandleBar = styled.div`
+  display: none;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #d1c1ff;
+    border-radius: 2px;
+    margin: 8px auto;
+    cursor: pointer;
+  }
+`;
+
+export const SearchWrapper = styled.div`
+  position: relative; // 기본 스타일 추가
+  width: 100%; // 기본 스타일 추가
+  z-index: 1000; // 기본 스타일 추가
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: transparent;
+  }
 `;
 
 export const ButtonContainer = styled.div`
   position: absolute;
   display: flex;
-  gap: 16px; // 20 * 0.8
-  left: 26px; // 33 * 0.8
-  top: 84px; // 105 * 0.8
+  gap: 16px;
+  left: 26px;
+  top: 84px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative;
+    left: 0;
+    top: 0;
+    padding: 16px;
+    justify-content: space-between;
+    margin-top: 48px;
+  }
 `;
 
 export const SavedRoutesButton = styled.button<{ isActive?: boolean }>`
@@ -90,36 +147,58 @@ export const FavoritePlacesButton = styled.button<{ isActive?: boolean }>`
 export const RecentSearchesTitle = styled.h2`
   position: absolute;
   white-space: nowrap;
-  left: 44px; // 55 * 0.8
-  bottom: 188px; // 235 * 0.8
+  left: 44px;
+  bottom: 188px;
   font-family: 'Gothic A1';
-  font-style: normal;
   font-weight: 600;
-  font-size: 16px; // 20 * 0.8
-  line-height: 20px; // 25 * 0.8
+  font-size: 16px;
+  line-height: 20px;
   color: #cccccc;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative;
+    left: 16px;
+    bottom: auto;
+    margin-top: 24px;
+  }
 `;
 
 export const RecentSearchesBox = styled.div`
   position: absolute;
-  width: 270px; // 338 * 0.8
-  height: 162px; // 202 * 0.8
-  left: 26px; // 32 * 0.8
-  bottom: 16px; // 20 * 0.8
+  width: 270px;
+  height: 162px;
+  left: 26px;
+  bottom: 16px;
   background: #252660;
-  border-radius: 20px; // 25 * 0.8
-  filter: blur(4px); // 5 * 0.8
+  border-radius: 20px;
+  filter: blur(4px);
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative;
+    width: calc(100% - 32px);
+    left: 16px;
+    bottom: auto;
+    margin-top: 8px;
+  }
 `;
 
 export const RecentSearchList = styled.div`
   position: absolute;
-  width: 142px; // 178 * 0.8
-  left: 41px; // 51 * 0.8
-  bottom: 32px; // 40 * 0.8
+  width: 142px;
+  left: 41px;
+  bottom: 32px;
   display: flex;
   flex-direction: column;
-  gap: 8px; // 10 * 0.8
+  gap: 8px;
   z-index: 1;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative;
+    width: calc(100% - 32px);
+    left: 16px;
+    bottom: auto;
+    margin-top: -150px;
+  }
 `;
 
 export const RecentSearchItem = styled.div`
