@@ -271,11 +271,20 @@ const MapPage = () => {
   };
 
   const handleCloseDetail = () => {
+    // 모든 상태를 초기화하여 LocationDetail과 마커를 모두 제거
     setShowLocationDetail(false);
     setSelectedPlace(null);
     setSelectedEvent(null);
     setSelectedPlaceLikeId(null);
+    setSelectedLocationGroup(null);
+    setPlaceDetails(undefined);
   };
+  // const handleCloseDetail = () => {
+  //   setShowLocationDetail(false);
+  //   setSelectedPlace(null);
+  //   setSelectedEvent(null);
+  //   setSelectedPlaceLikeId(null);
+  // };
 
   const currentLocation = React.useMemo(() => {
     if (selectedPlace) {
@@ -315,7 +324,13 @@ const MapPage = () => {
     return false;
   }, [selectedEvent, selectedPlace, placeLikeDetail]);
 
+  //MapPage.tsx에서 mapLocations 계산 부분을 수정
   const mapLocations = React.useMemo((): RouteLocation[] => {
+    // LocationDetail이 닫혀있으면 빈 배열 반환
+    if (!showLocationDetail) {
+      return [];
+    }
+
     if (selectedLocationGroup?.items) {
       const currentSelectedId = selectedEvent
         ? selectedEvent.eventId
@@ -335,7 +350,7 @@ const MapPage = () => {
       return sortedItems
         .map((item) => {
           const id = item.type === 'place' ? item.data.placeId : item.data.eventId;
-          if (!id) return null; // id가 없는 경우 처리
+          if (!id) return null;
 
           return {
             id,
@@ -384,7 +399,78 @@ const MapPage = () => {
       ];
     }
     return [];
-  }, [selectedPlace, selectedEvent, placeLikeDetail, selectedLocationGroup]);
+  }, [selectedPlace, selectedEvent, placeLikeDetail, selectedLocationGroup, showLocationDetail]); // showLocationDetail 의존성 추가
+
+  // const mapLocations = React.useMemo((): RouteLocation[] => {
+  //   if (selectedLocationGroup?.items) {
+  //     const currentSelectedId = selectedEvent
+  //       ? selectedEvent.eventId
+  //       : selectedPlace
+  //         ? selectedPlace.id
+  //         : null;
+
+  //     const sortedItems = [...selectedLocationGroup.items].sort((a, b) => {
+  //       const aId = a.type === 'place' ? a.data.placeId : a.data.eventId;
+  //       const bId = b.type === 'place' ? b.data.placeId : b.data.eventId;
+
+  //       if (aId === currentSelectedId) return -1;
+  //       if (bId === currentSelectedId) return 1;
+  //       return 0;
+  //     });
+
+  //     return sortedItems
+  //       .map((item) => {
+  //         const id = item.type === 'place' ? item.data.placeId : item.data.eventId;
+  //         if (!id) return null; // id가 없는 경우 처리
+
+  //         return {
+  //           id,
+  //           name: item.name,
+  //           isSelected: true,
+  //           latitude: item.data.latitude,
+  //           longitude: item.data.longitude,
+  //           animeName:
+  //             item.type === 'place' ? item.data.animeName || '' : item.data.animationTitle || '',
+  //           hashtags:
+  //             item.type === 'place'
+  //               ? item.data.selectedAnimation?.hashTags || []
+  //               : item.data.hashTags || [],
+  //           type: item.type,
+  //         };
+  //       })
+  //       .filter((item): item is RouteLocation => item !== null);
+  //   }
+
+  //   if (selectedEvent) {
+  //     return [
+  //       {
+  //         id: selectedEvent.eventId,
+  //         name: selectedEvent.name,
+  //         isSelected: true,
+  //         latitude: selectedEvent.latitude,
+  //         longitude: selectedEvent.longitude,
+  //         animeName: selectedEvent.animationTitle,
+  //         hashtags: selectedEvent.hashTags,
+  //         type: 'event',
+  //       },
+  //     ];
+  //   }
+  //   if (placeLikeDetail) {
+  //     return [
+  //       {
+  //         id: placeLikeDetail.placeId,
+  //         name: placeLikeDetail.placeName,
+  //         isSelected: true,
+  //         latitude: placeLikeDetail.lat,
+  //         longitude: placeLikeDetail.lng,
+  //         animeName: placeLikeDetail.animation.name,
+  //         hashtags: placeLikeDetail.hashtags.map((tag: HashTag) => tag.name),
+  //         type: 'place',
+  //       },
+  //     ];
+  //   }
+  //   return [];
+  // }, [selectedPlace, selectedEvent, placeLikeDetail, selectedLocationGroup]);
 
   return (
     <PageContainer>
