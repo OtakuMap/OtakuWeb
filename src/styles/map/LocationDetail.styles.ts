@@ -1,5 +1,7 @@
 import styled, { keyframes } from 'styled-components';
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 export const Container = styled.div`
   position: absolute;
   width: 628px;
@@ -12,10 +14,46 @@ export const Container = styled.div`
   border-radius: 23px;
   z-index: 1000;
 
-  @media (max-width: 768px) {
-    width: calc(100% - 32px);
-    min-height: 202px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
     height: auto;
+    min-height: 80vh;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+export const DragHandle = styled.div`
+  display: none;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #d1c1ff;
+    border-radius: 2px;
+    margin: 12px auto;
+    cursor: grab;
+  }
+`;
+
+export const ButtonContainer = styled.div`
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: fixed; // 모바일에서는 하단에 고정
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #252660;
+    z-index: 1002;
   }
 `;
 
@@ -66,12 +104,42 @@ export const LocationImage = styled.img`
   object-fit: cover;
   border-radius: 7px;
 
-  @media (max-width: 768px) {
-    position: relative;
-    left: 16px;
-    top: 16px;
-    width: 120px;
-    height: 120px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative; // 모바일에서만 position 변경
+    width: 100%;
+    height: 200px;
+    left: 0;
+    top: 0;
+    border-radius: 20px 20px 0 0;
+  }
+`;
+
+export const ContentWrapper = styled.div`
+  position: relative;
+  height: 100%;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+`;
+
+export const ImageSection = styled.div`
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 16px;
+  }
+`;
+
+export const InfoSection = styled.div`
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 `;
 
@@ -127,11 +195,13 @@ export const Title = styled(BaseText)`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
     position: relative;
-    left: 16px;
-    top: 24px;
-    max-width: calc(100% - 32px);
+    left: 0;
+    top: 0;
+    font-size: 24px;
+    line-height: 30px;
+    margin-bottom: 8px;
   }
 `;
 
@@ -342,7 +412,7 @@ export const FavButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    right: 120px;
+    right: 144px;
   }
 `;
 
