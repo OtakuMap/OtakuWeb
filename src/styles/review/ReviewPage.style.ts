@@ -982,7 +982,7 @@ export const BackButton = styled.button`
   font-size: 20px;
   cursor: pointer;
   position: absolute;
-  left: -710px;
+  left: -600px;
 `;
 
 export const ProfileSection = styled.div`
