@@ -1,5 +1,3 @@
-/*
-api 완료시 이 코드 사용
 import React, { useEffect, useState } from 'react';
 import {
   TitleContainer,
@@ -30,7 +28,7 @@ import { TransactionsUsagesResponse, TransactionsEarningsResponse } from '@/type
 import Dimg from '../../assets/img/purpledivider.png';
 import Prepage from '../../assets/img/prepagewhite.svg';
 import { useNavigate } from 'react-router-dom';
-import start from '../../assets/img/star.png';
+import Star from '../../assets/img/star.png';
 
 const PurchaseIncomeCheck: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
@@ -38,7 +36,9 @@ const PurchaseIncomeCheck: React.FC = () => {
   const [incomeData, setIncomeData] = useState<TransactionsEarningsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  // currentPage를 0이 아닌 1로 시작하도록 수정
+  const [currentPage, setCurrentPage] = useState(1); // 초기값을 1로 설정
+
   const itemsPerPage = 5;
 
   // 날짜 포맷 변환 함수
@@ -60,10 +60,10 @@ const PurchaseIncomeCheck: React.FC = () => {
 
       try {
         if (activeTab === 'purchase') {
-          const response = await pointAPI.transactionsusages();
+          const response = await pointAPI.transactionsusages(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
           if (response.isSuccess) setPurchaseData(response);
         } else {
-          const response = await pointAPI.transactionsearning();
+          const response = await pointAPI.transactionsearning(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
           if (response.isSuccess) setIncomeData(response);
         }
       } catch (err) {
@@ -74,19 +74,20 @@ const PurchaseIncomeCheck: React.FC = () => {
     };
 
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, currentPage]);
+
   const navigate = useNavigate();
   const dataList =
     activeTab === 'purchase'
-      ? purchaseData?.result?.transactions.map(({ purchasedAt, title, point }) => ({
-          date: purchasedAt,
-          listname: title,
-          status: `${point > 0 ? '+' : ''}${point}`,
+      ? purchaseData?.result?.transactions?.map(({ purchasedAt, title, point }) => ({
+          date: purchasedAt ?? '',
+          listname: title ?? '제목 없음',
+          status: point !== undefined ? `${point > 0 ? '+' : ''}${point}` : '0',
         })) || []
-      : incomeData?.result?.transactions.map(({ earnedAt, title, point }) => ({
-          date: earnedAt,
-          listname: title,
-          status: `+${point}`,
+      : incomeData?.result?.transactions?.map(({ purchasedAt, title, point }) => ({
+          date: purchasedAt ?? '',
+          listname: title ?? '제목 없음',
+          status: point !== undefined ? `+${point}` : '0',
         })) || [];
 
   const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
@@ -107,230 +108,6 @@ const PurchaseIncomeCheck: React.FC = () => {
           <Title>구매/수익 확인하기</Title>
           <Img src={Star} />
         </TitleContainer>
-        <TabContainer>
-          <Tab $active={activeTab === 'purchase'} onClick={() => setActiveTab('purchase')}>
-            구매 내역 확인
-          </Tab>
-          <Tab $active={activeTab === 'income'} onClick={() => setActiveTab('income')}>
-            수익 내역 확인
-          </Tab>
-        </TabContainer>
-        <EventListContainer>
-          {activeTab === 'purchase' ? (
-            <PurchaseTitle>구매 내역</PurchaseTitle>
-          ) : (
-            <IncomeTitle>수익 내역</IncomeTitle>
-          )}
-          <Divider />
-          {displayedItems.length > 0 ? (
-            displayedItems.map((item, index) => (
-              <PointRow key={index}>
-                <LeftGroup>
-                  <DateTime>{formatDate(item.purchasedAt)}</DateTime>
-                  <Listname>{item.title}</Listname>
-                </LeftGroup>
-                <RightGroup>
-                  <Used>{item.point}</Used>
-                </RightGroup>
-              </PointRow>
-            ))
-          ) : (
-            <p>{activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}</p>
-          )}
-          <PaginationContainer>
-            <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              {'<'}
-            </PaginationButton>
-            <PageNumber>
-              {currentPage} / {totalPages}
-            </PageNumber>
-            <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              {'>'}
-            </PaginationButton>
-          </PaginationContainer>
-        </EventListContainer>
-      </ContentWrapper>
-    </Container>
-  );
-};
-
-export default PurchaseIncomeCheck;
-*/
-
-import React, { useEffect, useState } from 'react';
-import {
-  TitleContainer,
-  Pagebutton,
-  Title,
-  PurchaseTitle,
-  Container,
-  ContentWrapper,
-  IncomeTitle,
-  PointRow,
-  LeftGroup,
-  TabContainer,
-  Tab,
-  EventListContainer,
-  RightGroup,
-  DateTime,
-  Used,
-  PaginationContainer,
-  PaginationButton,
-  PageNumber,
-  DividerFirst,
-  Divider,
-  Listname,
-  RemainPoint,
-  Img,
-} from '../../styles/point/purchaseIncomeCheck.style';
-import Dimg from '../../assets/img/purpledivider.png';
-import Prepage from '../../assets/img/prepagewhite.svg';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { pointAPI } from '@/api/point/pointAPI';
-import Star from '../../assets/img/star.png';
-
-const PurchaseIncomeCheck: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
-  const [purchaseData, setPurchaseData] = useState<any | null>(null); // 임시 데이터 타입
-  const [incomeData, setIncomeData] = useState<any | null>(null); // 임시 데이터 타입
-  const [balance, setBalance] = useState<number>(0); // balance state
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  // 날짜 포맷 변환 함수
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1)
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
-  };
-
-  const location = useLocation();
-  // API 호출하여 balance 값 가져오기
-  const fetchBalance = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await pointAPI.balance();
-      if (response.isSuccess && response.result) {
-        setBalance(Number(response.result.point) || 0);
-      } else {
-        setError('잔액 정보를 불러오는 중 오류가 발생했습니다.');
-      }
-    } catch (err) {
-      setError('데이터를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Fetch balance data when component mounts
-    fetchBalance();
-
-    // API 호출 부분 주석 처리
-    /*
-    const fetchData = async () => {
-      try {
-        if (activeTab === 'purchase') {
-          const response = await pointAPI.transactionsusages();
-          if (response.isSuccess) setPurchaseData(response);
-        } else {
-          const response = await pointAPI.transactionsearning();
-          if (response.isSuccess) setIncomeData(response);
-        }
-      } catch (err) {
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-    */
-
-    // 임의의 데이터 설정
-    const mockPurchaseData = {
-      isSuccess: true,
-      result: {
-        transactions: [
-          { purchasedAt: '2025-02-15T10:30:00Z', title: '상품 1', point: 500 },
-          { purchasedAt: '2025-02-16T14:45:00Z', title: '상품 2', point: -200 },
-          { purchasedAt: '2025-02-17T09:00:00Z', title: '상품 3', point: 300 },
-          { purchasedAt: '2025-02-18T13:30:00Z', title: '상품 4', point: 150 },
-          { purchasedAt: '2025-02-19T08:15:00Z', title: '상품 5', point: -100 },
-          { purchasedAt: '2025-02-20T17:00:00Z', title: '상품 6', point: 250 },
-        ],
-      },
-    };
-
-    const mockIncomeData = {
-      isSuccess: true,
-      result: {
-        transactions: [
-          { earnedAt: '2025-02-14T11:00:00Z', title: '수익 1', point: 100 },
-          { earnedAt: '2025-02-16T12:30:00Z', title: '수익 2', point: 200 },
-          { earnedAt: '2025-02-17T15:00:00Z', title: '수익 3', point: 300 },
-          { earnedAt: '2025-02-18T10:00:00Z', title: '수익 4', point: 150 },
-          { earnedAt: '2025-02-19T16:30:00Z', title: '수익 5', point: 100 },
-          { earnedAt: '2025-02-20T13:00:00Z', title: '수익 6', point: 400 },
-        ],
-      },
-    };
-
-    if (activeTab === 'purchase') {
-      setPurchaseData(mockPurchaseData);
-    } else {
-      setIncomeData(mockIncomeData);
-    }
-
-    setLoading(false);
-  }, [activeTab]);
-  const navigate = useNavigate();
-  const dataList =
-    activeTab === 'purchase'
-      ? purchaseData?.result?.transactions.map(({ purchasedAt, title, point }) => ({
-          date: purchasedAt,
-          listname: title,
-          status: `${point > 0 ? '+' : ''}${point}`,
-        })) || []
-      : incomeData?.result?.transactions.map(({ earnedAt, title, point }) => ({
-          date: earnedAt,
-          listname: title,
-          status: `+${point}`,
-        })) || [];
-
-  const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
-  const displayedItems = dataList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>{error}</p>;
-
-  return (
-    <Container>
-      <DividerFirst src={Dimg} />
-      <ContentWrapper>
-        <TitleContainer>
-          <Pagebutton src={Prepage} onClick={() => navigate('/my-point')}></Pagebutton>
-          <Title>구매/수익 확인하기</Title>
-          <Img src={Star} />
-        </TitleContainer>
-
         <TabContainer>
           <Tab $active={activeTab === 'purchase'} onClick={() => setActiveTab('purchase')}>
             구매 내역 확인
@@ -352,7 +129,6 @@ const PurchaseIncomeCheck: React.FC = () => {
                 <LeftGroup>
                   <DateTime>{formatDate(item.date)}</DateTime>
                   <Listname>{item.listname}</Listname>
-                  <RemainPoint>{balance}P</RemainPoint>
                 </LeftGroup>
                 <RightGroup>
                   <Used>{item.status}</Used>
@@ -360,12 +136,14 @@ const PurchaseIncomeCheck: React.FC = () => {
               </PointRow>
             ))
           ) : (
-            <p>{activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}</p>
+            <DateTime>
+              {activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}
+            </DateTime>
           )}
           <PaginationContainer>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} // currentPage가 0이 아닌 1로 처리
+              disabled={currentPage === 1} // currentPage가 1이면 왼쪽 버튼 비활성화
             >
               {'<'}
             </PaginationButton>
@@ -373,8 +151,8 @@ const PurchaseIncomeCheck: React.FC = () => {
               {currentPage} / {totalPages}
             </PageNumber>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} // currentPage가 totalPages보다 커지지 않도록 처리
+              disabled={currentPage === totalPages} // currentPage가 totalPages이면 오른쪽 버튼 비활성화
             >
               {'>'}
             </PaginationButton>

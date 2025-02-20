@@ -25,7 +25,9 @@ export interface PointbalanceResponse {
 
 // 포인트 충전
 export interface PointchargeRequest {
-  point: string;
+  price: number;
+  impUid: string;
+  merchantUid: string;
 }
 
 export interface PointchargeResponse {
@@ -138,6 +140,7 @@ export interface TransactionsUsagesResponse {
       point: number;
       purchasedAt: string;
     }[];
+    currentPage: number;
     totalPages: number;
     totalElements: number;
     isLast: boolean;
@@ -153,8 +156,9 @@ export interface TransactionsEarningsResponse {
     transactions: {
       title: string;
       point: number;
-      earnedAt: string;
+      purchasedAt: string;
     }[];
+    currentPage: number;
     totalPages: number;
     totalElements: number;
     isLast: boolean;
