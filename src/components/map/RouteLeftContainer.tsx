@@ -289,19 +289,34 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       setIsSaving(true);
 
       const routeItems = routeData.locations.map((location, index) => ({
-        name: location.name, // Include the name
+        name: location.name,
         placeId: location.id,
         itemOrder: index,
       }));
 
-      const requestData: CustomRouteRequest = {
-        originalRouteId: routeId || 0,
-        name: routeData.description,
-        routeItems,
-      };
-
-      const response = await saveCustomRoute(requestData);
-      toast.success('루트가 저장되었습니다!');
+      let response;
+      if (routeSource === RouteSource.REVIEW) {
+        // 후기에서 온 경우 - 새로운 루트 생성
+        const requestData: CustomRouteRequest = {
+          originalRouteId: 0, // 새로운 루트이므로 0
+          name: routeData.description,
+          routeItems,
+        };
+        response = await saveCustomRoute(requestData);
+        toast.success('새로운 루트가 저장되었습니다!');
+      } else {
+        // 저장된 루트나 좋아요한 루트에서 온 경우 - 기존 루트 수정
+        if (!routeId) {
+          throw new Error('루트 ID가 없습니다.');
+        }
+        const requestData = {
+          name: routeData.description,
+          routeId: routeId,
+          routeItems: routeItems.map(({ name, ...rest }) => rest),
+        };
+        response = await updateRoute(requestData);
+        toast.success('루트가 수정되었습니다!');
+      }
 
       console.log('저장된 루트:', response);
 
