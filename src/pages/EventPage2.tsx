@@ -176,23 +176,29 @@ const EventPage = () => {
       const response = await originalHandleReviewSubmit();
 
       // 리뷰 제출 성공 시
-      if (response && response.isSuccess) {
-        // 새로 등록된 리뷰 객체 생성 (타입 단언 사용)
+      if (response && response.isSuccess && response.result) {
         const newReview: EventShortReview = {
-          id: response.result.id,
-          content: reviewText,
-          rating: inputRating,
-          username: userProfile?.nickname || '',
+          id: response.result.reviewId,
+          content: response.result.content,
+          rating: response.result.rating,
+          user: {
+            userId: 0, // 임시 값
+            nickname: userProfile?.nickname || '',
+            profileImage: userProfile?.profileImageUrl || '',
+          },
           profileImage: {
+            id: 0,
+            uuid: '',
+            fileName: '',
             fileUrl: userProfile?.profileImageUrl || '',
           },
           likes: 0,
           dislikes: 0,
           userVote: null,
-        } as EventShortReview;
+        };
 
         // 기존 리뷰 목록 앞에 새 리뷰 추가
-        setShortReviews((prevReviews: EventShortReview[]) => [newReview, ...prevReviews]);
+        setShortReviews((prevReviews) => [newReview, ...prevReviews]);
 
         // 입력 필드 초기화
         setReviewText('');
@@ -422,12 +428,12 @@ const EventPage = () => {
               {paginatedShortReviews.map((review) => (
                 <S.ReviewCard
                   key={review.id}
-                  $isMyReview={review.username === userProfile?.nickname} // $isMyReview prop은 필수이므로 기본값 제공
+                  $isMyReview={review.user.nickname === userProfile?.nickname}
                 >
                   <S.ReviewHeader>
                     <S.Avatar src={review.profileImage.fileUrl} alt="프로필" />
                     <S.UserInfo>
-                      <S.UserName>{review.id}</S.UserName>
+                      <S.UserName>{review.user.nickname}</S.UserName>
                       {editingId === review.id ? (
                         <S.StarRatingInput>
                           {[1, 2, 3, 4].map((star) => (
@@ -468,7 +474,7 @@ const EventPage = () => {
                     <S.ReviewContent>{review.content}</S.ReviewContent>
                   )}
 
-                  {review.username === userProfile?.nickname && (
+                  {review.user.nickname === userProfile?.nickname && (
                     <S.EditDeleteButtons>
                       {editingId === review.id ? (
                         <>

@@ -1,26 +1,9 @@
 // types/event/short-review.ts
-export interface ShortReviewRequest {
+
+export interface User {
   userId: number;
-  rating: number;
-  content: string;
-}
-
-export interface UpdateShortReviewRequest {
-  rating: number;
-  content: string;
-}
-
-export interface ShortReviewResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: {
-    id: number;
-    reviewId: number;
-    content: string;
-    rating: number;
-    createdAt: string;
-  };
+  nickname: string;
+  profileImage: string;
 }
 
 export interface ProfileImage {
@@ -30,12 +13,22 @@ export interface ProfileImage {
   fileUrl: string;
 }
 
+export interface ShortReviewRequest {
+  rating: number;
+  content: string;
+}
+
+export interface UpdateShortReviewRequest {
+  rating: number;
+  content: string;
+}
+
 export interface EventShortReview {
   id: number;
+  user: User;
   content: string;
   rating: number;
   profileImage: ProfileImage;
-  username: string;
   likes: number;
   dislikes: number;
   userVote?: 'like' | 'dislike' | null;
@@ -49,6 +42,19 @@ export interface EventShortReviewListResponse {
     eventShortReviewList: EventShortReview[];
     currentPage: number;
     totalPages: number;
+  };
+}
+
+export interface ShortReviewResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    id: number;
+    reviewId: number;
+    content: string;
+    rating: number;
+    createdAt: string;
   };
 }
 

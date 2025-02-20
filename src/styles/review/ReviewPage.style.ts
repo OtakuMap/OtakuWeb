@@ -1368,9 +1368,9 @@ export const PurchaseModal = styled(ModalContent)`
   gap: 15px;
 `;
 
-export const BlurredContent = styled.div<{ $isPaid: boolean }>`
-  filter: ${(props) => (props.$isPaid ? 'blur(10px)' : 'none')};
-  pointer-events: ${(props) => (props.$isPaid ? 'none' : 'auto')};
+export const BlurredContent = styled.div<{ $isBlurred: boolean }>`
+  filter: ${(props) => (props.$isBlurred ? 'blur(10px)' : 'none')};
+  pointer-events: ${(props) => (props.$isBlurred ? 'none' : 'auto')};
   position: relative;
 `;
 
