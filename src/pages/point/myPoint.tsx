@@ -1,10 +1,32 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import '../../styles/font.css';
-import { FaCheck } from 'react-icons/fa6';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Dimg from '../../assets/img/purpledivider.png';
+import {
+  PaginationButton,
+  PaginationContainer,
+  PointRow,
+  Divider,
+  Used,
+  Name2,
+  Payment,
+  DateTime,
+  RightGroup,
+  LeftGroup,
+  CheckButton,
+  ChargeButton,
+  StyledFaCheck,
+  ButtonContainer,
+  Point,
+  Name,
+  PointChargeListContainer,
+  PointContainer,
+  MyPointContainer,
+  Title,
+  Container,
+  PageNumber,
+  DividerFirst,
+} from '../../styles/point/myPoint.style';
 import { pointAPI } from '@/api/point/pointAPI';
+import Dimg from '../../assets/img/purpledivider.png';
 
 const MyPoint: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +53,18 @@ const MyPoint: React.FC = () => {
 
     return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
   };
+
+  const handlePageChange = (direction: 'prev' | 'next') => {
+    setCurrentPage((prevPage) => {
+      if (direction === 'prev' && prevPage > 1) {
+        return prevPage - 1;
+      } else if (direction === 'next' && prevPage < totalPages) {
+        return prevPage + 1;
+      }
+      return prevPage;
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,16 +127,19 @@ const MyPoint: React.FC = () => {
           <DateTime>충전 내역이 없습니다.</DateTime>
         ) : (
           displayedItems.map((item, index) => (
-            <PointRow key={index}>
-              <LeftGroup>
-                <DateTime>{formatDate(item.chargedAt)}</DateTime> {/* 날짜 변환 후 출력 */}
-                <Payment>{item.chargedBy}</Payment> {/* 결제 수단 표시 */}
-              </LeftGroup>
-              <RightGroup>
-                <Name2>{item.point} P</Name2>
-                <Used>사용 완료</Used>
-              </RightGroup>
-            </PointRow>
+            <React.Fragment key={index}>
+              <PointRow>
+                <LeftGroup>
+                  <DateTime>{formatDate(item.chargedAt)}</DateTime>
+                  <Payment>{item.chargedBy}</Payment>
+                </LeftGroup>
+                <RightGroup>
+                  <Used>충전한 포인트 금액</Used>
+                  <Name2>{item.point} P</Name2>
+                </RightGroup>
+              </PointRow>
+              {index !== displayedItems.length - 1 && <Divider />}{' '}
+            </React.Fragment>
           ))
         )}
 
@@ -126,236 +163,3 @@ const MyPoint: React.FC = () => {
 };
 
 export default MyPoint;
-
-const DividerFirst = styled.img`
-  width: 1450px;
-  margin-top: 70px;
-`;
-
-const PageNumber = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  align-self: flex-start;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 25px;
-  color: #000000;
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-height: 90%;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto; /* 세로 스크롤이 가능하도록 설정 */
-  overflow-x: hidden; /* 가로 스크롤 숨기기 */
-  scrollbar-width: thin; /* Firefox에서 스크롤바를 얇게 설정 */
-  position: relative;
-  background-color: #101148;
-
-  /* Webkit 브라우저에서 스크롤바 숨기기 */
-  ::-webkit-scrollbar {
-    width: 0; /* 세로 스크롤바 숨기기 */
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: transparent; /* 스크롤바 핸들을 투명으로 설정 */
-  }
-`;
-
-const Title = styled.div`
-  display: flex;
-  position: relative;
-  font-family: 'Gothic A1';
-  align-self: flex-start;
-  font-size: 38px;
-  font-weight: 600;
-  line-height: 47.5px;
-  color: #ffffff;
-  margin-top: 32px;
-  margin-left: 56px;
-  flex-shrink: 0;
-`;
-
-const MyPointContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 1450px;
-  height: 138px;
-  background: #ffffff;
-  border-radius: 20px;
-  margin-top: 22px;
-  border: 1.5px solid #605f5f;
-`;
-
-const PointContainer = styled.div`
-  display: flex;
-  align-self: center;
-  justify-content: space-between;
-  width: 100%; // 버튼 간 간격을 조절할 수 있습니다.
-`;
-
-const PointChargeListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  width: 1450px;
-  height: 895px;
-  background: #ffffff;
-  border-radius: 20px;
-  margin-top: 32px;
-  margin-bottom: 67px;
-`;
-
-const Name = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 37.5px;
-  color: #101148;
-  margin-top: 24px;
-  margin-left: 33px;
-  align-self: flex-start;
-`;
-
-const Point = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 45px;
-  font-weight: 600;
-  line-height: 56.25px;
-  color: #101148;
-  margin-top: 37px;
-  margin-right: 47px;
-  margin-bottom: 5px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  align-self: flex-end;
-  justify-content: space-between;
-  margin-right: 23px;
-`;
-
-const StyledFaCheck = styled(FaCheck)`
-  margin-right: 4px;
-`;
-
-const ChargeButton = styled.button`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 25px;
-  color: #605f5f;
-  padding: 0px;
-  margin-right: 26px;
-`;
-
-const CheckButton = styled.button`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 25px;
-  color: #605f5f;
-  padding: 0px;
-`;
-
-const LeftGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  gap: 9px;
-`;
-
-const RightGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: 49px;
-  gap: 9px;
-`;
-
-const DateTime = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  color: #000000;
-  margin-left: 52px;
-`;
-
-const Payment = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 20px;
-  color: #000000;
-  margin-left: 52px;
-`;
-
-const Name2 = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 25px;
-  color: #000000;
-  margin-right: 85px;
-`;
-
-const Used = styled.div`
-  display: flex;
-  font-family: 'Gothic A1';
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  color: #f74c4c;
-  margin-right: 134px;
-`;
-
-const Divider = styled.hr`
-  border: 1px solid #464654;
-  width: 1300px;
-  position: relative;
-`;
-
-const PointRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-top: 20px;
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-`;
-
-const PaginationButton = styled.button`
-  margin: 0 8px;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: #101148;
-  cursor: pointer;
-
-  &:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-`;

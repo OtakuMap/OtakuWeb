@@ -88,7 +88,6 @@ const SignupPage: React.FC = () => {
     try {
       // 이메일 중복 체크
       const emailCheckResponse = await authAPI.checkEmailDuplication(email);
-
       if (emailCheckResponse.isSuccess) {
         alert('이메일이 사용 가능합니다. 인증번호를 전송합니다.');
 
