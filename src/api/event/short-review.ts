@@ -7,7 +7,6 @@ import {
   UpdateShortReviewRequest,
   DeleteShortReviewResponse,
   UpdateShortReviewResponse,
-  ShortReviewReactionResponse,
 } from '@/types/event/short-review';
 
 export const createShortReview = async (
@@ -70,22 +69,6 @@ export const deleteShortReview = async (
     return response.data;
   } catch (err) {
     console.error('Error deleting short review:', err);
-    throw err;
-  }
-};
-
-export const toggleShortReviewReaction = async (
-  reviewId: number,
-  reactionType: 0 | 1,
-): Promise<ShortReviewReactionResponse> => {
-  try {
-    const response = await instance.post<ShortReviewReactionResponse>(
-      `/events/short-reviews/${reviewId}/reaction`,
-      { reactionType },
-    );
-    return response.data;
-  } catch (err) {
-    console.error('Error toggling short review reaction:', err);
     throw err;
   }
 };
