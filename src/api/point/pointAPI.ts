@@ -104,24 +104,21 @@ export const pointAPI = {
   },
 
   // 결제 검증
-
-  verify: async (credentials: PointverifyRequest): Promise<PointverifyResponse> => {
+  verify: async (imp_uid: string): Promise<PointverifyResponse> => {
     try {
-      console.log('point verify Request:', {
-        url: `/payments/verify`,
-        data: credentials,
+      console.log('Point Verify Request:', {
+        url: `/payments/verify/${imp_uid}`,
         headers: instance.defaults.headers,
       });
 
       const response = await instance.post<PointverifyResponse>(
-        `/payments/verify`, // 쿼리 스트링 제거
-        credentials, // 데이터를 request body에 포함
+        `/payments/verify/${imp_uid}`, // URL 변경
       );
 
       console.log('Raw Response:', response);
       return response.data;
     } catch (error: unknown) {
-      console.error('Error point verify:', error);
+      console.error('Error in Point Verify:', error);
       return handleError<PointverifyResponse>(error);
     }
   },
@@ -161,43 +158,48 @@ export const pointAPI = {
     }
   },
 
-  // 포인트 사용 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
+  // 포인트 사용 내역 조회
   transactionsusages: async (
-    page: number = 1,
-    size: number = 10,
+    page: number = 0,
+    size: number = 5,
   ): Promise<TransactionsUsagesResponse> => {
     try {
-      console.log('Request URL:', '/transactions/usages', 'Page:', page, 'Size:', size);
+      console.log('🔹 포인트 사용 내역 요청:', { page, size });
 
-      const response = await instance.get<TransactionsUsagesResponse>(
-        '/transactions/usages',
+      const response = await instance.get<TransactionsUsagesResponse>('/transactions/usages', {
+        params: { page, size },
+      });
 
-        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
-      );
-      console.log('Response:', response);
+      console.log('✅ 요청 URL:', response.config.url);
+      console.log('✅ 요청 Params:', response.config.params);
+      console.log('📌 응답 데이터:', response.data);
+
       return response.data;
     } catch (error: unknown) {
-      console.error('Error during transactionsusages:', error);
+      console.error('❌ 포인트 사용 내역 API 오류:', error);
       return handleError<TransactionsUsagesResponse>(error);
     }
   },
 
-  // 포인트 수익 내역 조회 (GET 방식, page와 size 쿼리 파라미터 포함)
+  // 포인트 수익 내역 조회
   transactionsearning: async (
-    page: number = 1,
-    size: number = 10,
+    page: number = 0,
+    size: number = 5,
   ): Promise<TransactionsEarningsResponse> => {
     try {
-      console.log('Request URL:', '/transactions/earnings', 'Page:', page, 'Size:', size);
+      console.log('🔹 포인트 수익 내역 요청:', { page, size });
 
-      const response = await instance.get<TransactionsEarningsResponse>(
-        '/transactions/earnings',
-        { params: { page, size } }, // 쿼리 파라미터로 page와 size 전달
-      );
-      console.log('Response:', response);
+      const response = await instance.get<TransactionsEarningsResponse>('/transactions/earnings', {
+        params: { page, size },
+      });
+
+      console.log('✅ 요청 URL:', response.config.url);
+      console.log('✅ 요청 Params:', response.config.params);
+      console.log('📌 응답 데이터:', response.data);
+
       return response.data;
     } catch (error: unknown) {
-      console.error('Error during transactionsearning:', error);
+      console.error('❌ 포인트 수익 내역 API 오류:', error);
       return handleError<TransactionsEarningsResponse>(error);
     }
   },

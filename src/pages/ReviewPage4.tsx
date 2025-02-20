@@ -289,7 +289,7 @@ const ReviewPage4 = () => {
     }
   }, [placeId, isLoggedIn, selectedAnimation, inputRating, reviewText, dispatch, loadData]);
 
-  // 리액션 핸들러 (수정됨)
+  // 리액션 핸들러
   const handleReaction = useCallback(
     async (reviewId: number, reactionType: 0 | 1) => {
       if (!isLoggedIn || !placeId) {
@@ -305,22 +305,8 @@ const ReviewPage4 = () => {
 
       try {
         const response = await addShortReviewReaction(Number(placeId), reviewId, reactionType);
-
         if (response.isSuccess) {
-          // 로컬 상태 직접 업데이트
-          setReviews((prevReviews) =>
-            prevReviews.map((review) =>
-              review.id === reviewId
-                ? {
-                    ...review,
-                    likes: response.result.likes,
-                    dislikes: response.result.dislikes,
-                    isLiked: response.result.isLiked,
-                    isDisliked: response.result.isDisliked,
-                  }
-                : review,
-            ),
-          );
+          await loadData();
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -332,7 +318,7 @@ const ReviewPage4 = () => {
         }
       }
     },
-    [isLoggedIn, placeId, dispatch],
+    [isLoggedIn, placeId, dispatch, loadData],
   );
 
   // 리뷰 아이템 렌더링
@@ -487,10 +473,6 @@ const ReviewPage4 = () => {
       handleDeleteReview,
     ],
   );
-  useEffect(() => {
-    console.log('Reviews updated:', reviews);
-    // 여기에 reviews 상태 변경에 따른 추가 로직을 넣을 수 있습니다.
-  }, [reviews]);
 
   return (
     <S.Container>

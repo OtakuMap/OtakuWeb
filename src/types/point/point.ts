@@ -25,7 +25,9 @@ export interface PointbalanceResponse {
 
 // 포인트 충전
 export interface PointchargeRequest {
-  point: string;
+  price: number;
+  impUid: string;
+  merchantUid: string;
 }
 
 export interface PointchargeResponse {
@@ -39,16 +41,73 @@ export interface PointchargeResponse {
 
 // 포인트 결제 검증
 export interface PointverifyRequest {
-  impUid: string;
-  merchantUid: string;
-  amount: number;
+  imp_uid: string; // 결제 고유번호 (필수)
 }
 
 export interface PointverifyResponse {
-  isSuccess: boolean;
-  code: string;
+  code: number;
   message: string;
-  result: string;
+  response: PaymentCancelResponseData;
+}
+
+export interface PaymentCancelResponseData {
+  channel: string;
+  escrow: boolean;
+  name: string;
+  amount: number;
+  currency: string;
+  status: string;
+  payMethod: string;
+  pgProvider: string;
+  embPgProvider: string;
+  pgTid: string;
+  applyNum: string;
+  bankCode: string;
+  bankName: string;
+  cardCode: string;
+  cardName: string;
+  cardType: number;
+  vbankCode: string;
+  vbankName: string;
+  vbankNum: string;
+  vbankHolder: string;
+  vbankDate: string; // ISO 8601 형식의 날짜 문자열
+  vbankIssuedAt: number;
+  cancelAmount: number;
+  startedAt: number;
+  paidAt: string; // ISO 8601 형식의 날짜 문자열
+  failedAt: string; // ISO 8601 형식의 날짜 문자열
+  cancelledAt: string; // ISO 8601 형식의 날짜 문자열
+  failReason: string;
+  cancelReason: string;
+  receiptUrl: string;
+  cancelHistory: CancelHistory[];
+  cashReceiptIssued: boolean;
+  customerUidUsage: string;
+  impUid: string;
+  merchantUid: string;
+  customerUid: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerTel: string;
+  buyerAddr: string;
+  buyerPostcode: string;
+  customData: string;
+  cardNumber: string;
+  cardQuota: number;
+}
+
+export interface CancelHistory {
+  amount: number;
+  reason: string;
+  pgTid: string;
+  cancelledAt: number;
+  receiptUrl: string;
+}
+
+// 결제 취소
+export interface PaymentCancelRequest {
+  imp_uid: string; // 결제 고유번호 (필수)
 }
 
 // 포인트 충전 내역 확인 /api/points/transactions/charges (get)
@@ -81,6 +140,7 @@ export interface TransactionsUsagesResponse {
       point: number;
       purchasedAt: string;
     }[];
+    currentPage: number;
     totalPages: number;
     totalElements: number;
     isLast: boolean;
@@ -96,8 +156,9 @@ export interface TransactionsEarningsResponse {
     transactions: {
       title: string;
       point: number;
-      earnedAt: string;
+      purchasedAt: string;
     }[];
+    currentPage: number;
     totalPages: number;
     totalElements: number;
     isLast: boolean;

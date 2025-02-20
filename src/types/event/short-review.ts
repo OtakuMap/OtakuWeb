@@ -25,13 +25,23 @@ export interface UpdateShortReviewRequest {
 
 export interface EventShortReview {
   id: number;
-  user: User;
+  user: {
+    userId: number;
+    nickname: string;
+    profileImage: string;
+  };
   content: string;
   rating: number;
-  profileImage: ProfileImage;
-  likes: number;
-  dislikes: number;
-  userVote?: 'like' | 'dislike' | null;
+  profileImage: {
+    id: number;
+    uuid: string;
+    fileName: string;
+    fileUrl: string;
+  };
+  likes?: number;
+  dislikes?: number;
+  isLiked?: boolean;
+  isDisliked?: boolean;
 }
 
 export interface EventShortReviewListResponse {

@@ -143,6 +143,22 @@ export const VerifyButton = styled.button`
   cursor: pointer;
   padding: 0px;
 `;
+export const DetailText = styled.label`
+  text-align: flex-start;
+  font-family: 'Gothic A1';
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #999797;
+  width: 419px;
+`;
+
+export const Text = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: -25px;
+`;
 
 export const VerifyButtonShort = styled.button`
   height: 60px;
@@ -157,17 +173,6 @@ export const VerifyButtonShort = styled.button`
   padding: 0px;
 `;
 
-export const DetailText = styled.div`
-  width: 395px;
-  font-family: 'Gothic A1';
-  color: #999797;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  cursor: pointer;
-  margin-left: 164px;
-`;
-
 export const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -178,14 +183,38 @@ export const CheckboxGroup = styled.div`
 export const CheckboxItem = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
 `;
 
 export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
+  appearance: none;
   width: 30px;
   height: 30px;
-  accent-color: #bdaee5; /* 체크박스 색상 */
+  border-radius: 5px;
+  border: 2px solid #d1c4e9; /* 연보라색 테두리 */
+  background-color: #d1c4e9; /* 기본 연보라색 배경 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  margin-bottom: 10px;
+
+  &:checked {
+    background-color: #d1c4e9; /* 체크 후에도 연보라색 유지 */
+    position: relative;
+  }
+
+  &:checked::after {
+    content: ' '; /* 기본 체크 표시 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 10px;
+    border: solid #6b38fd;
+    border-width: 0 0 5px 5px;
+    transform: translate(-50%, -70%) rotate(-45deg);
+    border-radius: 3px;
+  }
 `;
 
 export const CheckboxLabel = styled.label`

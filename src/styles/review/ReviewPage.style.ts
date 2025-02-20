@@ -805,8 +805,8 @@ export const MapContainer = styled.div`
   text-align: center;
 
   img {
-    width: 200px; // 너비 고정
-    height: 200px; // 높이 고정
+    width: 500px; // 너비 고정
+    height: 500px; // 높이 고정
     object-fit: cover; // 이미지 비율 유지하면서 채우기
     border-radius: 8px; // 선택적: 모서리 둥글게
   }
