@@ -47,6 +47,11 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
   const [editError, setEditError] = useState<string | null>(null);
 
   const handleEditStart = (review: EventShortReview) => {
+    if (!review || typeof review.id !== 'number') {
+      console.error('Invalid review object:', review);
+      return;
+    }
+
     setEditingId(review.id);
     setEditText(review.content);
     setEditRating(review.rating);
@@ -61,6 +66,14 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
   };
 
   const handleEditComplete = async (reviewId: number) => {
+    console.log('handleEditComplete called with reviewId:', reviewId); // 디버깅용 로그
+
+    if (typeof reviewId !== 'number' || reviewId <= 0) {
+      console.error('Invalid Review ID:', reviewId);
+      setEditError('유효하지 않은 리뷰 ID입니다.');
+      return;
+    }
+
     if (!editText || !editRating) {
       setEditError('별점과 내용을 모두 입력해주세요.');
       return;
