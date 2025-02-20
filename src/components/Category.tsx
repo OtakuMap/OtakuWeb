@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as S from '../styles/category/category.styles';
 import { getEventsByCategory } from '@/api/category/category';
 import { Event, Genre, EventType, EventStatus } from '@/types/category/category';
+import { searchEvents } from '@/api/category/events-search';
+import { getEventDetails } from '@/api/category/events-details';
 import searchIcon from '../assets/search.png';
-import { searchEvents } from '@/api/category/events-search'; // 추가
 
 const chunk = (arr: any[], size: number) => {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
@@ -12,6 +14,7 @@ const chunk = (arr: any[], size: number) => {
 };
 
 const Category = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('애니');
   const [activeMainMenu, setActiveMainMenu] = useState('전체');
   const [activeSubMenu, setActiveSubMenu] = useState('');
@@ -25,6 +28,36 @@ const Category = () => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<Event[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const fetchInitialEvents = async () => {
+      try {
+        setIsLoading(true);
+        // 애니 > 전체에 해당하는 파라미터 명시적으로 설정
+        const params = {
+          page: 0,
+          size: 12,
+          type: 'ALL', // 전체 타입
+          status: 'ALL', // 전체 상태
+        };
+
+        const response = await getEventsByCategory(params);
+        console.log('Initial events response:', response); // 응답 확인
+
+        if (response.isSuccess) {
+          setEvents(response.result.events);
+          setIsLast(response.result.isLast);
+        }
+      } catch (error) {
+        console.error('Failed to fetch initial events:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialEvents();
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
 
   const fetchEvents = async () => {
     try {
@@ -64,7 +97,19 @@ const Category = () => {
     }
   };
 
-  // 검색어 필터링 함수
+  const handleEventClick = async (eventId: number) => {
+    try {
+      const response = await getEventDetails(eventId);
+      if (response.isSuccess) {
+        navigate(`/event/${eventId}`, {
+          state: { eventDetails: response.result },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch event details:', error);
+    }
+  };
+
   const filterSuggestions = useCallback(
     (searchText: string) => {
       if (!searchText.trim()) {
@@ -81,7 +126,6 @@ const Category = () => {
     [events],
   );
 
-  // 검색 입력 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
@@ -89,7 +133,6 @@ const Category = () => {
     setShowSuggestions(true);
   };
 
-  // handleSearchSubmit 함수 수정
   const handleSearchSubmit = async () => {
     if (inputValue.trim()) {
       setSearchTerm(inputValue.trim());
@@ -112,7 +155,6 @@ const Category = () => {
     }
   };
 
-  // handleKeyPress 함수 수정
   const handleKeyPress = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       await handleSearchSubmit();
@@ -121,7 +163,7 @@ const Category = () => {
       setSearchTerm('');
       setShowSuggestions(false);
       setPageNumber(0);
-      fetchEvents(); // 검색 취소시 원래 목록으로 돌아가기
+      fetchEvents();
     }
   };
 
@@ -148,7 +190,6 @@ const Category = () => {
     }
   };
 
-  // 외부 클릭 시 제안 목록 숨기기
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -161,13 +202,13 @@ const Category = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // 검색어, 탭, 메뉴 변경 시 이벤트 다시 불러오기
   useEffect(() => {
-    setPageNumber(0);
-    fetchEvents();
+    if (activeTab || activeMainMenu || activeSubMenu || searchTerm) {
+      setPageNumber(0);
+      fetchEvents();
+    }
   }, [activeTab, activeMainMenu, activeSubMenu, searchTerm]);
 
-  // 장르 및 이벤트 타입 변환 함수들
   const getGenreEnum = (subMenu: string): Genre => {
     const genreMap: { [key: string]: Genre } = {
       로맨스: Genre.ROMANCE,
@@ -190,7 +231,6 @@ const Category = () => {
     return typeMap[subMenu] || EventType.ALL;
   };
 
-  // 탭 변경 핸들러
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setActiveMainMenu(tab === '애니' ? '전체' : '진행중인 이벤트');
@@ -199,7 +239,6 @@ const Category = () => {
     setInputValue('');
   };
 
-  // 서브 메뉴 렌더링
   const renderSubMenu = () => {
     if (activeTab === '애니') {
       if (activeMainMenu === '장르별') {
@@ -329,7 +368,7 @@ const Category = () => {
           {chunk(events, 4).map((rowEvents, rowIndex) => (
             <S.AnimeRow key={rowIndex}>
               {rowEvents.map((event) => (
-                <S.AnimeCard key={event.id}>
+                <S.AnimeCard key={event.id} onClick={() => handleEventClick(event.id)}>
                   <S.AnimeImage src={event.thumbnail.fileUrl} alt={event.title} />
                   <S.AnimeTitle>{event.title}</S.AnimeTitle>
                   <S.EventDate>{`${event.startDate} ~ ${event.endDate}`}</S.EventDate>

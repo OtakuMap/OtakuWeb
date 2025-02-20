@@ -1,16 +1,16 @@
 import instance from '@/api/axios';
 import { DeleteEventsResponse } from '@/types/like/delete-events';
 
-export const deleteEvents = async (eventIds: number[]) => {
+export const deleteEvents = async (eventIds: number[]): Promise<DeleteEventsResponse> => {
   try {
-    const params = new URLSearchParams();
-    eventIds.forEach((id) => params.append('eventIds', id.toString()));
-
+    console.log('Sending eventIds:', eventIds);
     const response = await instance.delete<DeleteEventsResponse>('/event-likes', {
-      params,
+      data: { eventIds: eventIds },
+      headers: { 'Content-Type': 'application/json' },
     });
     return response.data;
   } catch (error) {
+    console.error('Delete events error:', error.response?.data);
     throw error;
   }
 };

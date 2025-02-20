@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import spaceIcon from '../assets/space-icon.png';
 import starIcon from '../assets/circle-star.png';
@@ -53,7 +54,7 @@ const SavedEvents: React.FC = () => {
   const handleToggleStar = async (event: EventLike, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (isTogglingFavorite === event.id) return; // 이미 처리 중인 경우 중복 요청 방지
+    if (isTogglingFavorite === event.id) return;
 
     try {
       setIsTogglingFavorite(event.id);
@@ -64,7 +65,6 @@ const SavedEvents: React.FC = () => {
           prevEvents.map((e) => (e.id === event.id ? { ...e, isFavorite: !e.isFavorite } : e)),
         );
 
-        // 즐겨찾기 목록을 보고 있을 때 즐겨찾기 해제하면 해당 항목 제거
         if (showOnlyStarred && event.isFavorite) {
           setEvents((prevEvents) => prevEvents.filter((e) => e.id !== event.id));
         }
@@ -83,25 +83,43 @@ const SavedEvents: React.FC = () => {
   };
 
   const handleDeleteSelected = async () => {
-    if (selectedEvents.length === 0 || isDeleting) return;
+    if (selectedEvents.length === 0) {
+      alert('삭제할 이벤트를 선택해주세요.');
+      return;
+    }
+
+    if (isDeleting) return;
 
     try {
       setIsDeleting(true);
+
+      console.log('Deleting events with IDs:', selectedEvents); // 이 로그 확인
+
       const response = await deleteEvents(selectedEvents);
+
+      console.log('Delete response:', response);
 
       if (response.isSuccess) {
         setEvents((prev) => prev.filter((event) => !selectedEvents.includes(event.id)));
         setSelectedEvents([]);
+        alert('선택한 이벤트가 성공적으로 삭제되었습니다.');
       } else {
-        console.error('Failed to delete events:', response.message);
+        console.error('Failed to delete events:', response);
+        alert(`삭제 실패: ${response.message || '알 수 없는 오류'}`);
       }
     } catch (error) {
-      console.error('Error deleting events:', error);
+      console.error('Full error details:', error);
+
+      if (axios.isAxiosError(error)) {
+        console.error('Error response:', error.response?.data);
+        alert(`삭제 중 오류: ${error.response?.data?.message || '서버 오류'}`);
+      } else {
+        alert('이벤트 삭제 중 예상치 못한 오류가 발생했습니다.');
+      }
     } finally {
       setIsDeleting(false);
     }
   };
-
   const getEventTypeLabel = (type: EventType) => {
     switch (type) {
       case 'POPUP_STORE':
@@ -147,13 +165,13 @@ const SavedEvents: React.FC = () => {
               <button
                 onClick={handleDeleteSelected}
                 style={{
-                  color: selectedEvents.length > 0 ? '#7B66FF' : 'inherit',
-                  cursor: selectedEvents.length > 0 ? 'pointer' : 'default',
+                  color: selectedEvents.length > 0 ? '#7B66FF' : '#999',
+                  cursor: selectedEvents.length > 0 ? 'pointer' : 'not-allowed',
                   opacity: isDeleting ? 0.5 : 1,
                 }}
-                disabled={isDeleting}
+                disabled={selectedEvents.length === 0 || isDeleting}
               >
-                {isDeleting ? '삭제중...' : '선택 삭제'}
+                {isDeleting ? '삭제중...' : `선택 삭제 (${selectedEvents.length})`}
               </button>
               <span>/</span>
               <button
@@ -197,7 +215,7 @@ const SavedEvents: React.FC = () => {
             {events.map((event) => (
               <S.EventCard
                 key={event.id}
-                isSelected={selectedEvents.includes(event.id)}
+                $isSelected={selectedEvents.includes(event.id)}
                 onClick={() => handleCardClick(event.id)}
               >
                 <S.EventImageWrapper>
