@@ -16,9 +16,14 @@ import StarIcon from '../assets/star.png';
 import SpaceIcon from '../assets/space.png';
 import PencilIcon from '../assets/pencil.png';
 import * as S from '../styles/mypage/mypage.style';
+import BackIcon from '../assets/back-icon.png'; // 뒤로가기 버튼 이미지 import
 
 const MyPage = () => {
   const navigate = useNavigate();
+  // 뒤로가기 핸들러 추가
+  const handleGoBack = () => {
+    navigate('/'); // 메인 페이지로 이동
+  };
   const dispatch = useDispatch();
   const { logout } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -298,6 +303,10 @@ const MyPage = () => {
 
   return (
     <S.Container>
+      {/* 뒤로가기 버튼 추가 */}
+      <S.BackButton onClick={handleGoBack}>
+        <S.BackIcon src={BackIcon} alt="뒤로가기" />
+      </S.BackButton>
       <S.Divider />
       <S.Mypage>마이 페이지</S.Mypage>
       <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
