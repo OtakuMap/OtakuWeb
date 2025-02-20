@@ -73,6 +73,7 @@ export interface RouteItemRequest {
 }
 
 export interface CustomRouteRequest {
+  originalRouteId: number;
   name: string;
   routeItems: {
     name: string;

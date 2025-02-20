@@ -18,7 +18,13 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import * as S from '../../styles/map/RouteLeftContainer.styles';
 import BackButton from '../common/BackButton';
-import { RouteLocation, RouteData, RouteInfo } from '../../types/map/route';
+import {
+  RouteLocation,
+  RouteData,
+  RouteInfo,
+  CustomRouteRequest,
+  UpdateRouteRequest,
+} from '../../types/map/route';
 import RouteDescriptionEditor from './RouteDescriptionEditor';
 import { useNavigate } from 'react-router-dom';
 import { RouteSource } from '@/types/map/routeSource';
@@ -211,6 +217,72 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
     setIsExpanded(!isExpanded);
   };
 
+  // const handleSaveRoute = useCallback(async () => {
+  //   if (!isLoggedIn) {
+  //     dispatch(openLoginModal());
+  //     return;
+  //   }
+
+  //   if (isSaving) return;
+
+  //   try {
+  //     setIsSaving(true);
+
+  //     const routeItems = routeData.locations.map((location, index) => ({
+  //       name: location.name,
+  //       placeId: location.id,
+  //       itemOrder: index,
+  //     }));
+
+  //     let response;
+  //     if (routeSource === RouteSource.REVIEW) {
+  //       // 후기에서 온 경우 - 새로운 루트 생성
+  //       const requestData = {
+  //         name: routeData.description,
+  //         routeItems,
+  //       };
+  //       response = await saveCustomRoute(requestData);
+  //       toast.success('새로운 루트가 저장되었습니다!');
+  //     } else {
+  //       // 저장된 루트나 좋아요한 루트에서 온 경우 - 기존 루트 수정
+  //       if (!routeId) {
+  //         throw new Error('루트 ID가 없습니다.');
+  //       }
+  //       const requestData = {
+  //         name: routeData.description,
+  //         routeId: routeId,
+  //         routeItems: routeItems.map(({ name, ...rest }) => rest),
+  //       };
+  //       response = await updateRoute(requestData);
+  //       toast.success('루트가 수정되었습니다!');
+  //     }
+
+  //     console.log('저장된 루트:', response);
+
+  //     // 성공 후 적절한 페이지로 리다이렉트
+  //     // if (routeSource === RouteSource.REVIEW) {
+  //     //   navigate('/route-management');
+  //     // } else {
+  //     //   navigate(-1);
+  //     // }
+  //     // 테스트를 위해 임시로 수정
+  //     if (routeSource === RouteSource.REVIEW) {
+  //       navigate('/route-management');
+  //     } else {
+  //       navigate(-1);
+  //     }
+  //   } catch (error: any) {
+  //     console.error('루트 저장 실패:', error);
+  //     toast.error(error.message || '루트 저장에 실패했습니다. 다시 시도해주세요.');
+  //   } finally {
+  //     setIsSaving(false);
+  //   }
+  // }, [isLoggedIn, routeData, routeSource, routeId, dispatch, isSaving, navigate]);
+
+  const handleBack = useCallback(() => {
+    window.history.back();
+  }, []);
+
   const handleSaveRoute = useCallback(async () => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());
@@ -231,7 +303,8 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       let response;
       if (routeSource === RouteSource.REVIEW) {
         // 후기에서 온 경우 - 새로운 루트 생성
-        const requestData = {
+        const requestData: CustomRouteRequest = {
+          originalRouteId: routeId || 0, // 현재의 routeId 사용
           name: routeData.description,
           routeItems,
         };
@@ -242,7 +315,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
         if (!routeId) {
           throw new Error('루트 ID가 없습니다.');
         }
-        const requestData = {
+        const requestData: UpdateRouteRequest = {
           name: routeData.description,
           routeId: routeId,
           routeItems: routeItems.map(({ name, ...rest }) => rest),
@@ -253,13 +326,6 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
 
       console.log('저장된 루트:', response);
 
-      // 성공 후 적절한 페이지로 리다이렉트
-      // if (routeSource === RouteSource.REVIEW) {
-      //   navigate('/route-management');
-      // } else {
-      //   navigate(-1);
-      // }
-      // 테스트를 위해 임시로 수정
       if (routeSource === RouteSource.REVIEW) {
         navigate('/route-management');
       } else {
@@ -272,10 +338,6 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       setIsSaving(false);
     }
   }, [isLoggedIn, routeData, routeSource, routeId, dispatch, isSaving, navigate]);
-
-  const handleBack = useCallback(() => {
-    window.history.back();
-  }, []);
 
   //설명 수정 - 저장
   const handleDescriptionSave = (newDescription: string) => {
