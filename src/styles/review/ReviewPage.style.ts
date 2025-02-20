@@ -1340,3 +1340,45 @@ export const AddLocationButton = styled.button`
     background-color: #e0e0e0;
   }
 `;
+
+export const ModalOverlay5 = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const ModalContent5 = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+`;
+
+export const PurchaseModal = styled(ModalContent)`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+export const BlurredContent = styled.div<{ $isPaid: boolean }>`
+  filter: ${(props) => (props.$isPaid ? 'blur(10px)' : 'none')};
+  pointer-events: ${(props) => (props.$isPaid ? 'none' : 'auto')};
+  position: relative;
+`;
+
+export const PurchaseOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+`;

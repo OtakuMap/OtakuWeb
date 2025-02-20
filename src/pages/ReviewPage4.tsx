@@ -289,7 +289,7 @@ const ReviewPage4 = () => {
     }
   }, [placeId, isLoggedIn, selectedAnimation, inputRating, reviewText, dispatch, loadData]);
 
-  // 리액션 핸들러
+  // 리액션 핸들러 (수정됨)
   const handleReaction = useCallback(
     async (reviewId: number, reactionType: 0 | 1) => {
       if (!isLoggedIn || !placeId) {
@@ -305,8 +305,22 @@ const ReviewPage4 = () => {
 
       try {
         const response = await addShortReviewReaction(Number(placeId), reviewId, reactionType);
+
         if (response.isSuccess) {
-          await loadData();
+          // 로컬 상태 직접 업데이트
+          setReviews((prevReviews) =>
+            prevReviews.map((review) =>
+              review.id === reviewId
+                ? {
+                    ...review,
+                    likes: response.result.likes,
+                    dislikes: response.result.dislikes,
+                    isLiked: response.result.isLiked,
+                    isDisliked: response.result.isDisliked,
+                  }
+                : review,
+            ),
+          );
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -318,7 +332,7 @@ const ReviewPage4 = () => {
         }
       }
     },
-    [isLoggedIn, placeId, dispatch, loadData],
+    [isLoggedIn, placeId, dispatch],
   );
 
   // 리뷰 아이템 렌더링

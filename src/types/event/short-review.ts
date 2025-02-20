@@ -65,3 +65,20 @@ export interface UpdateShortReviewResponse {
   message: string;
   result: string;
 }
+
+export interface ShortReviewReactionRequest {
+  reactionType: 0 | 1; // 0: dislike, 1: like
+}
+
+export interface ShortReviewReactionResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    reviewId: number;
+    likes: number;
+    dislikes: number;
+    isLiked: boolean;
+    isDisliked: boolean;
+  };
+}

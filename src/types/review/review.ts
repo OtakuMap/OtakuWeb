@@ -26,6 +26,7 @@ export interface ReviewDetail {
   title: string;
   view: number;
   content: string;
+  price: number; // 0이면 무료, 0 초과면 유료
   reviewImages: ImageData[];
   userName: string;
   profileImage: ImageData;

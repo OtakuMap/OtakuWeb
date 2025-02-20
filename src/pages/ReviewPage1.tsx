@@ -3,7 +3,6 @@ import { FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import sectionImage from '../assets/1.png';
 import deleteIcon from '../assets/X.png';
-import conanImage from '../assets/conan.png';
 import * as S from '../styles/review/ReviewPage.style';
 import { useTopReviews } from '../hooks/main/useTopReviews';
 import { useRecentSearches } from '../hooks/review/useRecentSearch';
@@ -92,9 +91,9 @@ const ReviewPage1: React.FC = () => {
         {isSearching && <S.LoadingText>검색 중...</S.LoadingText>}
 
         {/* 검색어가 없을 때 가이드 메시지 */}
-        {!searchInput.trim() && !searchError && !isSearching && (
+        {/* {!searchInput.trim() && !searchError && !isSearching && (
           <S.NoResults>관심있는 여행 후기를 검색해보세요!</S.NoResults>
-        )}
+        )} */}
 
         <S.RecentSearch>
           <S.Title>최근검색어</S.Title>
