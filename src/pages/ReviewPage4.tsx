@@ -351,7 +351,7 @@ const ReviewPage4 = () => {
         reviewUserId: review.user.userId,
         isOwner,
         userIdType: typeof userId,
-        review,
+        reviews,
       });
 
       if (isEditing) {
@@ -485,6 +485,7 @@ const ReviewPage4 = () => {
       handleReaction,
       handleEditClick,
       handleDeleteReview,
+      reviews,
     ],
   );
 

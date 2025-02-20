@@ -27,7 +27,8 @@ export const WhiteContainer = styled.div`
   margin: 10px 56px 40px 56px;
   box-sizing: border-box;
   width: calc(100% - 112px);
-  height: 1182px;
+  min-height: 1182px; // 최소 높이는 유지하면서
+  height: auto; // 내용에 따라 높이 조절
 `;
 export const WhiteContainer6 = styled.div`
   background-color: white;
@@ -802,6 +803,13 @@ export const MapContainer = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  img {
+    width: 200px; // 너비 고정
+    height: 200px; // 높이 고정
+    object-fit: cover; // 이미지 비율 유지하면서 채우기
+    border-radius: 8px; // 선택적: 모서리 둥글게
+  }
 `;
 
 export const MapImage = styled.img`
