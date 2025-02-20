@@ -31,6 +31,7 @@ export const Title = styled.div`
   flex-shrink: 0;
   margin-bottom: 42px;
 `;
+
 export const PointChargeBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,7 +43,7 @@ export const PointChargeBox = styled.div`
   background: #ffffff;
   border-radius: 20px;
   overflow-y: hidden;
-  scrollbar-width: none;
+  overflow-x: hidden;
 `;
 
 export const Text = styled.div`

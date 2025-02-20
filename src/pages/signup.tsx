@@ -25,6 +25,8 @@ import {
   CheckIcon2,
   TermsContent,
   Terms,
+  Text,
+  DetailText,
 } from '../styles/login/signup.style';
 /*import { debounce } from '@/utils/debounce';*/
 import { authAPI } from '../api/login/authAPI';
@@ -212,6 +214,9 @@ const SignupPage: React.FC = () => {
               중복 확인
             </VerifyButton>
           </FormGroup>
+          <Text>
+            <DetailText>• 6자 이상의 영문 혹은 영문과 숫자를 조합 </DetailText>
+          </Text>
 
           <FormGroup2>
             <Name>E-mail</Name>
@@ -258,6 +263,11 @@ const SignupPage: React.FC = () => {
               />
             </div>
           </FormGroup3>
+          <Text>
+            <DetailText>• 10자 이상 입력</DetailText>
+            <DetailText>• 영문/숫자/특수문자(공백제외)만 허용하며, 2개 이상 조합</DetailText>
+            <DetailText>• 동일한 숫자 3개 이상 연속 사용 불가</DetailText>
+          </Text>
 
           <FormGroup4>
             <Name>비밀번호 확인</Name>
