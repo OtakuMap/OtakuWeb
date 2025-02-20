@@ -76,9 +76,11 @@ const SavedEvents: React.FC = () => {
     }
   };
 
-  const handleCardClick = (id: number) => {
+  const handleCardClick = (event: EventLike) => {
     setSelectedEvents((prev) =>
-      prev.includes(id) ? prev.filter((eventId) => eventId !== id) : [...prev, id],
+      prev.includes(event.eventId)
+        ? prev.filter((id) => id !== event.eventId)
+        : [...prev, event.eventId],
     );
   };
 
@@ -88,38 +90,39 @@ const SavedEvents: React.FC = () => {
       return;
     }
 
-    if (isDeleting) return;
-
     try {
       setIsDeleting(true);
 
-      console.log('Deleting events with IDs:', selectedEvents); // 이 로그 확인
+      console.log('Deleting events with IDs:', selectedEvents);
 
       const response = await deleteEvents(selectedEvents);
-
-      console.log('Delete response:', response);
+      console.log('삭제 응답:', response);
 
       if (response.isSuccess) {
-        setEvents((prev) => prev.filter((event) => !selectedEvents.includes(event.id)));
+        // 삭제된 이벤트 제거
+        setEvents((prev) => prev.filter((event) => !selectedEvents.includes(event.eventId)));
         setSelectedEvents([]);
         alert('선택한 이벤트가 성공적으로 삭제되었습니다.');
       } else {
-        console.error('Failed to delete events:', response);
-        alert(`삭제 실패: ${response.message || '알 수 없는 오류'}`);
+        alert(response.message || '삭제에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('Full error details:', error);
-
+    } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error('Error response:', error.response?.data);
-        alert(`삭제 중 오류: ${error.response?.data?.message || '서버 오류'}`);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          '서버 오류가 발생했습니다.';
+
+        console.error('Delete error details:', error.response?.data);
+        alert(errorMessage);
       } else {
-        alert('이벤트 삭제 중 예상치 못한 오류가 발생했습니다.');
+        alert('예상치 못한 오류가 발생했습니다.');
       }
     } finally {
       setIsDeleting(false);
     }
   };
+
   const getEventTypeLabel = (type: EventType) => {
     switch (type) {
       case 'POPUP_STORE':
@@ -215,8 +218,8 @@ const SavedEvents: React.FC = () => {
             {events.map((event) => (
               <S.EventCard
                 key={event.id}
-                $isSelected={selectedEvents.includes(event.id)}
-                onClick={() => handleCardClick(event.id)}
+                $isSelected={selectedEvents.includes(event.eventId)}
+                onClick={() => handleCardClick(event)}
               >
                 <S.EventImageWrapper>
                   <S.EventImage src={event.thumbnail} alt={event.name} />
