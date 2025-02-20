@@ -18,7 +18,13 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import * as S from '../../styles/map/RouteLeftContainer.styles';
 import BackButton from '../common/BackButton';
-import { RouteLocation, RouteData, RouteInfo, CustomRouteRequest } from '../../types/map/route';
+import {
+  RouteLocation,
+  RouteData,
+  RouteInfo,
+  CustomRouteRequest,
+  UpdateRouteRequest,
+} from '../../types/map/route';
 import RouteDescriptionEditor from './RouteDescriptionEditor';
 import { useNavigate } from 'react-router-dom';
 import { RouteSource } from '@/types/map/routeSource';
@@ -298,7 +304,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
       if (routeSource === RouteSource.REVIEW) {
         // 후기에서 온 경우 - 새로운 루트 생성
         const requestData: CustomRouteRequest = {
-          originalRouteId: 0, // 새로운 루트이므로 0
+          originalRouteId: routeId || 0, // 현재의 routeId 사용
           name: routeData.description,
           routeItems,
         };
@@ -309,7 +315,7 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
         if (!routeId) {
           throw new Error('루트 ID가 없습니다.');
         }
-        const requestData = {
+        const requestData: UpdateRouteRequest = {
           name: routeData.description,
           routeId: routeId,
           routeItems: routeItems.map(({ name, ...rest }) => rest),
@@ -320,7 +326,6 @@ const RouteLeftContainer: React.FC<RouteLeftContainerProps> = ({
 
       console.log('저장된 루트:', response);
 
-      // 성공 후 리다이렉트
       if (routeSource === RouteSource.REVIEW) {
         navigate('/route-management');
       } else {
