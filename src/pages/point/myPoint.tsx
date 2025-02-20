@@ -90,7 +90,7 @@ const MyPoint: React.FC = () => {
         <Name>포인트 충전내역</Name>
 
         {chargeHistory.length === 0 ? (
-          <div>충전 내역이 없습니다.</div>
+          <DateTime>충전 내역이 없습니다.</DateTime>
         ) : (
           displayedItems.map((item, index) => (
             <PointRow key={index}>
@@ -105,8 +105,6 @@ const MyPoint: React.FC = () => {
             </PointRow>
           ))
         )}
-
-        <Divider />
 
         <PaginationContainer>
           <PaginationButton onClick={() => handlePageChange('prev')} disabled={currentPage === 1}>
