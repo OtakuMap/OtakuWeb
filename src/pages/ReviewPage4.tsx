@@ -351,7 +351,7 @@ const ReviewPage4 = () => {
         reviewUserId: review.user.userId,
         isOwner,
         userIdType: typeof userId,
-        reviews,
+        review,
       });
 
       if (isEditing) {
@@ -485,9 +485,12 @@ const ReviewPage4 = () => {
       handleReaction,
       handleEditClick,
       handleDeleteReview,
-      reviews,
     ],
   );
+  useEffect(() => {
+    console.log('Reviews updated:', reviews);
+    // 여기에 reviews 상태 변경에 따른 추가 로직을 넣을 수 있습니다.
+  }, [reviews]);
 
   return (
     <S.Container>
