@@ -23,7 +23,7 @@ const OAuthRedirectHandler = () => {
       if (provider) {
         try {
           await oauthLogin(provider, code); // ⬅ 객체가 아닌 문자열 전달
-          navigate('/main');
+          navigate('/');
         } catch (error) {
           console.error('OAuth Login failed:', error);
           // 에러 alert 있었으나 삭제
