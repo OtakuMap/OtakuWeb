@@ -4,6 +4,9 @@ import { EventDetails } from '@/types/event/details';
 import { EventShortReview } from '@/types/event/short-review';
 import { getEventDetails } from '@/api/event/details';
 import { createShortReview, updateShortReview, deleteShortReview } from '@/api/event/short-review';
+import { useDispatch } from 'react-redux';
+import { toggleShortReviewReaction } from '@/api/event/short-review';
+import { openLoginModal } from '@/store/slices/modalSlice';
 
 // EventDetails hook (기존 코드 동일)
 export const useEventDetails = (eventId: number) => {
@@ -40,6 +43,7 @@ export const useEventDetails = (eventId: number) => {
 
 // Reviews hook (기존 코드 동일)
 export const useReviews = (initialReviews: EventShortReview[]) => {
+  const dispatch = useDispatch();
   const [reviews, setReviews] = useState<EventShortReview[]>(initialReviews);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
@@ -120,37 +124,43 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
     }
   };
 
-  const handleLike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes + 1;
-          return {
-            ...review,
-            likes: newLikes,
-            userVote: review.userVote === 'like' ? null : 'like',
-          };
-        }
-        return review;
-      }),
-    );
+  const handleReaction = async (reviewId: number, reactionType: 0 | 1, isLoggedIn: boolean) => {
+    if (!isLoggedIn) {
+      dispatch(openLoginModal());
+      return;
+    }
+
+    try {
+      const response = await toggleShortReviewReaction(reviewId, reactionType);
+
+      if (response.isSuccess) {
+        setReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review.id === reviewId
+              ? {
+                  ...review,
+                  likes: response.result.likes,
+                  dislikes: response.result.dislikes,
+                  isLiked: response.result.isLiked,
+                  isDisliked: response.result.isDisliked,
+                }
+              : review,
+          ),
+        );
+      } else {
+        console.error('Failed to update reaction:', response.message);
+      }
+    } catch (error) {
+      console.error('Error handling reaction:', error);
+    }
   };
 
-  const handleDislike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          const newDislikes =
-            review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes + 1;
-          return {
-            ...review,
-            dislikes: newDislikes,
-            userVote: review.userVote === 'dislike' ? null : 'dislike',
-          };
-        }
-        return review;
-      }),
-    );
+  const handleLike = async (reviewId: number, isLoggedIn: boolean) => {
+    await handleReaction(reviewId, 1, isLoggedIn);
+  };
+
+  const handleDislike = async (reviewId: number, isLoggedIn: boolean) => {
+    await handleReaction(reviewId, 0, isLoggedIn);
   };
 
   return {

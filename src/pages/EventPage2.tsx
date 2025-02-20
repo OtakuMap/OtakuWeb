@@ -496,11 +496,17 @@ const EventPage = () => {
                   )}
 
                   <S.FeedbackButtons>
-                    <S.IconButton onClick={() => handleLike(review.id)}>
+                    <S.IconButton
+                      onClick={() => handleLike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
                       <ThumbsUp size={20} color={review.isLiked ? '#ffd700' : '#0c004b'} />
                       <span>{review.likes || 0}</span>
                     </S.IconButton>
-                    <S.IconButton onClick={() => handleDislike(review.id)}>
+                    <S.IconButton
+                      onClick={() => handleDislike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
                       <ThumbsDown size={20} color={review.isDisliked ? '#ffd700' : '#0c004b'} />
                       <span>{review.dislikes || 0}</span>
                     </S.IconButton>
