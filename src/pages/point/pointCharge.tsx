@@ -88,25 +88,22 @@ const PointCharge: React.FC = () => {
     });
   };
 
+  // 기존 콜백에서 verify 호출 부분
   const callback = async (response: PortOneResponse) => {
     console.log('callback 호출', response);
-    const { success, error_msg, imp_uid, merchant_uid } = response;
+    const { success, error_msg, imp_uid } = response;
 
     if (success) {
       alert('결제 성공!');
       try {
-        // verifyData 객체 확인
-        const verifyData = {
-          impUid: imp_uid, // imp_uid 확인
-          merchantUid: merchant_uid, // merchant_uid 확인
-          amount: selectedPoint,
-        };
+        console.log('보낼 verifyData:', imp_uid);
 
-        console.log('보낼 verifyData:', verifyData); // verifyData 확인
+        // verify 함수는 문자열 타입의 imp_uid를 인자로 받습니다.
+        const verifyResponse = await pointAPI.verify(imp_uid);
 
-        const verifyResponse = await pointAPI.verify(verifyData);
-
-        if (verifyResponse.isSuccess) {
+        // verifyResponse 안의 status가 "paid"인지 확인
+        if (verifyResponse.response.status === 'paid') {
+          // 결제 검증이 완료되었으므로 포인트 충전 API 호출
           const chargeData = { point: selectedPoint.toString() };
           const chargeResponse = await pointAPI.charge(chargeData);
 
@@ -116,7 +113,7 @@ const PointCharge: React.FC = () => {
             alert('포인트 충전 실패');
           }
         } else {
-          alert('결제 검증 실패');
+          alert('결제 검증 실패 또는 결제 상태가 paid가 아님');
         }
       } catch (error) {
         console.error('API 호출 실패:', error);
