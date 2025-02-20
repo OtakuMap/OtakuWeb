@@ -277,6 +277,15 @@ export const RecommendationsContainer = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: rgba(209, 193, 255, 0.5);
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: relative;
+    width: calc(100% - 32px);
+    left: 16px;
+    top: 0;
+    max-height: 30vh;
+    margin-top: 13px;
+  }
 `;
 
 export const RecommendationItem = styled.div<RecommendationItemProps>`
@@ -289,6 +298,11 @@ export const RecommendationItem = styled.div<RecommendationItemProps>`
   display: flex; // 다시 flex로
   align-items: center; // 세로 중앙 정렬
   justify-content: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 8px 16px;
+    margin-bottom: 8px;
+  }
 `;
 
 export const RecommendationText = styled.div`
@@ -301,8 +315,12 @@ export const RecommendationText = styled.div`
   color: #ffffff;
   text-align: center;
   padding: 1px 0;
-  // 아래 세 줄이 핵심입니다
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-all;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    line-height: 22px;
+  }
 `;
