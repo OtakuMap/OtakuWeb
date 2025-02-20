@@ -80,7 +80,7 @@ export const toggleShortReviewReaction = async (
 ): Promise<ShortReviewReactionResponse> => {
   try {
     const response = await instance.post<ShortReviewReactionResponse>(
-      `/api/events/short-reviews/${reviewId}/reaction`,
+      `/events/short-reviews/${reviewId}/reaction`,
       { reactionType },
     );
     return response.data;
