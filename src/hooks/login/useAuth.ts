@@ -148,13 +148,10 @@ export const useAuth = () => {
         );
         console.log('✅ OAuth 로그인 성공');
         navigate('/main');
-      } /*else {
-        console.log('❌ OAuth 로그인 실패:', response.message);
-        throw new Error(response.message);
-      }*/
+      }
     } catch (error) {
       console.error('🚨 OAuth 로그인 오류:', error);
-      throw error;
+      // 에러 메시지를 출력하는 부분은 제거
     } finally {
       setLoading(false);
     }
