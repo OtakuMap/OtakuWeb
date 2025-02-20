@@ -16,7 +16,7 @@ export const createShortReview = async (
 ): Promise<ShortReviewResponse> => {
   try {
     const response = await instance.post<ShortReviewResponse>(
-      `/api/events/${eventId}/short-reviews`,
+      `/events/${eventId}/short-reviews`,
       reviewData,
     );
     return response.data;
@@ -32,7 +32,7 @@ export const getEventShortReviews = async (
 ): Promise<EventShortReviewListResponse> => {
   try {
     const response = await instance.get<EventShortReviewListResponse>(
-      `/api/events/${eventId}/short-reviews`,
+      `/events/${eventId}/short-reviews`,
       {
         params: { page },
       },
@@ -50,7 +50,7 @@ export const updateShortReview = async (
 ): Promise<UpdateShortReviewResponse> => {
   try {
     const response = await instance.patch<UpdateShortReviewResponse>(
-      `/api/events/short-reviews/${eventShortReviewId}`,
+      `/events/short-reviews/${eventShortReviewId}`,
       data,
     );
     return response.data;
@@ -65,7 +65,7 @@ export const deleteShortReview = async (
 ): Promise<DeleteShortReviewResponse> => {
   try {
     const response = await instance.delete<DeleteShortReviewResponse>(
-      `/api/events/short-reviews/${eventShortReviewId}`,
+      `/events/short-reviews/${eventShortReviewId}`,
     );
     return response.data;
   } catch (err) {
