@@ -1,157 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import {
+  TitleContainer,
+  Pagebutton,
+  Title,
+  PurchaseTitle,
+  Container,
+  ContentWrapper,
+  IncomeTitle,
+  PointRow,
+  LeftGroup,
+  TabContainer,
+  Tab,
+  EventListContainer,
+  RightGroup,
+  DateTime,
+  Used,
+  PaginationContainer,
+  PaginationButton,
+  PageNumber,
+  DividerFirst,
+  Divider,
+  Listname,
+  Img,
+} from '../../styles/point/purchaseIncomeCheck.style';
 import { pointAPI } from '@/api/point/pointAPI';
 import { TransactionsUsagesResponse, TransactionsEarningsResponse } from '@/types/point/point';
 import Dimg from '../../assets/img/purpledivider.png';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-  max-height: 90%;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  background-color: #101148;
-  overflow-y: auto;
-  scrollbar-width: none;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  background-color: #101148;
-`;
-
-const Title = styled.h1`
-  font-family: 'Gothic A1';
-  margin-top: 32px;
-  font-size: 38px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 25px;
-  margin-left: 77px;
-`;
-
-const TabContainer = styled.div`
-  display: flex;
-  margin-bottom: 0px;
-  margin-left: 77px;
-`;
-
-const Tab = styled.button<{ $active?: boolean }>`
-  width: 194px;
-  height: 81px;
-  border: none;
-  background-color: ${(props) => (props.$active ? '#fff' : '#CCC')};
-  color: ${(props) => (props.$active ? '#000' : '#464654')};
-  border-radius: 20px 20px 0px 0px;
-  cursor: pointer;
-  text-align: center;
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 600;
-  margin-right: 28px;
-`;
-
-const EventListContainer = styled.div`
-  background: white;
-  border-radius: 0px 20px 20px 20px;
-  padding: 24px 80px;
-  width: 1350px;
-  margin-left: 77px;
-  align-items: center;
-`;
-
-const PurchaseTitle = styled.div`
-  font-family: 'Gothic A1';
-  font-size: 30px;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 10px;
-`;
-
-const IncomeTitle = styled(PurchaseTitle)``;
-
-const PointRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-const LeftGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  gap: 9px;
-`;
-
-const RightGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: 49px;
-  gap: 9px;
-`;
-
-const DateTime = styled.div`
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 600;
-  color: #000;
-`;
-
-const Listname = styled.div`
-  font-family: 'Gothic A1';
-  font-size: 16px;
-  font-weight: 500;
-  color: #000;
-`;
-
-const Used = styled.div`
-  font-family: 'Gothic A1';
-  font-size: 30px;
-  font-weight: 500;
-  color: #1e68f0;
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-`;
-
-const PaginationButton = styled.button`
-  margin: 0 8px;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: #101148;
-  cursor: pointer;
-
-  &:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const PageNumber = styled.div`
-  font-family: 'Gothic A1';
-  font-size: 20px;
-  font-weight: 600;
-  color: #000;
-`;
-
-const DividerFirst = styled.img`
-  width: 1450px;
-  margin-top: 70px;
-`;
+import Prepage from '../../assets/img/prepagewhite.svg';
+import { useNavigate } from 'react-router-dom';
+import Star from '../../assets/img/star.png';
 
 const PurchaseIncomeCheck: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'purchase' | 'income'>('purchase');
@@ -159,8 +36,22 @@ const PurchaseIncomeCheck: React.FC = () => {
   const [incomeData, setIncomeData] = useState<TransactionsEarningsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  // currentPage를 0이 아닌 1로 시작하도록 수정
+  const [currentPage, setCurrentPage] = useState(1); // 초기값을 1로 설정
+
   const itemsPerPage = 5;
+
+  // 날짜 포맷 변환 함수
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1)
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,10 +60,10 @@ const PurchaseIncomeCheck: React.FC = () => {
 
       try {
         if (activeTab === 'purchase') {
-          const response = await pointAPI.transactionsusages();
+          const response = await pointAPI.transactionsusages(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
           if (response.isSuccess) setPurchaseData(response);
         } else {
-          const response = await pointAPI.transactionsearning();
+          const response = await pointAPI.transactionsearning(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
           if (response.isSuccess) setIncomeData(response);
         }
       } catch (err) {
@@ -183,19 +74,20 @@ const PurchaseIncomeCheck: React.FC = () => {
     };
 
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, currentPage]);
 
+  const navigate = useNavigate();
   const dataList =
     activeTab === 'purchase'
-      ? purchaseData?.result?.transactions.map(({ purchasedAt, title, point }) => ({
-          date: purchasedAt,
-          listname: title,
-          status: `${point > 0 ? '+' : ''}${point}`,
+      ? purchaseData?.result?.transactions?.map(({ purchasedAt, title, point }) => ({
+          date: purchasedAt ?? '',
+          listname: title ?? '제목 없음',
+          status: point !== undefined ? `${point > 0 ? '+' : ''}${point}` : '0',
         })) || []
-      : incomeData?.result?.transactions.map(({ earnedAt, title, point }) => ({
-          date: earnedAt,
-          listname: title,
-          status: `+${point}`,
+      : incomeData?.result?.transactions?.map(({ purchasedAt, title, point }) => ({
+          date: purchasedAt ?? '',
+          listname: title ?? '제목 없음',
+          status: point !== undefined ? `+${point}` : '0',
         })) || [];
 
   const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
@@ -211,7 +103,11 @@ const PurchaseIncomeCheck: React.FC = () => {
     <Container>
       <DividerFirst src={Dimg} />
       <ContentWrapper>
-        <Title>구매/수익 확인하기</Title>
+        <TitleContainer>
+          <Pagebutton src={Prepage} onClick={() => navigate('/my-point')}></Pagebutton>
+          <Title>구매/수익 확인하기</Title>
+          <Img src={Star} />
+        </TitleContainer>
         <TabContainer>
           <Tab $active={activeTab === 'purchase'} onClick={() => setActiveTab('purchase')}>
             구매 내역 확인
@@ -226,11 +122,12 @@ const PurchaseIncomeCheck: React.FC = () => {
           ) : (
             <IncomeTitle>수익 내역</IncomeTitle>
           )}
+          <Divider />
           {displayedItems.length > 0 ? (
             displayedItems.map((item, index) => (
               <PointRow key={index}>
                 <LeftGroup>
-                  <DateTime>{item.date}</DateTime>
+                  <DateTime>{formatDate(item.date)}</DateTime>
                   <Listname>{item.listname}</Listname>
                 </LeftGroup>
                 <RightGroup>
@@ -239,12 +136,14 @@ const PurchaseIncomeCheck: React.FC = () => {
               </PointRow>
             ))
           ) : (
-            <p>{activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}</p>
+            <DateTime>
+              {activeTab === 'purchase' ? '구매 내역이 없습니다.' : '수익 내역이 없습니다.'}
+            </DateTime>
           )}
           <PaginationContainer>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} // currentPage가 0이 아닌 1로 처리
+              disabled={currentPage === 1} // currentPage가 1이면 왼쪽 버튼 비활성화
             >
               {'<'}
             </PaginationButton>
@@ -252,8 +151,8 @@ const PurchaseIncomeCheck: React.FC = () => {
               {currentPage} / {totalPages}
             </PageNumber>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} // currentPage가 totalPages보다 커지지 않도록 처리
+              disabled={currentPage === totalPages} // currentPage가 totalPages이면 오른쪽 버튼 비활성화
             >
               {'>'}
             </PaginationButton>

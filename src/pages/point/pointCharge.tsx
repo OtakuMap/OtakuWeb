@@ -88,39 +88,47 @@ const PointCharge: React.FC = () => {
     });
   };
 
-  // 기존 콜백에서 verify 호출 부분
   const callback = async (response: PortOneResponse) => {
-    console.log('callback 호출', response);
-    const { success, error_msg, imp_uid } = response;
+    console.log('✅ callback 호출됨:', response);
+    const { success, error_msg, imp_uid, merchant_uid, paid_amount } = response;
 
     if (success) {
-      alert('결제 성공!');
+      alert('✅ 결제 성공!');
       try {
-        console.log('보낼 verifyData:', imp_uid);
+        console.log('🔹 검증 요청 imp_uid:', imp_uid);
 
-        // verify 함수는 문자열 타입의 imp_uid를 인자로 받습니다.
+        // 결제 검증 요청
         const verifyResponse = await pointAPI.verify(imp_uid);
+        console.log('🔹 검증 응답:', verifyResponse);
 
-        // verifyResponse 안의 status가 "paid"인지 확인
-        if (verifyResponse.response.status === 'paid') {
-          // 결제 검증이 완료되었으므로 포인트 충전 API 호출
-          const chargeData = { point: selectedPoint.toString() };
+        if (verifyResponse.response?.status === 'paid') {
+          console.log('✅ 결제 검증 성공, 포인트 충전 요청');
+
+          // ✅ `PointchargeRequest` 형식으로 데이터 구성
+          const chargeData: PointchargeRequest = {
+            price: paid_amount, // 결제 금액
+            impUid: imp_uid, // 결제 고유 ID
+            merchantUid: merchant_uid, // 주문 번호
+          };
+
+          // 🔹 포인트 충전 요청
           const chargeResponse = await pointAPI.charge(chargeData);
+          console.log('🔹 충전 응답:', chargeResponse);
 
           if (chargeResponse.isSuccess) {
-            alert('포인트 충전 성공!');
+            alert('🎉 포인트 충전 성공!');
           } else {
-            alert('포인트 충전 실패');
+            alert('⚠️ 포인트 충전 실패: ' + chargeResponse.message);
           }
         } else {
-          alert('결제 검증 실패 또는 결제 상태가 paid가 아님');
+          alert('⚠️ 결제 검증 실패 (상태가 paid가 아님)');
         }
       } catch (error) {
-        console.error('API 호출 실패:', error);
-        alert('결제 검증 중 오류가 발생했습니다.');
+        console.error('🚨 API 호출 실패:', error);
+        alert('⚠️ 결제 검증 중 오류가 발생했습니다.');
       }
     } else {
-      alert(`결제 실패: ${error_msg}`);
+      alert(`❌ 결제 실패: ${error_msg}`);
     }
   };
 

@@ -12,7 +12,6 @@ const OAuthRedirectHandler = () => {
     const handleLogin = async () => {
       if (!code) {
         console.error('Authorization code not found.');
-        alert('잘못된 접근입니다. 다시 시도해주세요.');
         navigate('/');
         return;
       }

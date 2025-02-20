@@ -102,8 +102,8 @@ export const authAPI = {
 
       return response.data;
     } catch (error) {
-      console.error('OAuth 로그인 오류:', error);
-      return handleError<LoginResponse>(error);
+      // console.error 제거
+      return handleError<LoginResponse>(error); // 에러는 handleError로만 처리
     }
   },
 
