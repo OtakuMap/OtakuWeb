@@ -50,22 +50,15 @@ export const BANNER_DATA = [
   },
   {
     id: 8,
-    uuid: '2227977f-43a3-4e19-a7ca-3691da5b740c',
-    fileName: 'banner-8.jpg',
-    fileUrl:
-      'https://otakumap-s3-bucket.s3.ap-northeast-2.amazonaws.com/event/2227977f-43a3-4e19-a7ca-3691da5b740c',
-  },
-  {
-    id: 9,
     uuid: '77116d4c-3db3-45ee-8c03-6cc3f447a2ed',
-    fileName: 'banner-9.jpg',
+    fileName: 'banner-8.jpg',
     fileUrl:
       'https://otakumap-s3-bucket.s3.ap-northeast-2.amazonaws.com/event/77116d4c-3db3-45ee-8c03-6cc3f447a2ed',
   },
   {
-    id: 10,
+    id: 9,
     uuid: 'f47a964a-32ad-4b10-b5ae-e5d3d8a25d61',
-    fileName: 'banner-10.jpg',
+    fileName: 'banner-9.jpg',
     fileUrl:
       'https://otakumap-s3-bucket.s3.ap-northeast-2.amazonaws.com/event/f47a964a-32ad-4b10-b5ae-e5d3d8a25d61',
   },
