@@ -458,6 +458,7 @@ export const ProductImage = styled.img`
   width: 1057px;
   height: 737px;
   margin-bottom: 30px;
+  object-fit: contain;
 `;
 
 export const EditDeleteButtons = styled.div`

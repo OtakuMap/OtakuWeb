@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MapContainer from '@/components/map/MapContainer';
 import { saveEvent } from '@/api/event/SaveEvent';
@@ -149,6 +149,14 @@ const EventPage = () => {
     (currentPage - 1) * REVIEWS_PER_PAGE,
     currentPage * REVIEWS_PER_PAGE,
   );
+
+  // Handle opening the official site
+  const handleOpenOfficialSite = () => {
+    if (eventDetails && eventDetails.site) {
+      window.open(eventDetails.site, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const handleTextAreaClick = (e: React.MouseEvent) => {
     if (!isLoggedIn) {
       e.preventDefault();
@@ -287,8 +295,21 @@ const EventPage = () => {
         <S.TabWrapper>
           <S.TabInner>
             {['기본정보', '후기', '공식 사이트'].map((tab) => (
-              <S.Tab key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+              <S.Tab
+                key={tab}
+                isActive={activeTab === tab}
+                onClick={() => {
+                  if (tab === '공식 사이트') {
+                    handleOpenOfficialSite();
+                  } else {
+                    setActiveTab(tab);
+                  }
+                }}
+              >
                 {tab}
+                {tab === '공식 사이트' && eventDetails?.site && (
+                  <ExternalLink size={16} style={{ marginLeft: '5px' }} color="#0c004b" />
+                )}
               </S.Tab>
             ))}
           </S.TabInner>
@@ -475,11 +496,17 @@ const EventPage = () => {
                   )}
 
                   <S.FeedbackButtons>
-                    <S.IconButton onClick={() => handleLike(review.id)}>
+                    <S.IconButton
+                      onClick={() => handleLike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
                       <ThumbsUp size={20} color={review.isLiked ? '#ffd700' : '#0c004b'} />
                       <span>{review.likes || 0}</span>
                     </S.IconButton>
-                    <S.IconButton onClick={() => handleDislike(review.id)}>
+                    <S.IconButton
+                      onClick={() => handleDislike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
                       <ThumbsDown size={20} color={review.isDisliked ? '#ffd700' : '#0c004b'} />
                       <span>{review.dislikes || 0}</span>
                     </S.IconButton>

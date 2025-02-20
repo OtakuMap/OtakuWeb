@@ -172,6 +172,7 @@ const ReviewPage7 = () => {
         content,
         reviewType: selectedReviewType === '이벤트 후기' ? 'EVENT' : 'PLACE',
         animeId: selectedAnimationId,
+        visibility: selectedVisibility === '전체 열람가능' ? 'PUBLIC' : 'PURCHASERS_ONLY',
         routeItems: locations
           .filter((location) => location.name.trim() !== '')
           .map((location, index) => ({
