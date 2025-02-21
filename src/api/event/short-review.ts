@@ -72,3 +72,30 @@ export const deleteShortReview = async (
     throw err;
   }
 };
+
+interface ShortReviewReactionResponse {
+  isSuccess: boolean;
+  message?: string;
+  result: {
+    likeCount: number;
+    dislikeCount: number;
+    isLiked: boolean;
+    isDisliked: boolean;
+  };
+}
+
+export const toggleShortReviewReaction = async (
+  reviewId: number,
+  reactionType: 0 | 1,
+): Promise<ShortReviewReactionResponse> => {
+  try {
+    const response = await instance.post<ShortReviewReactionResponse>(
+      `/events/short-reviews/${reviewId}/reaction`,
+      { reactionType },
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error toggling short review reaction:', err);
+    throw err;
+  }
+};

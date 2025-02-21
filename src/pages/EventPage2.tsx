@@ -79,6 +79,7 @@ const EventPage = () => {
     handleDelete,
     handleLike,
     handleDislike,
+    isReactionLoading,
   } = useReviews([]);
 
   const {
@@ -498,14 +499,14 @@ const EventPage = () => {
                   <S.FeedbackButtons>
                     <S.IconButton
                       onClick={() => handleLike(review.id, isLoggedIn)}
-                      disabled={!isLoggedIn}
+                      disabled={!isLoggedIn || isReactionLoading}
                     >
                       <ThumbsUp size={20} color={review.isLiked ? '#ffd700' : '#0c004b'} />
                       <span>{review.likes || 0}</span>
                     </S.IconButton>
                     <S.IconButton
                       onClick={() => handleDislike(review.id, isLoggedIn)}
-                      disabled={!isLoggedIn}
+                      disabled={!isLoggedIn || isReactionLoading}
                     >
                       <ThumbsDown size={20} color={review.isDisliked ? '#ffd700' : '#0c004b'} />
                       <span>{review.dislikes || 0}</span>
