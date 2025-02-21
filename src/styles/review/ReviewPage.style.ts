@@ -328,12 +328,25 @@ export const ReviewTitle = styled.h3`
   margin-bottom: 26px;
 `;
 
+// export const ReviewText = styled.p`
+//   font-size: 20px;
+//   color: #605f5f;
+//   line-height: 1.5;
+//   width: 1000px;
+//   height: 125px;
+// `;
+
 export const ReviewText = styled.p`
   font-size: 20px;
   color: #605f5f;
   line-height: 1.5;
   width: 1000px;
   height: 125px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const ReviewImageWrapper = styled.div`

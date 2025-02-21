@@ -71,8 +71,8 @@ const Tag: React.FC<{ tag: { hashTagId?: number; name: string } | string }> = ({
   }, [tagText]);
 
   return (
-    <S.Tag ref={tagRef} data-full-text={`#${tagText}`}>
-      #{tagText}
+    <S.Tag ref={tagRef} data-full-text={`${tagText}`}>
+      {tagText}
     </S.Tag>
   );
 };
