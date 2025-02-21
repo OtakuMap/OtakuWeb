@@ -5,6 +5,7 @@ export enum Genre {
   FANTASY = 'FANTASY',
   THRILLER = 'THRILLER',
   SPORTS = 'SPORTS',
+  NULL = '',
 }
 
 export enum EventType {

@@ -34,81 +34,6 @@ const Category = () => {
   const [suggestions, setSuggestions] = useState<Event[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // 하나의 함수로 여러 상태를 업데이트
-  const updateMenuState = useCallback((tab: string, mainMenu: string, subMenu: string) => {
-    console.log(`상태 일괄 업데이트: Tab=${tab}, MainMenu=${mainMenu}, SubMenu=${subMenu}`);
-
-    // 상태 업데이트
-    setActiveTab(tab);
-    setActiveMainMenu(mainMenu);
-    setActiveSubMenu(subMenu);
-    setPageNumber(0);
-
-    // 요청 ID 증가 - 다음 요청에 사용
-    requestIdRef.current++;
-    const currentRequestId = requestIdRef.current;
-
-    // 현재 진행 중인 요청 취소 처리
-    fetchingRef.current = false;
-
-    // setTimeout으로 상태 업데이트 완료 후 실행
-    setTimeout(() => {
-      fetchEvents(0, {
-        tab,
-        mainMenu,
-        subMenu,
-        requestId: currentRequestId,
-      });
-    }, 0);
-  }, []);
-
-  // 초기 데이터 로드
-  useEffect(() => {
-    const fetchInitialEvents = async () => {
-      try {
-        setIsLoading(true);
-        requestIdRef.current++;
-        const currentRequestId = requestIdRef.current;
-        fetchingRef.current = true;
-
-        // 초기 파라미터 설정
-        const params = {
-          page: 0,
-          size: 12,
-          type: EventType.ALL,
-          status: EventStatus.ALL,
-          genre: Genre.ALL,
-        };
-
-        console.log('초기 데이터 로드 파라미터:', params);
-        lastParamsRef.current = params;
-
-        const response = await getEventsByCategory(params);
-
-        // 요청 ID가 변경되었으면 응답 무시
-        if (currentRequestId !== requestIdRef.current) {
-          console.log('최신 요청이 아니므로 응답 무시');
-          return;
-        }
-
-        if (response.isSuccess) {
-          console.log('초기 데이터 로드 성공: ', response.result.events.length, '개의 이벤트');
-          setEvents(response.result.events);
-          setIsLast(response.result.isLast);
-        } else {
-          console.error('API 응답 오류:', response.message);
-        }
-      } catch (error) {
-        console.error('초기 데이터 로드 실패:', error);
-      } finally {
-        setIsLoading(false);
-        fetchingRef.current = false;
-      }
-    };
-
-    fetchInitialEvents();
-  }, []);
-
   // API 요청 함수 개선 - 요청 ID 추적 및 취소 로직 추가
   const fetchEvents = async (page = pageNumber, overrideState = null) => {
     // 현재 요청의 ID 확인
@@ -141,6 +66,7 @@ const Category = () => {
         type: EventType.ALL,
         status: EventStatus.ALL,
         genre: Genre.ALL,
+        isAnimeTab: false, // 기본값은 false
       };
 
       // 오버라이드된 상태가 있으면 사용, 없으면 현재 상태 사용
@@ -148,12 +74,16 @@ const Category = () => {
       const currentMainMenu = overrideState?.mainMenu || activeMainMenu;
       const currentSubMenu = overrideState?.subMenu || activeSubMenu;
 
+      // 애니메이션 탭 여부 설정
+      params.isAnimeTab = currentTab === '애니';
+
       // 선택된 탭과 메뉴에 따라 파라미터 업데이트
       if (currentTab === '애니') {
         if (currentMainMenu === '장르별' && currentSubMenu) {
           params.genre = getGenreEnum(currentSubMenu);
         }
       } else if (currentTab === '이벤트') {
+        params.genre = Genre.NULL;
         params.status =
           currentMainMenu === '진행중인 이벤트' ? EventStatus.IN_PROCESS : EventStatus.NOT_STARTED;
 
@@ -181,6 +111,7 @@ const Category = () => {
       console.log('현재 탭:', currentTab);
       console.log('현재 메인메뉴:', currentMainMenu);
       console.log('현재 서브메뉴:', currentSubMenu);
+      console.log('애니메이션 탭 여부:', params.isAnimeTab);
 
       lastParamsRef.current = params;
 
@@ -233,6 +164,82 @@ const Category = () => {
       }
     }
   };
+
+  // 하나의 함수로 여러 상태를 업데이트
+  const updateMenuState = useCallback((tab: string, mainMenu: string, subMenu: string) => {
+    console.log(`상태 일괄 업데이트: Tab=${tab}, MainMenu=${mainMenu}, SubMenu=${subMenu}`);
+
+    // 상태 업데이트
+    setActiveTab(tab);
+    setActiveMainMenu(mainMenu);
+    setActiveSubMenu(subMenu);
+    setPageNumber(0);
+
+    // 요청 ID 증가 - 다음 요청에 사용
+    requestIdRef.current++;
+    const currentRequestId = requestIdRef.current;
+
+    // 현재 진행 중인 요청 취소 처리
+    fetchingRef.current = false;
+
+    // setTimeout으로 상태 업데이트 완료 후 실행
+    setTimeout(() => {
+      fetchEvents(0, {
+        tab,
+        mainMenu,
+        subMenu,
+        requestId: currentRequestId,
+      });
+    }, 0);
+  }, []);
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const fetchInitialEvents = async () => {
+      try {
+        setIsLoading(true);
+        requestIdRef.current++;
+        const currentRequestId = requestIdRef.current;
+        fetchingRef.current = true;
+
+        // 초기 파라미터 설정
+        const params = {
+          page: 0,
+          size: 12,
+          type: EventType.ALL,
+          status: EventStatus.ALL,
+          genre: Genre.ALL,
+          isAnimeTab: true, // 기본 애니 탭
+        };
+
+        console.log('초기 데이터 로드 파라미터:', params);
+        lastParamsRef.current = params;
+
+        const response = await getEventsByCategory(params);
+
+        // 요청 ID가 변경되었으면 응답 무시
+        if (currentRequestId !== requestIdRef.current) {
+          console.log('최신 요청이 아니므로 응답 무시');
+          return;
+        }
+
+        if (response.isSuccess) {
+          console.log('초기 데이터 로드 성공: ', response.result.events.length, '개의 이벤트');
+          setEvents(response.result.events);
+          setIsLast(response.result.isLast);
+        } else {
+          console.error('API 응답 오류:', response.message);
+        }
+      } catch (error) {
+        console.error('초기 데이터 로드 실패:', error);
+      } finally {
+        setIsLoading(false);
+        fetchingRef.current = false;
+      }
+    };
+
+    fetchInitialEvents();
+  }, []);
 
   // 페이지 번호 변경(더보기 버튼)에 따른 추가 데이터 로드
   useEffect(() => {
@@ -343,6 +350,7 @@ const Category = () => {
       판타지: Genre.FANTASY,
       스릴러: Genre.THRILLER,
       전체: Genre.ALL,
+      빈칸: Genre.NULL,
     };
     return genreMap[subMenu] || Genre.ALL;
   };
