@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MapContainer from '@/components/map/MapContainer';
 import { saveEvent } from '@/api/event/SaveEvent';
@@ -37,10 +37,13 @@ const EventPage = () => {
   const [reviewsTotalPages, setReviewsTotalPages] = useState(1);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewsError, setReviewsError] = useState<string | null>(null);
-  const [shortReviews, setShortReviews] = useState<EventShortReview[]>([]);
   const [shortReviewsLoading, setShortReviewsLoading] = useState(false);
   const [shortReviewsError, setShortReviewsError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const userId = useAppSelector((state) => {
+    const id = state.auth.userId;
+    return id && id !== 'undefined' ? id : null;
+  });
 
   // 사용자 프로필 정보 불러오기
   useEffect(() => {
@@ -63,7 +66,8 @@ const EventPage = () => {
   // Custom hooks 사용
   const { eventDetails, loading, error } = useEventDetails(eventId);
   const {
-    setReviews,
+    reviews, // shortReviews로 이름 변경하지 않음
+    setReviews, // setShortReviews로 이름 변경하지 않음
     editingId,
     editText,
     editRating,
@@ -84,7 +88,7 @@ const EventPage = () => {
     setInputRating,
     submitError,
     handleReviewSubmit: originalHandleReviewSubmit,
-  } = useReviewSubmission(eventId, setReviews);
+  } = useReviewSubmission(eventId, userId ? Number(userId) : 0); // userProfile?.id 대신 userId 사용
 
   // 후기 게시물 불러오는 useEffect 추가
   useEffect(() => {
@@ -95,13 +99,13 @@ const EventPage = () => {
       setReviewsError(null);
 
       try {
-        const response = await getEventReviews(eventId, currentPage - 1); // API는 0부터 시작하므로 currentPage - 1
+        const response = await getEventReviews(eventId, currentPage - 1);
 
-        if (response.isSuccess) {
-          setEventReviews(response.result.eventReviews);
-          setReviewsTotalPages(response.result.totalPages);
+        if (response?.isSuccess && response.result) {
+          setEventReviews(response.result.eventReviews || []);
+          setReviewsTotalPages(response.result.totalPages || 1);
         } else {
-          setReviewsError(response.message);
+          setReviewsError(response.message || '후기 게시물을 불러오는데 실패했습니다.');
         }
       } catch (error) {
         console.error('Error fetching event reviews:', error);
@@ -123,11 +127,10 @@ const EventPage = () => {
       setShortReviewsError(null);
 
       try {
-        const response = await getEventShortReviews(eventId, currentPage - 1); // 첫 페이지로 고정
+        const response = await getEventShortReviews(eventId, currentPage - 1);
 
         if (response.isSuccess) {
-          // 새로 등록된 리뷰를 포함하여 리스트 업데이트
-          setShortReviews(response.result.eventShortReviewList);
+          setReviews(response.result.eventShortReviewList); // setShortReviews 대신 setReviews 사용
         } else {
           setShortReviewsError(response.message);
         }
@@ -140,12 +143,19 @@ const EventPage = () => {
     };
 
     fetchShortReviews();
-  }, [eventId, currentPage]); // shortReviews.length 추가로 리뷰 등록 시 자동 새로고침
+  }, [eventId, currentPage, setReviews]);
 
-  const paginatedShortReviews = shortReviews.slice(
+  const paginatedShortReviews = reviews.slice(
     (currentPage - 1) * REVIEWS_PER_PAGE,
     currentPage * REVIEWS_PER_PAGE,
   );
+
+  // Handle opening the official site
+  const handleOpenOfficialSite = () => {
+    if (eventDetails && eventDetails.site) {
+      window.open(eventDetails.site, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const handleTextAreaClick = (e: React.MouseEvent) => {
     if (!isLoggedIn) {
@@ -167,25 +177,14 @@ const EventPage = () => {
   const handleReviewSubmit = async () => {
     try {
       const response = await originalHandleReviewSubmit();
+      console.log('Response from createShortReview:', response); // API 응답 구조 확인
 
-      // 리뷰 제출 성공 시
       if (response && response.isSuccess) {
-        // 새로 등록된 리뷰 객체 생성 (타입 단언 사용)
-        const newReview: EventShortReview = {
-          id: response.result.id,
-          content: reviewText,
-          rating: inputRating,
-          username: userProfile?.nickname || '',
-          profileImage: {
-            fileUrl: userProfile?.profileImageUrl || '',
-          },
-          likes: 0,
-          dislikes: 0,
-          userVote: null,
-        } as EventShortReview;
-
-        // 기존 리뷰 목록 앞에 새 리뷰 추가
-        setShortReviews((prevReviews: EventShortReview[]) => [newReview, ...prevReviews]);
+        // API 응답에서 새로 생성된 리뷰 데이터 가져오기
+        const fetchResponse = await getEventShortReviews(eventId, currentPage - 1);
+        if (fetchResponse.isSuccess) {
+          setReviews(fetchResponse.result.eventShortReviewList);
+        }
 
         // 입력 필드 초기화
         setReviewText('');
@@ -273,8 +272,8 @@ const EventPage = () => {
   // };
 
   const totalPages = Math.max(
-    Math.ceil(shortReviews.length / REVIEWS_PER_PAGE),
-    Math.ceil(eventReviews.length / REVIEWS_PER_PAGE),
+    Math.ceil(reviews.length / REVIEWS_PER_PAGE),
+    Math.ceil(reviews.length / REVIEWS_PER_PAGE),
   );
 
   return (
@@ -296,8 +295,21 @@ const EventPage = () => {
         <S.TabWrapper>
           <S.TabInner>
             {['기본정보', '후기', '공식 사이트'].map((tab) => (
-              <S.Tab key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+              <S.Tab
+                key={tab}
+                isActive={activeTab === tab}
+                onClick={() => {
+                  if (tab === '공식 사이트') {
+                    handleOpenOfficialSite();
+                  } else {
+                    setActiveTab(tab);
+                  }
+                }}
+              >
                 {tab}
+                {tab === '공식 사이트' && eventDetails?.site && (
+                  <ExternalLink size={16} style={{ marginLeft: '5px' }} color="#0c004b" />
+                )}
               </S.Tab>
             ))}
           </S.TabInner>
@@ -386,28 +398,27 @@ const EventPage = () => {
               </S.InputHeader>
             </S.ReviewInput>
             <S.ReviewCount>
-              한 줄 리뷰 ({shortReviews.length}){shortReviewsLoading && <span> 로딩중...</span>}
+              한 줄 리뷰 ({reviews.length}){shortReviewsLoading && <span> 로딩중...</span>}
               {shortReviewsError && <span style={{ color: 'red' }}> {shortReviewsError}</span>}
               <span>
                 평균 평점:{' '}
-                {shortReviews.length > 0
+                {reviews.length > 0
                   ? (
-                      shortReviews.reduce((acc, review) => acc + review.rating, 0) /
-                      shortReviews.length
+                      reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
                     ).toFixed(1)
                   : '0.0'}
               </span>
             </S.ReviewCount>
             <S.ReviewList>
               {paginatedShortReviews.map((review) => (
-                <S.ReviewCard
-                  key={review.id}
-                  $isMyReview={review.username === userProfile?.nickname} // $isMyReview prop은 필수이므로 기본값 제공
-                >
+                <S.ReviewCard key={review.id} $isMyReview={review.user.userId === Number(userId)}>
                   <S.ReviewHeader>
-                    <S.Avatar src={review.profileImage.fileUrl} alt="프로필" />
+                    <S.Avatar
+                      src={review.profileImage.fileUrl || review.user.profileImage}
+                      alt="프로필"
+                    />
                     <S.UserInfo>
-                      <S.UserName>{review.id}</S.UserName>
+                      <S.UserName>{review.user.nickname}</S.UserName>
                       {editingId === review.id ? (
                         <S.StarRatingInput>
                           {[1, 2, 3, 4].map((star) => (
@@ -448,11 +459,17 @@ const EventPage = () => {
                     <S.ReviewContent>{review.content}</S.ReviewContent>
                   )}
 
-                  {review.username === userProfile?.nickname && (
+                  {review.user.userId === Number(userId) && (
                     <S.EditDeleteButtons>
                       {editingId === review.id ? (
                         <>
-                          <S.ActionButton onClick={() => handleEditComplete(review.id)}>
+                          <S.ActionButton
+                            onClick={() => {
+                              if (review.id) {
+                                handleEditComplete(review.id);
+                              }
+                            }}
+                          >
                             완료
                           </S.ActionButton>
                           <img src={dividerLine} alt="divider" className="h-4 mx-1" />
@@ -464,7 +481,13 @@ const EventPage = () => {
                             수정
                           </S.ActionButton>
                           <img src={dividerLine} alt="divider" className="h-4 mx-1" />
-                          <S.ActionButton onClick={() => handleDelete(review.id)}>
+                          <S.ActionButton
+                            onClick={() => {
+                              if (review.id) {
+                                handleDelete(review.id);
+                              }
+                            }}
+                          >
                             삭제
                           </S.ActionButton>
                         </>
@@ -473,30 +496,30 @@ const EventPage = () => {
                   )}
 
                   <S.FeedbackButtons>
-                    <S.IconButton onClick={() => handleLike(review.id)}>
-                      <ThumbsUp
-                        size={20}
-                        color={review.userVote === 'like' ? '#ffd700' : '#0c004b'}
-                      />
-                      <span>{review.likes}</span>
+                    <S.IconButton
+                      onClick={() => handleLike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
+                      <ThumbsUp size={20} color={review.isLiked ? '#ffd700' : '#0c004b'} />
+                      <span>{review.likes || 0}</span>
                     </S.IconButton>
-                    <S.IconButton onClick={() => handleDislike(review.id)}>
-                      <ThumbsDown
-                        size={20}
-                        color={review.userVote === 'dislike' ? '#ffd700' : '#0c004b'}
-                      />
-                      <span>{review.dislikes}</span>
+                    <S.IconButton
+                      onClick={() => handleDislike(review.id, isLoggedIn)}
+                      disabled={!isLoggedIn}
+                    >
+                      <ThumbsDown size={20} color={review.isDisliked ? '#ffd700' : '#0c004b'} />
+                      <span>{review.dislikes || 0}</span>
                     </S.IconButton>
                   </S.FeedbackButtons>
                 </S.ReviewCard>
               ))}
             </S.ReviewList>
             <S.ReviewCount>
-              후기 게시물 ({eventReviews.length}){reviewsLoading && <span> 로딩중...</span>}
+              후기 게시물 ({eventReviews?.length || 0}){reviewsLoading && <span> 로딩중...</span>}
               {reviewsError && <span style={{ color: 'red' }}> {reviewsError}</span>}
             </S.ReviewCount>
             <S.PostGrid>
-              {eventReviews
+              {(eventReviews || [])
                 .slice((currentPage - 1) * REVIEWS_PER_PAGE, currentPage * REVIEWS_PER_PAGE)
                 .map((review) => (
                   <S.PostCard
@@ -504,8 +527,11 @@ const EventPage = () => {
                     onClick={() => navigate(`/review/${review.id}`)}
                     style={{ cursor: 'pointer' }}
                   >
-                    <S.PostImage src={review.reviewPhotoUrl.fileUrl} alt={review.title} />
-                    <S.PostTitle>{review.title}</S.PostTitle>
+                    <S.PostImage
+                      src={review.reviewPhotoUrl?.fileUrl || ''}
+                      alt={review.title || '리뷰 이미지'}
+                    />
+                    <S.PostTitle>{review.title || '제목 없음'}</S.PostTitle>
                   </S.PostCard>
                 ))}
             </S.PostGrid>

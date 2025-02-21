@@ -35,6 +35,9 @@ const LeftContainer: React.FC<LeftContainerProps> = ({
   // const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 430);
   const { favoritePlaces, isLoading, error, fetchFavoritePlaces } = useFavoritePlaces();
   const {
     savedRoutes,
@@ -68,6 +71,25 @@ const LeftContainer: React.FC<LeftContainerProps> = ({
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 430);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setIsExpanded(false);
+    }
+  }, [isMobile]);
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   // 뒤로가기 처리
   const handleBack = () => {
@@ -297,45 +319,63 @@ const LeftContainer: React.FC<LeftContainerProps> = ({
   };
 
   return (
-    <S.Container>
-      <BackButton onClick={handleBack} />
-      <Search
-        value={searchValue}
-        onValueChange={setSearchValue}
-        showSuggestions={showSuggestions}
-        onShowSuggestionsChange={setShowSuggestions}
-        onSearch={handleSearch}
-        onPlaceSelect={handlePlaceSelect}
-        onEventSelect={handleEventSelect}
-      />
-      <S.ButtonContainer>
-        <S.SavedRoutesButton
-          isActive={activeView === 'savedRoutes'}
-          onClick={handleSavedRoutesClick}
-        >
-          저장한 루트 보기
-        </S.SavedRoutesButton>
-        <S.FavoritePlacesButton
-          isActive={activeView === 'favoritePlaces'}
-          onClick={handleFavoritePlacesClick}
-        >
-          저장한 장소 보기
-        </S.FavoritePlacesButton>
-      </S.ButtonContainer>
-      {renderMainContent()}
-      <S.RecentSearchesTitle>최근 검색한 장소</S.RecentSearchesTitle>
-      <S.RecentSearchesBox />
-      <S.RecentSearchList>
-        {recentSearches.map((search, index) => (
-          <RecentSearchItem
-            key={index}
-            search={search}
-            onDelete={() => handleDeleteSearch(search)}
-            onClick={() => handleRecentSearchClick(search)}
+    <>
+      {isMobile && (
+        <S.SearchWrapper>
+          <Search
+            value={searchValue}
+            onValueChange={setSearchValue}
+            showSuggestions={showSuggestions}
+            onShowSuggestionsChange={setShowSuggestions}
+            onSearch={handleSearch}
+            onPlaceSelect={handlePlaceSelect}
+            onEventSelect={handleEventSelect}
           />
-        ))}
-      </S.RecentSearchList>
-    </S.Container>
+        </S.SearchWrapper>
+      )}
+      <S.Container ref={containerRef} className={isExpanded ? 'expanded' : ''}>
+        {!isMobile && <BackButton onClick={handleBack} />}
+        {!isMobile && (
+          <Search
+            value={searchValue}
+            onValueChange={setSearchValue}
+            showSuggestions={showSuggestions}
+            onShowSuggestionsChange={setShowSuggestions}
+            onSearch={handleSearch}
+            onPlaceSelect={handlePlaceSelect}
+            onEventSelect={handleEventSelect}
+          />
+        )}
+        {isMobile && <S.HandleBar onClick={toggleExpand} />}
+        <S.ButtonContainer>
+          <S.SavedRoutesButton
+            isActive={activeView === 'savedRoutes'}
+            onClick={handleSavedRoutesClick}
+          >
+            저장한 루트 보기
+          </S.SavedRoutesButton>
+          <S.FavoritePlacesButton
+            isActive={activeView === 'favoritePlaces'}
+            onClick={handleFavoritePlacesClick}
+          >
+            저장한 장소 보기
+          </S.FavoritePlacesButton>
+        </S.ButtonContainer>
+        {renderMainContent()}
+        <S.RecentSearchesTitle>최근 검색한 장소</S.RecentSearchesTitle>
+        <S.RecentSearchesBox />
+        <S.RecentSearchList>
+          {recentSearches.map((search, index) => (
+            <RecentSearchItem
+              key={index}
+              search={search}
+              onDelete={() => handleDeleteSearch(search)}
+              onClick={() => handleRecentSearchClick(search)}
+            />
+          ))}
+        </S.RecentSearchList>
+      </S.Container>
+    </>
   );
 };
 

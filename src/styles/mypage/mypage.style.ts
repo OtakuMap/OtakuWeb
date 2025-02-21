@@ -13,6 +13,25 @@ export const Container = styled.div`
   position: relative;
 `;
 
+export const BackButton = styled.button`
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+`;
+
+export const BackIcon = styled.img``;
+export const Divider = styled.hr`
+  border: 0;
+  height: 1px;
+  background-color: #d1c1ff;
+  width: 100%;
+  margin-top: 51px;
+`;
+
 export const Mypage = styled.h1`
   color: white;
   font-size: 25px;
@@ -36,25 +55,31 @@ export const BottomRightIcon = styled(Icon)`
 `;
 
 export const ProfileContainer = styled.div`
-  margin-top: 80px;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 `;
 
-export const Avatar = styled.div<{ imageUrl?: string }>`
-  width: 116px;
-  height: 116px;
+export const Avatar = styled.div<{ $imageUrl?: string }>`
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background-color: #ddd;
-  margin-bottom: 25px;
-  background-image: ${(props) => (props.imageUrl ? `url(${props.imageUrl})` : 'none')};
+  background-image: ${({ $imageUrl }) => ($imageUrl ? `url(${$imageUrl})` : 'none')};
   background-size: cover;
   background-position: center;
+  background-color: ${({ $imageUrl }) => ($imageUrl ? 'transparent' : '#f0f0f0')};
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export const Nickname = styled.h1`
+  margin-top: 20px;
   margin-bottom: 10px;
   font-family: Gothic A1;
   font-size: 20px;
@@ -128,7 +153,7 @@ export const InputContainer = styled.div`
   display: flex;
   align-items: center;
   position: relative;
-  width: 180px;
+  width: 250px; // 너비를 늘려 간격 확보
 `;
 
 export const InputField = styled.input`
@@ -182,9 +207,10 @@ export const EditButton = styled.button`
 
 // 이메일 수정 부분의 EditButton 스타일만 따로 정의
 export const EmailEditButton = styled(EditButton)`
-  left: 270px;
-  right: 20px; // 오른쪽 여백 조정
+  left: 300px; // 오른쪽 위치 조정
+  right: 20px;
 `;
+
 export const EditIcon = styled.img`
   width: 16px;
   height: 16px;
@@ -272,7 +298,7 @@ export const AmountTitle = styled.span`
   font-weight: 600;
   width: 100%; // 너비를 100%로 설정
   margin-top: 30px;
-  margin-left: 195px;
+  margin-left: 175px;
 `;
 
 export const ReviewAmount = styled.p`

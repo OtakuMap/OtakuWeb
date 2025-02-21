@@ -165,6 +165,7 @@ const SavedPlaces: React.FC = () => {
 
   return (
     <S.Container>
+      <S.Divider />
       <S.IconContainer>
         <S.IconImage src={spaceIcon} alt="Space Icon" />
       </S.IconContainer>
