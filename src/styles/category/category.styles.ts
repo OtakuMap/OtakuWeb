@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 export const Container = styled.div`
   margin-top: 60px;
   display: flex;
@@ -7,6 +9,12 @@ export const Container = styled.div`
   min-height: 100vh;
   width: 100vw;
   background-color: #101148;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    margin-top: 20px;
+    width: 100%;
+  }
 `;
 
 export const Sidebar = styled.div`
@@ -16,6 +24,13 @@ export const Sidebar = styled.div`
   overflow: hidden;
   border: 2px solid #d1c1ff;
   border-radius: 0 12px 0 0;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 0;
+    flex-direction: column;
+  }
 `;
 
 export const PurpleAccent = styled.div`
@@ -25,6 +40,13 @@ export const PurpleAccent = styled.div`
   display: flex;
   padding-top: 50px;
   justify-content: flex-start;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    padding-top: 20px;
+    flex-direction: row;
+    justify-content: space-around;
+  }
 `;
 
 export const MenuSection = styled.div`
@@ -32,12 +54,21 @@ export const MenuSection = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+  }
 `;
 
 export const TabContainer = styled.div`
   display: flex;
   border-bottom: 2px solid rgb(255, 255, 255);
   width: 200px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
 export const Tab = styled.button<{ $active: boolean }>`
@@ -105,11 +136,23 @@ export const MainMenuItem = styled.button<{ $active: boolean }>`
       width: 3px;
     }
   `}
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    text-align: center;
+    padding: 10px;
+    font-size: 13px;
+  }
 `;
 
 export const SubMenuContainer = styled.div`
   flex: 1;
   background-color: #101148;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+  }
 `;
 
 export const SubMenuItem = styled.button<{ $active: boolean }>`
@@ -125,6 +168,13 @@ export const SubMenuItem = styled.button<{ $active: boolean }>`
   &:hover {
     background-color: #101148;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: auto;
+    padding: 8px 15px;
+    text-align: center;
+    font-size: 13px;
+  }
 `;
 
 export const SearchContainer = styled.div`
@@ -132,6 +182,12 @@ export const SearchContainer = styled.div`
   width: 272px;
   margin-left: 40px;
   padding-top: 16px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    margin: 20px auto;
+    padding-top: 10px;
+  }
 `;
 
 export const SearchInput = styled.input`
@@ -183,6 +239,10 @@ export const SuggestionsContainer = styled.div`
   z-index: 1000;
   padding: 8px 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    max-height: 200px;
+  }
 `;
 
 export const SuggestionItem = styled.div`
@@ -194,6 +254,11 @@ export const SuggestionItem = styled.div`
   &:hover {
     background-color: #d1c1ff;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 10px;
+    font-size: 13px;
+  }
 `;
 
 export const MainContent = styled.div`
@@ -201,6 +266,9 @@ export const MainContent = styled.div`
   padding: 30px;
   background-color: #101148;
   min-height: 100vh;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 15px;
+  }
 `;
 
 export const ContentTitle = styled.h2`
@@ -209,6 +277,12 @@ export const ContentTitle = styled.h2`
   font-family: 'Gothic A1';
   font-size: 38px;
   font-weight: 600;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 15px;
+  }
 `;
 
 export const AnimeGrid = styled.div`
@@ -218,6 +292,12 @@ export const AnimeGrid = styled.div`
   margin-top: 30px;
   margin-left: 180px;
   width: 846px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin: 15px auto;
+    width: 100%;
+    gap: 20px;
+  }
 `;
 
 export const AnimeRow = styled.div`
@@ -226,6 +306,12 @@ export const AnimeRow = styled.div`
   gap: 40px;
   padding-bottom: 40px;
   position: relative; // 추가
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding-bottom: 20px;
+  }
 
   &::after {
     // border-bottom 대신 after 가상요소 사용
@@ -236,6 +322,11 @@ export const AnimeRow = styled.div`
     right: -58px; // 오른쪽으로 더 확장
     height: 1px;
     background-color: #a09797;
+  }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    left: 0;
+    right: 0;
   }
 
   &:last-child::after {
@@ -250,6 +341,11 @@ export const AnimeCard = styled.div`
   &:hover {
     transform: translateY(-5px);
   }
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 export const AnimeImage = styled.img`
@@ -259,6 +355,10 @@ export const AnimeImage = styled.img`
   background-color: #2d2f63;
   border-radius: 4px;
   margin-bottom: 10px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 150px;
+    height: 150px;
+  }
 `;
 
 export const AnimeTitle = styled.p`
@@ -269,6 +369,12 @@ export const AnimeTitle = styled.p`
   font-size: 18px;
   line-height: 22.5px;
   text-align: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 140px;
+    font-size: 14px;
+    line-height: 18px;
+  }
 `;
 
 export const EventDate = styled.p`
@@ -279,6 +385,11 @@ export const EventDate = styled.p`
   font-size: 18px;
   line-height: 22.5px;
   text-align: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    line-height: 18px;
+  }
 `;
 
 export const LoadMoreButton = styled.button`
@@ -297,6 +408,13 @@ export const LoadMoreButton = styled.button`
   &:hover {
     background-color: #2d2f63;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    margin: 20px auto;
+    height: 40px;
+    font-size: 13px;
+  }
 `;
 
 export const LoadingIndicator = styled.div`
@@ -306,4 +424,9 @@ export const LoadingIndicator = styled.div`
   margin-left: 180px;
   color: #8e8ea0;
   font-size: 14px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    margin: 20px 0;
+  }
 `;
