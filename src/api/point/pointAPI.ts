@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import {
   ReviewpurchaseRequest,
   ReviewpurchaseResponse,
+  purchasereviewResponse,
   PointbalanceResponse,
   PointchargeRequest,
   PointchargeResponse,
@@ -86,6 +87,25 @@ export const pointAPI = {
     } catch (error: unknown) {
       console.error('Error review purchase:', error);
       return handleError<ReviewpurchaseResponse>(error);
+    }
+  },
+
+  validatePurchase: async (reviewId: number, type: string): Promise<purchasereviewResponse> => {
+    try {
+      console.log('Validating review purchase:', {
+        url: `/reviews/purchase`,
+        params: { reviewId, type },
+      });
+
+      const response = await instance.get<purchasereviewResponse>(`/reviews/purchase`, {
+        params: { reviewId, type },
+      });
+
+      console.log('Validation Response:', response);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error validating review purchase:', error);
+      return handleError<purchasereviewResponse>(error);
     }
   },
 

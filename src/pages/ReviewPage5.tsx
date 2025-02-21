@@ -11,6 +11,17 @@ import { RouteData } from '@/types/review/route';
 import { RouteSource } from '@/types/map/routeSource';
 //import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { pointAPI } from '@/api/point/pointAPI';
+
+interface PortOneResponse {
+  success: boolean;
+  error_msg?: string;
+  imp_uid: string;
+  merchant_uid: string;
+  pay_method: string;
+  paid_amount: number;
+  status: string;
+}
 
 const ReviewPage5 = () => {
   const navigate = useNavigate();
@@ -23,6 +34,60 @@ const ReviewPage5 = () => {
   const { reviewId } = useParams();
   const [searchParams] = useSearchParams();
   const type = (searchParams.get('type') as ReviewType) || 'PLACE';
+
+  const [isPurchasePopupOpen, setIsPurchasePopupOpen] = useState(false);
+
+  const openPurchasePopup = () => setIsPurchasePopupOpen(true);
+  const closePurchasePopup = () => setIsPurchasePopupOpen(false);
+
+  const onClickPayment = async () => {
+    const PortOne = window.IMP;
+    if (!PortOne) {
+      console.error('PortOne 객체가 로드되지 않았습니다.');
+      return;
+    }
+
+    PortOne.init('imp87071777');
+
+    const data = {
+      pg: 'kakaopay.TC0ONETIME',
+      pay_method: 'card',
+      merchant_uid: `order_${new Date().getTime()}`,
+      name: '포인트 충전',
+      amount: '500',
+      buyer_name: '홍길동',
+      buyer_tel: '010-1234-5678',
+      buyer_email: 'test@example.com',
+      buyer_addr: '서울시 강남구',
+      buyer_postalcode: '123-456',
+      m_redirect_url: 'http://localhost:3000/payment-success',
+    };
+
+    console.log('결제 요청 데이터:', data);
+    PortOne.request_pay(data, (response: PortOneResponse) => {
+      console.log('callback 호출됨:', response);
+      callback(response);
+    });
+  };
+
+  const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const balanceRes = await pointAPI.balance();
+        if (balanceRes.isSuccess && balanceRes.result) {
+          setBalance(Number(balanceRes.result.point) || 0);
+        } else {
+          throw new Error('잔액 정보를 불러올 수 없습니다.');
+        }
+      } catch (err) {
+        console.error('포인트 잔액 불러오기 실패:', err);
+      }
+    };
+
+    fetchBalance();
+  }, []);
 
   useEffect(() => {
     const fetchReviewDetail = async () => {
@@ -145,7 +210,30 @@ const ReviewPage5 = () => {
               >
                 루트 지도에서 보기
               </S.Button>
-              <S.SupportButton>후기 구매하기</S.SupportButton>
+
+              <S.SupportButton onClick={openPurchasePopup}>후기 구매하기</S.SupportButton>
+              {isPurchasePopupOpen && (
+                <S.PurchasePopupOverlay onClick={closePurchasePopup}>
+                  <S.PurchasePopup onClick={(e) => e.stopPropagation()}>
+                    <S.PopupHeader>
+                      <S.CloseButton onClick={closePurchasePopup}>×</S.CloseButton>
+                    </S.PopupHeader>
+                    <S.PopupContent>
+                      <S.TitleText>구매하기</S.TitleText>
+                      <S.Text>
+                        현재 보유 포인트: <S.Point>{balance} P</S.Point>
+                      </S.Text>
+                      <S.Text>
+                        게시글 열람: <S.Point>-500 P</S.Point>
+                      </S.Text>
+                      <S.Text>
+                        잔여 포인트: <S.Point>{balance - 500} P</S.Point>
+                      </S.Text>
+                      <S.PurchaseButton onClick={onClickPayment}>구매하기</S.PurchaseButton>
+                    </S.PopupContent>
+                  </S.PurchasePopup>
+                </S.PurchasePopupOverlay>
+              )}
             </S.RouteButtonContainer>
           </S.SideContent>
         </S.ContentContainer>

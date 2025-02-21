@@ -1,4 +1,104 @@
 import styled from 'styled-components';
+export const PopupContent = styled.div`
+  margin-top: 49px;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 중앙 정렬 */
+`;
+
+export const PurchaseButton = styled.button`
+  background-color: #b8effd;
+  color: black;
+  width: 177px;
+  height: 48px;
+  border: none;
+  border-radius: 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-family: 'Gothic A1';
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 27.5px;
+  letter-spacing: 0%;
+  align-items: center;
+  display: block; /* 블록 요소로 변경 */
+  margin-left: auto;
+  margin-right: auto; /* 중앙 정렬 */
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+export const Text = styled.div`
+  display: flex;
+  align-items: center;
+  font-family: 'Gothic A1';
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 30px;
+  color: #000000;
+  width: 389px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+`;
+
+export const Point = styled.span`
+  margin-left: 8px; /* 필요하면 간격 조정 */
+  font-weight: 600; /* 강조 효과 */
+  color: #101148;
+`;
+
+export const PurchasePopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+`;
+
+export const PurchasePopup = styled.div`
+  background: white;
+  border-radius: 10px;
+  width: 606px;
+  height: 492px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const PopupHeader = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const TitleText = styled.div`
+  font: 'Gothic A1';
+  width: 174px;
+  position: relative;
+  font-family: 'Gothic A1';
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 35px;
+  color: #000000;
+  flex-shrink: 0;
+  margin-left: 0px;
+  margin-bottom: 30px;
+`;
+
+export const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+`;
 
 // Common styles
 export const Container = styled.div`
