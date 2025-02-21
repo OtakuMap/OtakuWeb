@@ -89,13 +89,20 @@ export const toggleShortReviewReaction = async (
   reactionType: 0 | 1,
 ): Promise<ShortReviewReactionResponse> => {
   try {
+    // 객체가 아닌 reactionType 값만 직접 전송
     const response = await instance.post<ShortReviewReactionResponse>(
       `/events/short-reviews/${reviewId}/reaction`,
-      { reactionType },
+      reactionType,
     );
     return response.data;
-  } catch (err) {
+  } catch (err: any) {
+    // 타입을 any로 명시
     console.error('Error toggling short review reaction:', err);
+
+    // 에러 응답 로깅 추가 (타입 가드 사용)
+    if (err.response) {
+      console.error('Error response:', err.response.data);
+    }
     throw err;
   }
 };
