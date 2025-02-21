@@ -71,17 +71,21 @@ const handleError = <T>(error: unknown): T => {
 
 export const pointAPI = {
   // 후기 구매
+  // 후기 구매
   purchase: async (credentials: ReviewpurchaseRequest): Promise<ReviewpurchaseResponse> => {
     try {
+      const { reviewId, type, ...rest } = credentials; // reviewId, type 분리
       console.log('review purchase Request:', {
-        url: '/reviews/purchase',
-        data: credentials,
+        url: `/reviews/purchase?reviewId=${reviewId}&type=${type}`,
+        data: rest, // reviewId, type 제외한 결제 데이터만 보냄
         headers: instance.defaults.headers,
       });
+
       const response = await instance.post<ReviewpurchaseResponse>(
-        '/reviews/purchase',
-        credentials,
+        `/reviews/purchase?reviewId=${reviewId}&type=${type}`, // ✅ URL 파라미터로 전달
+        rest, // ✅ 나머지는 body로 전달
       );
+
       console.log('Raw Response:', response);
       return response.data;
     } catch (error: unknown) {

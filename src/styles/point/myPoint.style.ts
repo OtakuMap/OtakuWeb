@@ -103,10 +103,13 @@ export const Name = styled.div`
 export const Point = styled.div`
   display: flex;
   font-family: 'Gothic A1';
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 30px;
+  font-size: 45px;
+  font-weight: 600;
+  line-height: 56.25px;
   color: #101148;
+  margin-top: 37px;
+  margin-right: 47px;
+  margin-bottom: 5px;
 `;
 
 export const ButtonContainer = styled.div`
