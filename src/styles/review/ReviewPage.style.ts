@@ -1503,3 +1503,78 @@ export const PurchaseOverlay = styled.div`
   text-align: center;
   z-index: 10;
 `;
+
+// ReviewPage.style.js에 추가할 필요가 있는 스타일 컴포넌트
+
+// 블러 처리된 콘텐츠를 감싸는 컨테이너
+export const BlurredContent1 = styled.div`
+  filter: blur(8px) !important;
+  -webkit-filter: blur(8px) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  opacity: 0.7 !important;
+  position: relative;
+
+  /* 더 명확한 블러 효과를 위한 오버레이 */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+  }
+
+  /* 내부 컴포넌트까지 블러 효과 적용 */
+  * {
+    filter: blur(8px) !important;
+    -webkit-filter: blur(8px) !important;
+  }
+`;
+
+// 블러 오버레이
+export const BlurOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+`;
+
+// 블러 메시지
+export const BlurMessage = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 80%;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+// 구매하기 버튼 (블러 오버레이 내부)
+export const PurchaseContentButton = styled.button`
+  background-color: #f76b8a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e45a79;
+  }
+`;

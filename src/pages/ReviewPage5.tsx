@@ -36,6 +36,8 @@ const ReviewPage5 = () => {
   const type = (searchParams.get('type') as ReviewType) || 'PLACE';
 
   const [isPurchasePopupOpen, setIsPurchasePopupOpen] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
+  const [price, setPrice] = useState(0);
 
   const openPurchasePopup = () => setIsPurchasePopupOpen(true);
   const closePurchasePopup = () => setIsPurchasePopupOpen(false);
@@ -70,6 +72,31 @@ const ReviewPage5 = () => {
     });
   };
 
+  const callback = async (response: PortOneResponse) => {
+    try {
+      console.log('결제 응답:', response);
+      if (response.success) {
+        // 결제 성공 시 구매 처리 API 호출
+        // 가정: pointAPI.purchaseReview API가 있다고 가정합니다
+        const purchaseResponse = await pointAPI.purchaseReview(Number(reviewId));
+
+        if (purchaseResponse.isSuccess) {
+          setIsPurchased(true);
+          setBalance((prev) => prev - 500); // 500 포인트 차감
+          alert('구매가 완료되었습니다.');
+          closePurchasePopup();
+        } else {
+          alert('구매 처리 중 오류가 발생했습니다.');
+        }
+      } else {
+        alert(`결제에 실패했습니다: ${response.error_msg}`);
+      }
+    } catch (error) {
+      console.error('결제 처리 중 오류 발생:', error);
+      alert('결제 처리 중 오류가 발생했습니다.');
+    }
+  };
+
   const [balance, setBalance] = useState<number>(0);
 
   useEffect(() => {
@@ -98,6 +125,10 @@ const ReviewPage5 = () => {
         const response = await getReviewDetail(Number(reviewId), type);
         if (response.isSuccess) {
           setReviewData(response.result);
+          // 여기서 API 응답에서 price 값을 설정
+          setPrice(response.result.price || 0);
+          // 이미 구매한 상태인지 확인
+          setIsPurchased(response.result.isPurchased || false);
         } else {
           setError(response.message);
         }
@@ -178,7 +209,13 @@ const ReviewPage5 = () => {
 
         <S.ContentContainer>
           <S.MainContent>
-            <S.ReviewContext>{reviewData.content}</S.ReviewContext>
+            {price > 0 && !isPurchased ? (
+              <S.BlurredContent1>
+                <S.ReviewContext>{reviewData.content}</S.ReviewContext>
+              </S.BlurredContent1>
+            ) : (
+              <S.ReviewContext>{reviewData.content}</S.ReviewContext>
+            )}
             <S.MapContainer>
               {reviewData.reviewImages.map((image) => (
                 <img key={image.id} src={image.fileUrl} alt={image.fileName} />
@@ -211,7 +248,9 @@ const ReviewPage5 = () => {
                 루트 지도에서 보기
               </S.Button>
 
-              <S.SupportButton onClick={openPurchasePopup}>후기 구매하기</S.SupportButton>
+              {price > 0 && !isPurchased && (
+                <S.SupportButton onClick={openPurchasePopup}>후기 구매하기</S.SupportButton>
+              )}
               {isPurchasePopupOpen && (
                 <S.PurchasePopupOverlay onClick={closePurchasePopup}>
                   <S.PurchasePopup onClick={(e) => e.stopPropagation()}>
