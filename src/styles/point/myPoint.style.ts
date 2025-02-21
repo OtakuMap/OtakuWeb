@@ -38,6 +38,10 @@ export const Container = styled.div`
   ::-webkit-scrollbar-thumb {
     background: transparent; /* 스크롤바 핸들을 투명으로 설정 */
   }
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 export const Title = styled.div`
@@ -52,6 +56,11 @@ export const Title = styled.div`
   margin-top: 32px;
   margin-left: 56px;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    margin: 16px 0 8px 20px;
+  }
 `;
 
 export const MyPointContainer = styled.div`
@@ -66,6 +75,11 @@ export const MyPointContainer = styled.div`
   border-radius: 20px;
   margin-top: 22px;
   border: 1.5px solid #605f5f;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 15px;
+  }
 `;
 
 export const PointContainer = styled.div`
@@ -85,6 +99,9 @@ export const PointChargeListContainer = styled.div`
   border-radius: 20px;
   margin-top: 32px;
   margin-bottom: 67px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const Name = styled.div`
@@ -98,6 +115,9 @@ export const Name = styled.div`
   margin-left: 33px;
   align-self: flex-start;
   margin-bottom: 11px;
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
 `;
 
 export const Point = styled.div`
@@ -110,6 +130,10 @@ export const Point = styled.div`
   margin-top: 37px;
   margin-right: 47px;
   margin-bottom: 5px;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+  }
 `;
 
 export const ButtonContainer = styled.div`
@@ -132,6 +156,10 @@ export const ChargeButton = styled.button`
   color: #605f5f;
   padding: 0px;
   margin-right: 26px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
 export const CheckButton = styled.button`
@@ -142,6 +170,10 @@ export const CheckButton = styled.button`
   line-height: 25px;
   color: #605f5f;
   padding: 0px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
 export const LeftGroup = styled.div`
@@ -169,6 +201,11 @@ export const DateTime = styled.div`
   color: #000000;
   margin-left: 85px;
   margin-top: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+    margin-top: -10px;
+  }
 `;
 
 export const Payment = styled.div`
@@ -191,6 +228,11 @@ export const Name2 = styled.div`
   color: #101148;
   margin-right: 135px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    margin-bottom: 20;
+  }
 `;
 
 export const Used = styled.div`
@@ -201,6 +243,10 @@ export const Used = styled.div`
   line-height: 25px;
   color: #000000;
   margin-right: 86px;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+  }
 `;
 
 export const Divider = styled.hr`
