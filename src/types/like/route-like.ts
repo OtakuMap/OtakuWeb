@@ -2,6 +2,8 @@ export interface RouteLike {
   id: number;
   routeId: number;
   name: string;
+  reviewId: number;
+  type: string; // 'event' | 'place'
   isFavorite: boolean;
 }
 
