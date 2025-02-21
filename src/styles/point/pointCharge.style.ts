@@ -16,6 +16,9 @@ export const Container = styled.div`
   scrollbar-width: none;
   overflow-y: auto;
   background-color: #101148;
+  @media (max-width: 768px) {
+    padding: 10px; /* 모바일 화면에서 조금 더 압축 */
+  }
 `;
 export const Title = styled.div`
   display: flex;
@@ -30,6 +33,12 @@ export const Title = styled.div`
   margin-left: 56px;
   flex-shrink: 0;
   margin-bottom: 42px;
+  @media (max-width: 768px) {
+    font-size: 24px; /* 모바일에서 폰트 크기 조정 */
+    margin-left: 0px;
+    text-align: center;
+    width: 100%;
+  }
 `;
 
 export const PointChargeBox = styled.div`
@@ -44,6 +53,10 @@ export const PointChargeBox = styled.div`
   border-radius: 20px;
   overflow-y: hidden;
   overflow-x: hidden;
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 15px;
+  }
 `;
 
 export const Text = styled.div`
@@ -82,6 +95,11 @@ export const DetailText = styled.div`
   cursor: pointer;
   text-align: flex-start;
   width: 656px;
+  @media (max-width: 768px) {
+    font-size: 10px;
+    width: 300px;
+    margin-left: 180px;
+  }
 `;
 
 export const ChargeButton = styled.button`
@@ -118,6 +136,12 @@ export const CheckboxItem = styled.div`
   font-weight: 600;
   line-height: 25px;
   width: 858px;
+  @media (max-width: 768px) {
+    width: 250px;
+    margin-left: 200px;
+    font-size: 10px;
+    margin-top: 20px;
+  }
 `;
 
 export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
@@ -159,6 +183,10 @@ export const Pagebutton = styled.div`
   align-self: flex-start;
   margin-left: 85px;
   margin-top: 63px;
+  @media (max-width: 768px) {
+    width: 10px;
+    margin-left: 0px;
+  }
 `;
 
 export const SubTitle = styled.div`
@@ -168,6 +196,11 @@ export const SubTitle = styled.div`
   align-self: flex-start;
   margin-top: 68px;
   line-height: 30px;
+  @media (max-width: 768px) {
+    font-size: 20px;
+    width: 100px;
+    margin-left: 80px;
+  }
 `;
 export const SubTitle2 = styled.div`
   font-size: 24px;
@@ -182,6 +215,12 @@ export const ButtonGroup = styled.div`
   margin-bottom: 20px;
   flex-direction: column;
   margin-right: 86px;
+  @media (max-width: 768px) {
+    font-size: 10px;
+    width: 50px;
+    margin-top: 100px;
+    margin-right: 200px;
+  }
 `;
 
 export const PointGroup = styled.div`
@@ -189,6 +228,13 @@ export const PointGroup = styled.div`
   display: flex;
   align-items: center;
   margin-top: 57px;
+  @media (max-width: 768px) {
+    font-size: 10px;
+    width: 50px;
+    width: 50px;
+    margin-top: 100px;
+    margin-right: 200px;
+  }
 `;
 
 export const InputGroup = styled.div`

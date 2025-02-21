@@ -100,6 +100,8 @@ export const CloseButton = styled.button`
   cursor: pointer;
 `;
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 // Common styles
 export const Container = styled.div`
   background-color: #0c004b;
@@ -112,12 +114,21 @@ export const Container = styled.div`
   justify-content: flex-start;
   margin-top: 60px;
   overflow-x: hidden;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 30px;
+  }
 `;
 
 export const NavigationWrapper = styled.div`
   width: calc(100% - 112px);
   margin: 0 56px;
   align-self: flex-start; // 추가: 부모의 중앙 정렬을 무시하고 왼쪽 정렬을 강제
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: calc(100% - 40px);
+    margin: 0 20px;
+  }
 `;
 
 export const WhiteContainer = styled.div`
@@ -129,6 +140,13 @@ export const WhiteContainer = styled.div`
   width: calc(100% - 112px);
   min-height: 1182px; // 최소 높이는 유지하면서
   height: auto; // 내용에 따라 높이 조절
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 20px;
+    margin: 0px 20px 20px 20px;
+    width: calc(100% - 40px);
+    height: auto;
+  }
 `;
 export const WhiteContainer6 = styled.div`
   background-color: white;
@@ -138,6 +156,13 @@ export const WhiteContainer6 = styled.div`
   box-sizing: border-box;
   width: calc(100% - 112px);
   height: 1050px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 20px;
+    margin: 0px 20px 20px 20px;
+    width: calc(100% - 40px);
+    height: auto;
+  }
 `;
 
 export const Header = styled.div`
@@ -151,6 +176,12 @@ export const Header = styled.div`
   max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 0 15px;
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 export const BHeader = styled.div`
@@ -165,6 +196,12 @@ export const BHeader = styled.div`
   margin: 0 auto;
   box-sizing: border-box;
   color: black;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 0 15px;
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 // ReviewPage1 specific styles
@@ -204,6 +241,11 @@ export const SectionTitle6 = styled.div`
   justify-content: space-between;
   align-items: center;
   color: black;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 18px;
+    margin: 0px 0px 15px 20px;
+  }
 `;
 export const SectionTitle = styled.h2`
   font-size: 28px;
@@ -229,6 +271,13 @@ export const BSectionTitle = styled.h2`
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 20px;
+    line-height: 26px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+  }
 `;
 
 export const Image = styled.img`
@@ -247,6 +296,11 @@ export const SearchWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    margin-bottom: 15px;
+  }
 `;
 
 export const SearchBarWrapper = styled.div`
@@ -257,6 +311,10 @@ export const SearchBarWrapper = styled.div`
   width: 100%;
   height: 100%;
   margin-top: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 10px;
+  }
 `;
 
 export const ErrorMessage = styled.div`
@@ -290,6 +348,11 @@ export const SearchInput = styled.input`
   font-size: 14px;
   border-radius: 20px;
   outline: none;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 13px;
+    padding: 8px;
+    padding-left: 15px;
+  }
 `;
 
 export const SearchButton = styled.button`
@@ -312,6 +375,11 @@ export const SearchButton = styled.button`
 export const RecentSearch = styled.div`
   width: 671px;
   margin-top: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    margin-top: 15px;
+  }
 `;
 
 export const Title = styled.h2`
@@ -319,6 +387,11 @@ export const Title = styled.h2`
   margin-bottom: 10px;
   padding-bottom: 15px;
   border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    padding-bottom: 10px;
+  }
 `;
 export const BTitle = styled.h2`
   margin-bottom: 10px;
@@ -332,6 +405,12 @@ export const BTitle = styled.h2`
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 24px;
+    line-height: 30px;
+    padding-bottom: 10px;
+  }
 `;
 
 export const SearchList = styled.ul`
@@ -370,6 +449,11 @@ export const ReviewGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
 `;
 
 export const ReviewCard = styled.div`
@@ -384,6 +468,11 @@ export const TopReviews = styled.div`
   margin-top: 10px;
   padding-left: 20px;
   padding-right: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    padding: 0 15px;
+  }
 `;
 export const Rank = styled.div`
   position: absolute;
@@ -408,6 +497,10 @@ export const ReviewList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 15px;
+  }
 `;
 
 export const ReviewItem = styled.div`
@@ -415,10 +508,20 @@ export const ReviewItem = styled.div`
   gap: 20px;
   padding: 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
 `;
 
 export const ReviewContent = styled.div`
   flex: 1;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+  }
 `;
 
 export const ReviewTitle = styled.h3`
@@ -426,6 +529,11 @@ export const ReviewTitle = styled.h3`
   font-weight: bold;
   color: #000;
   margin-bottom: 26px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
 `;
 
 // export const ReviewText = styled.p`
@@ -447,6 +555,13 @@ export const ReviewText = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    font-size: 16px;
+    height: auto;
+    min-height: 80px;
+  }
 `;
 
 export const ReviewImageWrapper = styled.div`
@@ -454,6 +569,11 @@ export const ReviewImageWrapper = styled.div`
   height: 189px;
   border-radius: 8px;
   overflow: hidden;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 150px;
+  }
 `;
 
 export const ReviewImage = styled.img`
@@ -488,6 +608,10 @@ export const ContentWrapper = styled.div`
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 95%;
+  }
 `;
 
 export const LocationBar = styled.div`
@@ -501,6 +625,12 @@ export const LocationBar = styled.div`
   padding: 0 20px;
   width: 400px;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 40px;
+    padding: 0 15px;
+  }
 `;
 
 export const LocationInput = styled.div`
@@ -599,6 +729,12 @@ export const FeedbackSection = styled.div`
   align-items: center;
   margin-bottom: 20px;
   gap: 100px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 15px;
+  }
 `;
 
 export const FeedbackInput = styled.textarea`
@@ -612,6 +748,12 @@ export const FeedbackInput = styled.textarea`
   box-sizing: border-box;
   outline: none;
   color: black;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 120px;
+    font-size: 13px;
+  }
 `;
 
 export const ProfileContainer = styled.div`
@@ -621,6 +763,11 @@ export const ProfileContainer = styled.div`
   flex-direction: column;
   gap: 10px;
   margin-left: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-left: 10px;
+    gap: 5px;
+  }
 `;
 
 export const ProfileImage = styled.img`
@@ -630,6 +777,12 @@ export const ProfileImage = styled.img`
   background-color: gray;
   margin-bottom: 10px;
   object-fit: cover;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+  }
 `;
 
 export const ProfileInfo = styled.div`
@@ -650,6 +803,11 @@ export const ReviewProfileContainer = styled.div`
   align-items: center;
   gap: 30px;
   margin-left: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 15px;
+    margin-left: 10px;
+  }
 `;
 
 export const ReviewProfileImage = styled.img`
@@ -659,6 +817,11 @@ export const ReviewProfileImage = styled.img`
   background-color: gray;
   margin-bottom: 0px;
   object-fit: cover;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 export const ReviewProfileInfo = styled.div`
@@ -733,6 +896,12 @@ export const ReviewGrid4 = styled.div`
   width: 100%;
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 15px;
+    margin-top: 30px;
+  }
 `;
 
 export const ReviewContent4 = styled.p`
@@ -747,6 +916,11 @@ export const ReviewContent4 = styled.p`
   font-family: 'Gothic A1';
   font-weight: '600';
   word-wrap: 'break-word';
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    margin: 15px 0;
+  }
 `;
 export const ReviewItem4 = styled.div`
   background-color: white;
@@ -758,6 +932,12 @@ export const ReviewItem4 = styled.div`
   width: 250px;
   min-height: 250px;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+  }
 `;
 
 export const FeedbackButtonsWrapper = styled.div`
@@ -903,6 +1083,11 @@ export const Date = styled.span`
 export const ContentContainer = styled.div`
   display: flex;
   gap: 32px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 20px;
+  }
 `;
 
 export const MainContent = styled.div`
@@ -918,10 +1103,15 @@ export const MapContainer = styled.div`
   text-align: center;
 
   img {
-    width: 500px; // 너비 고정
-    height: 500px; // 높이 고정
-    object-fit: cover; // 이미지 비율 유지하면서 채우기
-    border-radius: 8px; // 선택적: 모서리 둥글게
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+
+    @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+      width: 100%;
+      height: 300px;
+    }
   }
 `;
 
@@ -947,6 +1137,15 @@ export const SideContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 20px;
+    padding-top: 20px;
+  }
 `;
 
 export const SaveRouteButton = styled.button`
@@ -1064,6 +1263,13 @@ export const ModalContent = styled.div`
   height: 152px;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    padding: 20px;
+    height: auto;
+    min-height: 120px;
+  }
 `;
 
 export const ModalTitle = styled.div`
@@ -1082,6 +1288,11 @@ export const ButtonGroup = styled.div`
   justify-content: center;
   gap: 150px;
   margin-top: 15px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 50px;
+    margin-top: 10px;
+  }
 `;
 
 export const ModalButton = styled.button`
@@ -1094,6 +1305,11 @@ export const ModalButton = styled.button`
   font-family: 'Gothic A1';
   font-weight: 600;
   word-wrap: break-word;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    padding: 8px;
+  }
 `;
 
 export const BackButton = styled.button`
@@ -1112,6 +1328,10 @@ export const ProfileSection = styled.div`
   align-items: center;
   margin: 40px 0;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin: 20px 0;
+  }
 `;
 
 export const DiamondLeft = styled.img`
@@ -1164,6 +1384,11 @@ export const ProfileImage6 = styled.div`
 export const ContentContainer7 = styled.div`
   display: flex;
   gap: 32px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 20px;
+  }
 `;
 
 export const HeaderContainer7 = styled.div`
@@ -1197,6 +1422,12 @@ export const ContentTextArea = styled.textarea`
   border: none;
   outline: none;
 
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    height: 250px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
   &::placeholder {
     color: #999;
   }
@@ -1206,6 +1437,11 @@ export const RouteSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 10px;
+    width: 100%;
+  }
 `;
 
 export const RouteItem7 = styled.div`
@@ -1214,6 +1450,11 @@ export const RouteItem7 = styled.div`
   gap: 10px;
   position: relative;
   padding-right: 40px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding-right: 30px;
+    gap: 8px;
+  }
 `;
 
 export const RouteInput = styled.input`
@@ -1303,6 +1544,11 @@ export const SelectBoxContainer = styled.div`
   margin: 20px 0;
   width: 100%;
   min-width: 350px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    min-width: 100%;
+    margin: 15px 0;
+  }
 `;
 
 export const SelectBox = styled.div`

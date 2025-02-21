@@ -81,8 +81,11 @@ const Main = () => {
     navigate(`/event/${eventId}`);
   };
 
-  const handleReviewItemClick = (reviewId: string) => {
-    navigate(`/review/${reviewId}`);
+  // const handleReviewItemClick = (reviewId: string) => {
+  //   navigate(`/review/${reviewId}`);
+  // };
+  const handleReviewItemClick = (reviewId: number, type: 'event' | 'place') => {
+    navigate(`/review/${reviewId}?type=${type.toUpperCase()}`);
   };
 
   return (
