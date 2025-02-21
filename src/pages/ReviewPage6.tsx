@@ -100,7 +100,7 @@ const ReviewPage6 = () => {
   return (
     <S.Container>
       <S.ProfileSection>
-        <S.BackButton onClick={() => navigate(-1)}>
+        <S.BackButton onClick={() => navigate('/')}>
           <img src={vector} alt="뒤로가기 아이콘" />
         </S.BackButton>
         <S.DiamondLeft src={diamondLeft} alt="Left Diamond" />

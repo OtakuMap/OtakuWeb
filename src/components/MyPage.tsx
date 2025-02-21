@@ -7,7 +7,6 @@ import { reportEvent } from '../api/userInfo/report-event';
 import { updateNotificationSettings } from '../api/userInfo/notification-settings';
 import { updateProfileImage } from '../api/userInfo/profile_image';
 import { resetPassword } from '../api/userInfo/reset-password';
-import { uploadImage } from '../api/common/upload-image';
 import { UserInfo } from '../types/userInfo/userType';
 import { deleteAllReviews } from '../api/userInfo/deleteReviews';
 import { useAuth } from '../hooks/login/useAuth';
@@ -17,9 +16,14 @@ import StarIcon from '../assets/star.png';
 import SpaceIcon from '../assets/space.png';
 import PencilIcon from '../assets/pencil.png';
 import * as S from '../styles/mypage/mypage.style';
+import BackIcon from '../assets/back-icon.png'; // 뒤로가기 버튼 이미지 import
 
 const MyPage = () => {
   const navigate = useNavigate();
+  // 뒤로가기 핸들러 추가
+  const handleGoBack = () => {
+    navigate('/'); // 메인 페이지로 이동
+  };
   const dispatch = useDispatch();
   const { logout } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -31,8 +35,7 @@ const MyPage = () => {
   const [formData, setFormData] = useState({
     nickname: '',
     email: '',
-    password: 'xxxxxxxxxxxxx',
-    passwordCheck: 'xxxxxxxxxxxxx',
+    password: 'xxxxxxxxxxxxx', // passwordCheck 제거
   });
   const [eventForm, setEventForm] = useState({
     eventName: '',
@@ -82,18 +85,22 @@ const MyPage = () => {
     }
 
     try {
-      const uploadResponse = await uploadImage('profile', file);
-      if (!uploadResponse.isSuccess) {
-        throw new Error('이미지 업로드에 실패했습니다.');
-      }
+      const formData = new FormData();
+      formData.append('profileImage', file);
 
-      const updateResponse = await updateProfileImage(uploadResponse.result);
-      if (updateResponse.isSuccess) {
+      const response = await updateProfileImage(formData);
+      console.log('프로필 이미지 업로드 응답:', response); // 응답 확인
+
+      if (response.isSuccess) {
         const userResponse = await getUserInfo();
+        console.log('유저 정보 응답:', userResponse); // 유저 정보 응답 확인
+
         setUserInfo(userResponse.result);
+        dispatch(updateProfile({ profileImageUrl: response.result }));
         alert('프로필 이미지가 성공적으로 변경되었습니다.');
       }
     } catch (error) {
+      console.error('에러 발생:', error); // 에러 로그 추가
       if (error instanceof Error) {
         alert(error.message);
       } else {
@@ -152,30 +159,21 @@ const MyPage = () => {
 
       // 비밀번호 변경
       if (isEditing.password) {
-        if (formData.password !== formData.passwordCheck) {
-          alert('비밀번호가 일치하지 않습니다.');
-          return;
-        }
+        try {
+          const passwordResponse = await resetPassword({
+            password: formData.password,
+          });
 
-        if (!userInfo?.id) {
-          alert('사용자 정보를 찾을 수 없습니다.');
-          return;
-        }
-
-        const passwordResponse = await resetPassword({
-          userId: userInfo.id,
-          password: formData.password,
-          passwordCheck: formData.passwordCheck,
-        });
-
-        if (passwordResponse.isSuccess) {
-          setIsEditing((prev) => ({ ...prev, password: false }));
-          alert('비밀번호가 성공적으로 변경되었습니다.');
-          setFormData((prev) => ({
-            ...prev,
-            password: 'xxxxxxxxxxxxx',
-            passwordCheck: 'xxxxxxxxxxxxx',
-          }));
+          if (passwordResponse.isSuccess) {
+            setIsEditing((prev) => ({ ...prev, password: false }));
+            alert('비밀번호가 성공적으로 변경되었습니다.');
+            setFormData((prev) => ({
+              ...prev,
+              password: 'xxxxxxxxxxxxx',
+            }));
+          }
+        } catch (error) {
+          alert('비밀번호 변경에 실패했습니다.');
         }
         return;
       }
@@ -305,12 +303,17 @@ const MyPage = () => {
 
   return (
     <S.Container>
+      {/* 뒤로가기 버튼 추가 */}
+      <S.BackButton onClick={handleGoBack}>
+        <S.BackIcon src={BackIcon} alt="뒤로가기" />
+      </S.BackButton>
+      <S.Divider />
       <S.Mypage>마이 페이지</S.Mypage>
       <S.TopLeftIcon src={StarIcon} alt="Star Icon" />
 
       <S.ProfileContainer>
         <label htmlFor="profile-image-input" style={{ cursor: 'pointer' }}>
-          <S.Avatar imageUrl={userInfo?.profileImageUrl} />
+          <S.Avatar $imageUrl={userInfo?.profileImageUrl} />
           <input
             id="profile-image-input"
             type="file"
@@ -367,20 +370,12 @@ const MyPage = () => {
           <S.Label>비밀번호 변경</S.Label>
           <S.InputContainer>
             {isEditing.password ? (
-              <>
-                <S.InputField
-                  type="password"
-                  placeholder="새 비밀번호"
-                  value={formData.password}
-                  onChange={(e) => handleChange('password', e.target.value)}
-                />
-                <S.InputField
-                  type="password"
-                  placeholder="비밀번호 확인"
-                  value={formData.passwordCheck}
-                  onChange={(e) => handleChange('passwordCheck', e.target.value)}
-                />
-              </>
+              <S.InputField
+                type="password"
+                placeholder="새 비밀번호"
+                value={formData.password}
+                onChange={(e) => handleChange('password', e.target.value)}
+              />
             ) : (
               <S.Text>{formData.password}</S.Text>
             )}

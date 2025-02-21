@@ -115,9 +115,9 @@ const MapPage = () => {
     };
   }, [selectedPlace, selectedEvent, placeLikeDetail, mapInstance]);
 
-  const handleFilterChange = (filter: 'spot' | 'event') => {
-    console.log('Filter state:', filter);
-  };
+  // const handleFilterChange = (filter: 'spot' | 'event') => {
+  //   console.log('Filter state:', filter);
+  // };
 
   // const handlePlaceSelect = (place: SearchSuggestion['data'], locationGroup: LocationGroup) => {
   //   console.log('Raw place data:', place);
@@ -495,7 +495,7 @@ const MapPage = () => {
             setShowLocationDetail(true);
           }}
         />
-        <FilterButton onFilterChange={handleFilterChange} />
+        {/* <FilterButton onFilterChange={handleFilterChange} /> */}
         {showLocationDetail && (selectedPlace || selectedEvent || placeLikeDetail) && (
           <LocationDetail
             key={`location-detail-${selectedPlace?.id || selectedEvent?.eventId || placeLikeDetail?.placeId}-${Date.now()}`}
