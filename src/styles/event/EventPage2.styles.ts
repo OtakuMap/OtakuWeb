@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+const IPHONE_15_BREAKPOINT = '430px';
+
 interface EventHeaderProps {
   imageUrl: string;
 }
@@ -15,18 +17,31 @@ export const Container = styled.div`
   justify-content: flex-start;
   margin-top: 60px;
   overflow-x: hidden;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 30px;
+  }
 `;
 export const ErrorMessage = styled.div`
   color: #ff0000;
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 12px;
+    margin-top: 6px;
+  }
 `;
 export const Content = styled.div`
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 0 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 0 10px;
+  }
 `;
 
 export const EventHeader = styled.div<EventHeaderProps>`
@@ -42,6 +57,12 @@ export const EventHeader = styled.div<EventHeaderProps>`
     url(${(props) => props.imageUrl});
   background-size: cover;
   background-position: center;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    height: auto;
+    padding: 20px;
+    margin-bottom: 15px;
+  }
 `;
 
 export const EventHeaderInner = styled.div`
@@ -52,6 +73,12 @@ export const EventHeaderInner = styled.div`
   padding: 0 20px;
   display: flex;
   gap: 40px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 10px;
+  }
 `;
 
 export const EventImage = styled.img`
@@ -59,6 +86,12 @@ export const EventImage = styled.img`
   height: 476px;
   object-fit: cover;
   margin-top: auto;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 300px;
+    margin-top: 0;
+  }
 `;
 
 export const EventInfo = styled.div`
@@ -69,6 +102,11 @@ export const EventInfo = styled.div`
   padding-bottom: 40px;
   margin-left: 10px;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding-bottom: 20px;
+    margin-left: 0;
+  }
 `;
 
 // Navigation styles
@@ -79,6 +117,11 @@ export const TabWrapper = styled.div`
   margin-right: calc(-50vw + 50%);
   border-bottom: 1px solid #ffffff;
   background-color: #0c004b;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 `;
 
 export const TabInner = styled.div`
@@ -88,6 +131,12 @@ export const TabInner = styled.div`
   display: flex;
   gap: 120px;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 40px;
+    padding: 0 10px;
+    min-width: min-content;
+  }
 `;
 
 export const Tab = styled.button<{ isActive: boolean }>`
@@ -123,6 +172,19 @@ export const Tab = styled.button<{ isActive: boolean }>`
     transition: all 0.2s ease-in-out;
     z-index: 2;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 18px;
+    line-height: 24px;
+    padding: 0 0 8px 0;
+    margin-bottom: 6px;
+
+    &::after {
+      width: ${(props) => (props.isActive ? '100px' : '0')};
+      height: ${(props) => (props.isActive ? '6px' : '2px')};
+      bottom: -10px;
+    }
+  }
 `;
 
 // Review section styles
@@ -137,14 +199,28 @@ export const ReviewCount = styled.div`
   flex-direction: column;
   font-weight: '600';
 
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    margin-left: 15px;
+    gap: 5px;
+  }
+
   span {
     color: #ffd700;
     font-size: 18px;
+
+    @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+      font-size: 14px;
+    }
   }
 `;
 
 export const ReviewSection = styled.div`
   margin-top: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 10px;
+  }
 `;
 
 export const ReviewInput = styled.div`
@@ -152,6 +228,11 @@ export const ReviewInput = styled.div`
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
 `;
 
 export const InputHeader = styled.div`
@@ -160,6 +241,11 @@ export const InputHeader = styled.div`
   justify-content: center;
   gap: 15px;
   margin-bottom: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 export const ProfileSection = styled.div`
@@ -168,6 +254,11 @@ export const ProfileSection = styled.div`
   align-items: center;
   justify-content: center;
   gap: 5px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 3px;
+    margin-bottom: 10px;
+  }
 `;
 
 export const Avatar = styled.img`
@@ -175,32 +266,59 @@ export const Avatar = styled.img`
   height: 60px;
   border-radius: 50%;
   margin-left: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+  }
 `;
 
 export const Profileimg = styled.img`
   width: 60px;
   height: 60px;
   border-radius: 50%;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 export const UserName = styled.div`
   font-weight: bold;
   color: black;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+  }
 `;
 
 export const ProfileName = styled.div`
   font-weight: bold;
   color: white;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+  }
 `;
 
 export const Rating = styled.div`
   color: #ffd700;
   font-size: 18px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+  }
 `;
 
 export const InputSection = styled.div`
   position: relative;
   display: flex;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+  }
 `;
 
 export const TextArea = styled.textarea<{ isNotLoggedIn?: boolean }>`
@@ -220,6 +338,13 @@ export const TextArea = styled.textarea<{ isNotLoggedIn?: boolean }>`
   background-color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#f5f5f5' : 'white')};
   cursor: ${({ isNotLoggedIn }) => (isNotLoggedIn ? 'pointer' : 'text')};
   color: ${({ isNotLoggedIn }) => (isNotLoggedIn ? '#666' : '#000')};
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 150px;
+    font-size: 14px;
+    padding-right: 15px;
+  }
 `;
 
 export const ReviewButton = styled.button<{ isNotLoggedIn?: boolean }>`
@@ -239,6 +364,13 @@ export const ReviewButton = styled.button<{ isNotLoggedIn?: boolean }>`
     outline: none;
     border: none;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    right: 10px;
+    bottom: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
 `;
 
 export const ReviewList = styled.div`
@@ -250,6 +382,10 @@ export const ReviewList = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    padding: 10px;
+    gap: 10px;
+  }
 `;
 
 export const ReviewCard = styled.div<{ $isMyReview: boolean }>`
@@ -263,6 +399,13 @@ export const ReviewCard = styled.div<{ $isMyReview: boolean }>`
   justify-content: center;
   width: 950px;
   height: 152px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: auto;
+    min-height: 120px;
+    padding: 12px;
+  }
 `;
 
 export const ReviewHeader = styled.div`
@@ -271,6 +414,11 @@ export const ReviewHeader = styled.div`
   gap: 10px;
   margin-bottom: 15px;
   width: 100%;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 5px;
+    margin-bottom: 10px;
+  }
 `;
 
 export const UserInfo = styled.div`
@@ -279,6 +427,10 @@ export const UserInfo = styled.div`
   align-items: center;
   text-align: center;
   margin-left: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-left: 10px;
+  }
 `;
 
 export const ReviewContent = styled.p`
@@ -288,6 +440,12 @@ export const ReviewContent = styled.p`
   white-space: pre-line;
   font-weight: '500';
   margin-left: 30px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    margin-left: 15px;
+    margin-bottom: 40px;
+  }
 `;
 
 export const FeedbackButtons = styled.div`
@@ -299,6 +457,13 @@ export const FeedbackButtons = styled.div`
   bottom: 15px;
   right: 15px;
   cursor: pointer;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    bottom: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
   &:focus {
     outline: none;
     border: none;
@@ -313,6 +478,20 @@ export const IconButton = styled.button`
   border: none;
   color: #666;
   cursor: pointer;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 3px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+
   &:focus {
     outline: none;
     border: none;
@@ -324,6 +503,11 @@ export const PostGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-top: 30px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 20px;
+  }
 `;
 
 export const PostCard = styled.div`
@@ -340,6 +524,11 @@ export const PostImage = styled.img`
   height: 200px;
   object-fit: cover;
   border-radius: 10px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 180px;
+  }
 `;
 
 export const PostTitle = styled.h3`
@@ -347,6 +536,11 @@ export const PostTitle = styled.h3`
   color: white;
   font-size: 16px;
   font-weight: normal;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    text-align: center;
+    padding: 0 10px;
+  }
 `;
 
 export const EventTitle = styled.h1`
@@ -358,6 +552,10 @@ export const EventTitle = styled.h1`
 
   color: #ffffff;
   margin-bottom: 5px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 28px;
+    line-height: 36px;
+  }
 `;
 
 export const EventSubtitle = styled.h2`
@@ -370,6 +568,12 @@ export const EventSubtitle = styled.h2`
   color: #ffffff;
 
   margin-bottom: 100px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 40px;
+  }
 `;
 
 export const SaveButton = styled.button`
@@ -399,6 +603,14 @@ export const SaveButton = styled.button`
   &:focus {
     outline: none;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    position: static;
+    width: 100%;
+    height: 44px;
+    font-size: 18px;
+    margin-top: 20px;
+  }
 `;
 
 export const EventInfoSection = styled.div`
@@ -407,10 +619,19 @@ export const EventInfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-top: 20px;
+    padding: 0 10px;
+    gap: 15px;
+  }
 `;
 
 export const Section = styled.div`
   margin-bottom: 20px;
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin-bottom: 15px;
+  }
 `;
 
 export const SectionTitle = styled.div`
@@ -422,6 +643,11 @@ export const SectionTitle = styled.div`
   font-size: 28px;
   line-height: 35px;
   color: #ffffff;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 20px;
+    line-height: 26px;
+  }
 `;
 
 export const SectionText = styled.div`
@@ -433,6 +659,11 @@ export const SectionText = styled.div`
   font-size: 24px;
   line-height: 30px;
   color: #ffffff;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 16px;
+    line-height: 22px;
+  }
 `;
 
 export const MapWrapper = styled.div`
@@ -445,6 +676,12 @@ export const MapWrapper = styled.div`
   border-radius: 10px;
   overflow: hidden;
   position: relative;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: 250px;
+    margin: 20px auto;
+  }
 `;
 
 export const ProductContainer = styled.div`
@@ -452,6 +689,10 @@ export const ProductContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    margin: 10px 0 20px 0;
+  }
 `;
 
 export const ProductImage = styled.img`
@@ -459,6 +700,12 @@ export const ProductImage = styled.img`
   height: 737px;
   margin-bottom: 30px;
   object-fit: contain;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
 `;
 
 export const EditDeleteButtons = styled.div`
@@ -468,6 +715,12 @@ export const EditDeleteButtons = styled.div`
   display: flex;
   gap: 10px;
   outline: none;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    top: 10px;
+    right: 10px;
+    gap: 5px;
+  }
 `;
 
 export const ActionButton = styled.button`
@@ -488,6 +741,11 @@ export const ActionButton = styled.button`
     outline: none;
     border: none;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
 `;
 
 export const InlineEditTextArea = styled.textarea`
@@ -503,6 +761,13 @@ export const InlineEditTextArea = styled.textarea`
   margin-left: 20px;
   font-family: inherit;
   overflow-y: auto;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 90%;
+    height: 50px;
+    font-size: 14px;
+    margin-left: 10px;
+  }
 `;
 
 export const divider = styled.div`
@@ -510,6 +775,11 @@ export const divider = styled.div`
   margin-top: 10px;
   margin-bottom: 30px;
   border: 1px solid #605f5f;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    width: 100%;
+    margin: 8px 0 20px 0;
+  }
 `;
 
 export const StarRatingInput = styled.div`
@@ -522,6 +792,15 @@ export const StarRatingInput = styled.div`
     display: flex;
     align-items: center;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    height: 24px;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
 `;
 
 export const ReviewStarRating = styled.div`
@@ -533,6 +812,15 @@ export const ReviewStarRating = styled.div`
     display: flex;
     align-items: center;
   }
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    height: 24px;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
 `;
 
 export const Pagination = styled.div`
@@ -543,6 +831,11 @@ export const Pagination = styled.div`
   margin-top: 20px;
   color: white;
   margin-bottom: 20px;
+
+  @media (max-width: ${IPHONE_15_BREAKPOINT}) {
+    gap: 15px;
+    margin: 15px 0;
+  }
 `;
 
 export const PaginationButton = styled.button`

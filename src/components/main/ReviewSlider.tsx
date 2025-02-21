@@ -6,17 +6,35 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import * as S from '../../styles/review/ReviewSlider.styles';
 
+// interface Review {
+//   id?: string;
+//   title?: string;
+//   reviewImage?: {
+//     fileUrl: string;
+//   };
+// }
+
+// interface ReviewSliderProps {
+//   reviews?: Review[];
+//   onReviewClick: (reviewId: string) => void; // 타입 변경
+// }
 interface Review {
-  id?: string;
-  title?: string;
+  id: number;
+  title: string;
   reviewImage?: {
+    id: number;
+    uuid: string;
+    fileName: string;
     fileUrl: string;
-  };
+  } | null;
+  view: number;
+  type: 'event' | 'place';
+  createdAt: string;
 }
 
 interface ReviewSliderProps {
   reviews?: Review[];
-  onReviewClick: (reviewId: string) => void; // 타입 변경
+  onReviewClick: (reviewId: number, type: 'event' | 'place') => void;
 }
 
 const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick }) => {
@@ -74,7 +92,7 @@ const ReviewSlider: React.FC<ReviewSliderProps> = ({ reviews = [], onReviewClick
               {reviews.map((review, index) => (
                 <S.SlideItem
                   key={review?.id || index}
-                  onClick={() => review?.id && onReviewClick(review.id)} // 이 부분이 변경됨
+                  onClick={() => review?.id && onReviewClick(review.id, review.type)}
                 >
                   <S.ImageContainer>
                     <S.Image
