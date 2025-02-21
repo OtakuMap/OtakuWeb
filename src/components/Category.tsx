@@ -131,6 +131,18 @@ const Category = () => {
     }
   };
 
+  const handleEventClick = async (eventId: number) => {
+    try {
+      const response = await getEventDetails(eventId);
+      if (response.isSuccess) {
+        navigate(`/event/${eventId}`, {
+          state: { eventDetails: response.result },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch event details:', error);
+    }
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
