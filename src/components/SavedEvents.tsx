@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import spaceIcon from '../assets/space-icon.png';
 import starIcon from '../assets/circle-star.png';
@@ -53,7 +54,7 @@ const SavedEvents: React.FC = () => {
   const handleToggleStar = async (event: EventLike, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (isTogglingFavorite === event.id) return; // 이미 처리 중인 경우 중복 요청 방지
+    if (isTogglingFavorite === event.id) return;
 
     try {
       setIsTogglingFavorite(event.id);
@@ -64,7 +65,6 @@ const SavedEvents: React.FC = () => {
           prevEvents.map((e) => (e.id === event.id ? { ...e, isFavorite: !e.isFavorite } : e)),
         );
 
-        // 즐겨찾기 목록을 보고 있을 때 즐겨찾기 해제하면 해당 항목 제거
         if (showOnlyStarred && event.isFavorite) {
           setEvents((prevEvents) => prevEvents.filter((e) => e.id !== event.id));
         }
@@ -76,27 +76,48 @@ const SavedEvents: React.FC = () => {
     }
   };
 
-  const handleCardClick = (id: number) => {
+  const handleCardClick = (event: EventLike) => {
     setSelectedEvents((prev) =>
-      prev.includes(id) ? prev.filter((eventId) => eventId !== id) : [...prev, id],
+      prev.includes(event.eventId)
+        ? prev.filter((id) => id !== event.eventId)
+        : [...prev, event.eventId],
     );
   };
 
   const handleDeleteSelected = async () => {
-    if (selectedEvents.length === 0 || isDeleting) return;
+    if (selectedEvents.length === 0) {
+      alert('삭제할 이벤트를 선택해주세요.');
+      return;
+    }
 
     try {
       setIsDeleting(true);
+
+      console.log('Deleting events with IDs:', selectedEvents);
+
       const response = await deleteEvents(selectedEvents);
+      console.log('삭제 응답:', response);
 
       if (response.isSuccess) {
-        setEvents((prev) => prev.filter((event) => !selectedEvents.includes(event.id)));
+        // 삭제된 이벤트 제거
+        setEvents((prev) => prev.filter((event) => !selectedEvents.includes(event.eventId)));
         setSelectedEvents([]);
+        alert('선택한 이벤트가 성공적으로 삭제되었습니다.');
       } else {
-        console.error('Failed to delete events:', response.message);
+        alert(response.message || '삭제에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('Error deleting events:', error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          '서버 오류가 발생했습니다.';
+
+        console.error('Delete error details:', error.response?.data);
+        alert(errorMessage);
+      } else {
+        alert('예상치 못한 오류가 발생했습니다.');
+      }
     } finally {
       setIsDeleting(false);
     }
@@ -147,13 +168,13 @@ const SavedEvents: React.FC = () => {
               <button
                 onClick={handleDeleteSelected}
                 style={{
-                  color: selectedEvents.length > 0 ? '#7B66FF' : 'inherit',
-                  cursor: selectedEvents.length > 0 ? 'pointer' : 'default',
+                  color: selectedEvents.length > 0 ? '#7B66FF' : '#999',
+                  cursor: selectedEvents.length > 0 ? 'pointer' : 'not-allowed',
                   opacity: isDeleting ? 0.5 : 1,
                 }}
-                disabled={isDeleting}
+                disabled={selectedEvents.length === 0 || isDeleting}
               >
-                {isDeleting ? '삭제중...' : '선택 삭제'}
+                {isDeleting ? '삭제중...' : `선택 삭제 (${selectedEvents.length})`}
               </button>
               <span>/</span>
               <button
@@ -197,8 +218,8 @@ const SavedEvents: React.FC = () => {
             {events.map((event) => (
               <S.EventCard
                 key={event.id}
-                isSelected={selectedEvents.includes(event.id)}
-                onClick={() => handleCardClick(event.id)}
+                $isSelected={selectedEvents.includes(event.eventId)}
+                onClick={() => handleCardClick(event)}
               >
                 <S.EventImageWrapper>
                   <S.EventImage src={event.thumbnail} alt={event.name} />
