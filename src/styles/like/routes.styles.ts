@@ -145,7 +145,7 @@ export const Tab = styled.button<{ active?: boolean }>`
 
 export const RouteListContainer = styled.div`
   background: white;
-  width: 1550px;
+  width: 1350px;
   border-radius: 0px 20px 20px 20px;
   padding: 45px 72px;
   margin-top: -1px;
