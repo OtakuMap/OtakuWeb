@@ -143,6 +143,7 @@ const Category = () => {
       console.error('Failed to fetch event details:', error);
     }
   };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
