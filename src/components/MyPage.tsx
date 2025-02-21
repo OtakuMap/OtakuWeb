@@ -117,77 +117,130 @@ const MyPage = () => {
     }
   };
 
-  // 기존 handleSave 함수를 수정
   const handleSave = async () => {
     try {
-      // 닉네임 수정
-      if (isEditing.nickname && formData.nickname !== userInfo?.nickname) {
-        const response = await updateNickname(formData.nickname);
-        if (response.isSuccess) {
-          dispatch(updateProfile({ nickname: formData.nickname }));
-          setUserInfo((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  nickname: formData.nickname,
-                }
-              : null,
-          );
-          setIsEditing((prev) => ({ ...prev, nickname: false }));
-          alert('닉네임이 성공적으로 수정되었습니다.');
-        }
+      // accessToken 체크 로직 변경
+      const token = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (!token || !refreshToken) {
+        alert('로그인이 필요합니다.');
+        logout();
+        navigate('/login');
         return;
       }
 
-      // 이메일 수정
-      if (isEditing.email && formData.email !== userInfo?.email) {
-        const response = await updateEmail(formData.email);
-        if (response.isSuccess) {
-          setUserInfo((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  email: formData.email,
-                }
-              : null,
-          );
-          setIsEditing((prev) => ({ ...prev, email: false }));
-          alert('이메일이 성공적으로 수정되었습니다.');
-        }
-        return;
-      }
+      let emailUpdateSuccess = false;
+      let passwordUpdateSuccess = false;
+      let nicknameUpdateSuccess = false;
 
-      // 비밀번호 변경
-      if (isEditing.password) {
+      // 비밀번호 변경 먼저 처리
+      if (isEditing.password && formData.password !== 'xxxxxxxxxxxxx') {
         try {
           const passwordResponse = await resetPassword({
             password: formData.password,
           });
 
           if (passwordResponse.isSuccess) {
-            setIsEditing((prev) => ({ ...prev, password: false }));
-            alert('비밀번호가 성공적으로 변경되었습니다.');
             setFormData((prev) => ({
               ...prev,
               password: 'xxxxxxxxxxxxx',
             }));
+            passwordUpdateSuccess = true;
+          } else {
+            throw new Error(passwordResponse.message || '비밀번호 변경에 실패했습니다.');
           }
         } catch (error) {
-          alert('비밀번호 변경에 실패했습니다.');
+          if (error.response?.status === 401) {
+            // 토큰 재발급 시도
+            try {
+              const tokenRefreshResponse = await refreshAccessToken(refreshToken);
+              if (tokenRefreshResponse.isSuccess) {
+                localStorage.setItem('accessToken', tokenRefreshResponse.result.accessToken);
+                // 비밀번호 변경 재시도
+                const retryResponse = await resetPassword({
+                  password: formData.password,
+                });
+                if (retryResponse.isSuccess) {
+                  passwordUpdateSuccess = true;
+                }
+              }
+            } catch (refreshError) {
+              alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+              logout();
+              navigate('/login');
+              return;
+            }
+          } else {
+            alert(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
+          }
         }
-        return;
+      }
+
+      // 이메일 수정
+      if (isEditing.email && formData.email !== userInfo?.email) {
+        try {
+          const response = await updateEmail(formData.email);
+          if (response.isSuccess) {
+            setUserInfo((prev) => (prev ? { ...prev, email: formData.email } : null));
+            emailUpdateSuccess = true;
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+            logout();
+            navigate('/login');
+            return;
+          }
+          alert(error.message || '이메일 수정 중 오류가 발생했습니다.');
+        }
+      }
+
+      // 닉네임 수정
+      if (isEditing.nickname && formData.nickname !== userInfo?.nickname) {
+        try {
+          const response = await updateNickname(formData.nickname);
+          if (response.isSuccess) {
+            dispatch(updateProfile({ nickname: formData.nickname }));
+            setUserInfo((prev) => (prev ? { ...prev, nickname: formData.nickname } : null));
+            nicknameUpdateSuccess = true;
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+            logout();
+            navigate('/login');
+            return;
+          }
+          alert(error.message || '닉네임 수정 중 오류가 발생했습니다.');
+        }
+      }
+
+      // 성공한 수정사항에 대한 처리
+      if (nicknameUpdateSuccess || emailUpdateSuccess || passwordUpdateSuccess) {
+        setIsEditing({
+          nickname: false,
+          email: false,
+          password: false,
+        });
+
+        if (nicknameUpdateSuccess) alert('닉네임이 성공적으로 수정되었습니다.');
+        if (emailUpdateSuccess) alert('이메일이 성공적으로 수정되었습니다.');
+        if (passwordUpdateSuccess) alert('비밀번호가 성공적으로 변경되었습니다.');
+      } else {
+        alert('변경된 내용이 없습니다.');
       }
     } catch (error) {
-      if (isEditing.nickname) {
-        alert('닉네임 수정에 실패했습니다.');
-      } else if (isEditing.email) {
-        alert('이메일 수정에 실패했습니다.');
-      } else if (isEditing.password) {
-        alert('비밀번호 변경에 실패했습니다.');
+      console.error('Error in handleSave:', error);
+      if (error.response?.status === 401) {
+        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+        logout();
+        navigate('/login');
+      } else {
+        alert('정보 업데이트 중 오류가 발생했습니다.');
       }
     }
   };
-
   const handleEdit = (field: string) => {
     // 다른 필드 편집 중이면 먼저 저장하도록 알림
     if (Object.values(isEditing).some((value) => value)) {

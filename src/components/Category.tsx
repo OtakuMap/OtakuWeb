@@ -30,55 +30,85 @@ const Category = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // 초기 데이터 로드
+  // 초기 데이터 로드를 위한 useEffect 수정
   useEffect(() => {
     const fetchInitialEvents = async () => {
       try {
         setIsLoading(true);
-        // 애니 > 전체에 해당하는 파라미터 명시적으로 설정
+        // 초기 파라미터 설정
         const params = {
           page: 0,
           size: 12,
-          type: 'ALL', // 전체 타입
-          status: 'ALL', // 전체 상태
+          type: EventType.ALL, // 전체 타입
+          status: EventStatus.ALL, // 전체 상태
+          genre: Genre.ALL, // 전체 장르
         };
 
+        console.log('초기 데이터 로드 파라미터:', params);
+
         const response = await getEventsByCategory(params);
-        console.log('Initial events response:', response); // 응답 확인
 
         if (response.isSuccess) {
           setEvents(response.result.events);
           setIsLast(response.result.isLast);
+        } else {
+          console.error('API 응답 오류:', response.message);
         }
       } catch (error) {
-        console.error('Failed to fetch initial events:', error);
+        console.error('초기 데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchInitialEvents();
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  }, []);
+
+  // 메뉴 변경 시 이벤트 로드를 위한 useEffect
+  useEffect(() => {
+    // 컴포넌트 마운트 시에는 실행하지 않음 (초기 데이터 로드에서 처리)
+    // 메뉴나 탭이 변경될 때만 실행
+    if (pageNumber === 0 && (activeTab || activeMainMenu || activeSubMenu || searchTerm)) {
+      fetchEvents();
+    }
+  }, [activeTab, activeMainMenu, activeSubMenu, searchTerm]);
+
+  // 페이지 번호 변경에 따른 추가 데이터 로드
+  useEffect(() => {
+    // 페이지 번호가 0보다 클 때만 실행 (더 보기 버튼 클릭 시)
+    if (pageNumber > 0) {
+      fetchEvents();
+    }
+  }, [pageNumber]);
 
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const params: any = {
+      // 기본 파라미터 설정
+      const params = {
         page: pageNumber,
         size: 12,
         title: searchTerm || undefined,
+        type: EventType.ALL, // 기본 타입 설정
+        status: EventStatus.ALL, // 기본 상태 설정
+        genre: Genre.ALL, // 기본 장르 설정
       };
 
+      // 선택된 탭과 메뉴에 따라 파라미터 업데이트
       if (activeTab === '애니') {
         if (activeMainMenu === '장르별' && activeSubMenu) {
           params.genre = getGenreEnum(activeSubMenu);
         }
-      } else {
+      } else if (activeTab === '이벤트') {
         params.status =
           activeMainMenu === '진행중인 이벤트' ? EventStatus.IN_PROCESS : EventStatus.NOT_STARTED;
+
         if (activeSubMenu) {
           params.type = getEventTypeEnum(activeSubMenu);
         }
       }
+
+      console.log('Request params:', params); // 디버깅용 로그
 
       const response = await getEventsByCategory(params);
 
@@ -92,39 +122,14 @@ const Category = () => {
       }
     } catch (error) {
       console.error('Failed to fetch events:', error);
+      // 에러 객체를 자세히 기록
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleEventClick = async (eventId: number) => {
-    try {
-      const response = await getEventDetails(eventId);
-      if (response.isSuccess) {
-        navigate(`/event/${eventId}`, {
-          state: { eventDetails: response.result },
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch event details:', error);
-    }
-  };
-
-  const filterSuggestions = useCallback(
-    (searchText: string) => {
-      if (!searchText.trim()) {
-        setSuggestions([]);
-        return;
-      }
-
-      const filtered = events.filter((event) =>
-        event.title.toLowerCase().includes(searchText.toLowerCase()),
-      );
-
-      setSuggestions(filtered);
-    },
-    [events],
-  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
