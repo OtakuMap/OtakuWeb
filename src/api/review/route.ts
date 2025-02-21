@@ -4,7 +4,7 @@ import instance from '@/api/axios';
 import { RouteApiResponse, RouteData } from '@/types/review/route';
 
 export const saveRoute = async (
-  reviewId: number,
+  routeId: number,
   routeData: RouteData[],
 ): Promise<RouteApiResponse> => {
   try {
@@ -12,9 +12,9 @@ export const saveRoute = async (
     const payload = routeData; // 백엔드가 원하는 정확한 형식 확인 필요
 
     console.log('Request Payload:', JSON.stringify(payload));
-    console.log('Review ID:', reviewId);
+    console.log('Review ID:', routeId);
 
-    const response = await instance.post<RouteApiResponse>(`/route-likes/${reviewId}`, payload, {
+    const response = await instance.post<RouteApiResponse>(`/route-likes/${routeId}`, payload, {
       // 추가 헤더 및 설정
       headers: {
         'Content-Type': 'application/json',
