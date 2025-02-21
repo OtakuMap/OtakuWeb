@@ -56,7 +56,7 @@ export const Header = styled.header`
 
   img {
     width: 100%;
-    height: 500px;
+    height: 650px;
     // height: auto;
     object-fit: cover;
     object-position: center;
