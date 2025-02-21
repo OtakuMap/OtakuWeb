@@ -27,7 +27,8 @@ export const WhiteContainer = styled.div`
   margin: 10px 56px 40px 56px;
   box-sizing: border-box;
   width: calc(100% - 112px);
-  height: 1182px;
+  min-height: 1182px; // 최소 높이는 유지하면서
+  height: auto; // 내용에 따라 높이 조절
 `;
 export const WhiteContainer6 = styled.div`
   background-color: white;
@@ -327,12 +328,25 @@ export const ReviewTitle = styled.h3`
   margin-bottom: 26px;
 `;
 
+// export const ReviewText = styled.p`
+//   font-size: 20px;
+//   color: #605f5f;
+//   line-height: 1.5;
+//   width: 1000px;
+//   height: 125px;
+// `;
+
 export const ReviewText = styled.p`
   font-size: 20px;
   color: #605f5f;
   line-height: 1.5;
   width: 1000px;
   height: 125px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const ReviewImageWrapper = styled.div`
@@ -802,6 +816,13 @@ export const MapContainer = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  img {
+    width: 500px; // 너비 고정
+    height: 500px; // 높이 고정
+    object-fit: cover; // 이미지 비율 유지하면서 채우기
+    border-radius: 8px; // 선택적: 모서리 둥글게
+  }
 `;
 
 export const MapImage = styled.img`
@@ -982,7 +1003,7 @@ export const BackButton = styled.button`
   font-size: 20px;
   cursor: pointer;
   position: absolute;
-  left: -710px;
+  left: -600px;
 `;
 
 export const ProfileSection = styled.div`
@@ -1339,4 +1360,46 @@ export const AddLocationButton = styled.button`
   &:hover:not(:disabled) {
     background-color: #e0e0e0;
   }
+`;
+
+export const ModalOverlay5 = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const ModalContent5 = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+`;
+
+export const PurchaseModal = styled(ModalContent)`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+export const BlurredContent = styled.div<{ $isBlurred: boolean }>`
+  filter: ${(props) => (props.$isBlurred ? 'blur(10px)' : 'none')};
+  pointer-events: ${(props) => (props.$isBlurred ? 'none' : 'auto')};
+  position: relative;
+`;
+
+export const PurchaseOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
 `;

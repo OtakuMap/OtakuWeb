@@ -18,9 +18,15 @@ export interface Review {
   type: string;
 }
 
+export interface HashTag {
+  hashTagId: number;
+  name: string;
+}
+
 export interface AnimationGroup {
   animationId: number;
   animationName: string;
+  hashTags: HashTag[];
   reviews: Review[];
   totalReviews: number;
 }

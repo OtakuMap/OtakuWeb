@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { fetchReviews } from '../api/review/PlaceReview';
 import { fetchPlaceAnimations } from '../api/review/animation';
 import { searchAnimations, addAnimation } from '../api/review/AddAnimation';
-import { ReviewResponse, SortType, AnimationGroup } from '../types/review/PlaceReview';
+import { ReviewResponse, SortType, AnimationGroup, Review } from '../types/review/PlaceReview';
 import { PlaceAnimation } from '../types/review/animation';
 import { tokenStorage } from '@/utils/token';
 import { savePlace } from '../api/review/SavePlace';
@@ -16,6 +16,7 @@ const ReviewPage3 = () => {
 
   // Review-related states
   const [reviewData, setReviewData] = useState<ReviewResponse['result'] | null>(null);
+  const [filteredReviews, setFilteredReviews] = useState<AnimationGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +32,19 @@ const ReviewPage3 = () => {
   const [searchResults, setSearchResults] = useState<{ animationId: number; name: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isCustomAnimationMode, setIsCustomAnimationMode] = useState(false);
+
+  // 애니메이션 선택에 따라 필터링된 리뷰 업데이트
+  useEffect(() => {
+    if (reviewData && selectedAnimation) {
+      const filtered = reviewData.animationGroups.filter(
+        (group) => group.animationId === selectedAnimation.animationId,
+      );
+      setFilteredReviews(filtered);
+    } else if (reviewData) {
+      // 애니메이션 선택 안 했을 때는 전체 리뷰
+      setFilteredReviews(reviewData.animationGroups);
+    }
+  }, [selectedAnimation, reviewData]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -282,10 +296,12 @@ const ReviewPage3 = () => {
           )}
         </S.DropdownContainer3>
 
+        {/* 애니메이션에 따른 해시태그 동적 표시 */}
         <S.TagContainer>
-          <S.Tag>#다이에이</S.Tag>
-          <S.Tag>#고시엔</S.Tag>
-          <S.Tag>#아구에니</S.Tag>
+          {selectedAnimation &&
+            reviewData?.animationGroups
+              .find((group) => group.animationId === selectedAnimation.animationId)
+              ?.hashTags.map((tag) => <S.Tag key={tag.hashTagId}>#{tag.name}</S.Tag>)}
         </S.TagContainer>
       </S.NavigationWrapper>
 
@@ -313,7 +329,7 @@ const ReviewPage3 = () => {
         </S.BHeader>
 
         <S.ReviewList>
-          {reviewData.animationGroups.map((group: AnimationGroup) => (
+          {filteredReviews.map((group) => (
             <div key={group.animationId}>
               <h3>{group.animationName}</h3>
               {group.reviews.map((review) => (

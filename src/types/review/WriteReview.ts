@@ -15,6 +15,7 @@ export interface WriteReviewRequest {
   content: string;
   reviewType: 'EVENT' | 'PLACE';
   animeId: number;
+  visibility: 'PUBLIC' | 'PURCHASERS_ONLY'; // 새로 추가
   routeItems: RouteItem[];
 }
 
