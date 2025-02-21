@@ -1,6 +1,7 @@
 // 후기 구매 /api/reviews/purchase
 export interface ReviewpurchaseRequest {
-  reviewId: string;
+  reviewId: number;
+  type: string;
 }
 
 export interface ReviewpurchaseResponse {
@@ -8,7 +9,7 @@ export interface ReviewpurchaseResponse {
   code: string;
   message: string;
   result?: {
-    remainPoints: string;
+    remainingPoints: number;
   };
 }
 
@@ -25,9 +26,13 @@ export interface PointbalanceResponse {
 
 // 포인트 충전
 export interface PointchargeRequest {
-  price: number;
+  // 원래 price 였음음
   impUid: string;
   merchantUid: string;
+  point: number;
+  chargedBy: string;
+  status: string;
+  chargedAt: string;
 }
 
 export interface PointchargeResponse {
@@ -36,6 +41,16 @@ export interface PointchargeResponse {
   message: string;
   result?: {
     point: string;
+  };
+}
+
+// 후기 구매 검증
+export interface purchasereviewResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result?: {
+    isPurchased: string;
   };
 }
 

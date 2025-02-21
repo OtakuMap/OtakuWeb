@@ -37,7 +37,37 @@ const PurchaseIncomeCheck: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // currentPage를 0이 아닌 1로 시작하도록 수정
-  const [currentPage, setCurrentPage] = useState(1); // 초기값을 1로 설정
+  const [currentPage, setCurrentPage] = useState(0); // 초기값 0으로 설정
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 개수 저장
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        let response;
+        if (activeTab === 'purchase') {
+          response = await pointAPI.transactionsusages(currentPage, itemsPerPage);
+          if (response.isSuccess) setPurchaseData(response);
+        } else {
+          response = await pointAPI.transactionsearning(currentPage, itemsPerPage);
+          if (response.isSuccess) setIncomeData(response);
+        }
+
+        // ✅ totalPages 상태 업데이트 (기존 중복 선언 제거)
+        if (response?.result?.totalElements !== undefined) {
+          setTotalPages(Math.ceil(response.result.totalElements / itemsPerPage) || 1);
+        }
+      } catch (err) {
+        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeTab, currentPage]);
 
   const itemsPerPage = 5;
 
@@ -53,29 +83,6 @@ const PurchaseIncomeCheck: React.FC = () => {
     return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        if (activeTab === 'purchase') {
-          const response = await pointAPI.transactionsusages(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
-          if (response.isSuccess) setPurchaseData(response);
-        } else {
-          const response = await pointAPI.transactionsearning(currentPage - 1, itemsPerPage); // page 값을 0부터 전달
-          if (response.isSuccess) setIncomeData(response);
-        }
-      } catch (err) {
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [activeTab, currentPage]);
-
   const navigate = useNavigate();
   const dataList =
     activeTab === 'purchase'
@@ -90,10 +97,9 @@ const PurchaseIncomeCheck: React.FC = () => {
           status: point !== undefined ? `+${point}` : '0',
         })) || [];
 
-  const totalPages = Math.ceil(dataList.length / itemsPerPage) || 1;
   const displayedItems = dataList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage, // 시작 인덱스 수정
+    (currentPage + 1) * itemsPerPage, // 끝 인덱스 수정
   );
 
   if (loading) return <p>로딩 중...</p>;
@@ -142,17 +148,17 @@ const PurchaseIncomeCheck: React.FC = () => {
           )}
           <PaginationContainer>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} // currentPage가 0이 아닌 1로 처리
-              disabled={currentPage === 1} // currentPage가 1이면 왼쪽 버튼 비활성화
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))} // 0 이하로 못 내려감
+              disabled={currentPage === 0} // 첫 페이지(0)일 때 비활성화
             >
               {'<'}
             </PaginationButton>
             <PageNumber>
-              {currentPage} / {totalPages}
+              {currentPage + 1} / {totalPages} {/* 사용자에게는 1부터 보이도록 */}
             </PageNumber>
             <PaginationButton
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} // currentPage가 totalPages보다 커지지 않도록 처리
-              disabled={currentPage === totalPages} // currentPage가 totalPages이면 오른쪽 버튼 비활성화
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))} // totalPages 이상으로 못 올라감
+              disabled={currentPage === totalPages - 1} // 마지막 페이지일 때 비활성화
             >
               {'>'}
             </PaginationButton>
