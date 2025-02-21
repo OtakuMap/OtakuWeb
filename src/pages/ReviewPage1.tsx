@@ -21,8 +21,8 @@ const ReviewPage1: React.FC = () => {
     { text: '검색어검색어', date: '2024.11.14' },
   ]);
 
-  const handleReviewClick = (reviewId: string) => {
-    navigate(`/review/${reviewId}`);
+  const handleReviewClick = (reviewId: number, type: string) => {
+    navigate(`/review/${reviewId}?type=${type.toUpperCase()}`);
   };
 
   const handleSearchWithValidation = async (searchTerm: string) => {
