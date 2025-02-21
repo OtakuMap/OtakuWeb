@@ -102,7 +102,7 @@ export const Title = styled.h1`
 
   @media (max-width: ${breakpoints.mobile}) {
     font-size: 22px;
-    margin: 24px 10px;
+    margin: 40px 10px;
   }
 `;
 
