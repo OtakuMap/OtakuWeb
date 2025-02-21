@@ -61,7 +61,7 @@ const ReviewPage5 = () => {
       pg: 'kakaopay.TC0ONETIME',
       pay_method: 'card',
       merchant_uid: `order_${new Date().getTime()}`,
-      name: '포인트 충전',
+      name: '리뷰 결제',
       amount: '500',
       buyer_name: '홍길동',
       buyer_tel: '010-1234-5678',
@@ -83,7 +83,7 @@ const ReviewPage5 = () => {
           // ✅ API 호출 시 reviewId와 type 추가
           const purchaseCredentials = {
             reviewId: Number(reviewId), // URL 파라미터로 전달할 reviewId
-            type, // URL 파라미터로 전달할 type ('event' 또는 'place')
+            type: String(type), // URL 파라미터로 전달할 type ('event' 또는 'place')
             imp_uid: response.imp_uid,
             merchant_uid: response.merchant_uid,
             amount: response.paid_amount,
