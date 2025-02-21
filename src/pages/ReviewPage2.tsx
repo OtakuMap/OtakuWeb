@@ -30,8 +30,8 @@ const ReviewPage2: React.FC = () => {
       return prev;
     });
   };
-  const handleReviewClick = (reviewId: number) => {
-    navigate(`/review/${reviewId}`);
+  const handleReviewClick = (reviewId: number, type: string) => {
+    navigate(`/review/${reviewId}?type=${type.toUpperCase()}`);
   };
 
   if (loading) return <div>검색 중...</div>;
@@ -79,7 +79,7 @@ const ReviewPage2: React.FC = () => {
           {searchResults && searchResults.length > 0 ? (
             searchResults.map((review) => (
               <S.ReviewItem key={review.id}>
-                <S.ReviewContent onClick={() => handleReviewClick(review.reviewId)}>
+                <S.ReviewContent onClick={() => handleReviewClick(review.reviewId, review.type)}>
                   <S.ReviewTitle>{review.title}</S.ReviewTitle>
                   <S.ReviewText>{review.content}</S.ReviewText>
                 </S.ReviewContent>

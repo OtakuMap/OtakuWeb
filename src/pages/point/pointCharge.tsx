@@ -76,12 +76,10 @@ const PointCharge: React.FC = () => {
       buyer_email: 'test@example.com',
       buyer_addr: '서울시 강남구',
       buyer_postalcode: '123-456',
-      m_redirect_url: 'http://localhost:3000/payment-success', // 테스트 서버 도메인 사용
+      m_redirect_url: 'http://localhost:3000/payment-success',
     };
 
     console.log('결제 요청 데이터:', data);
-    console.log('IMP.request_pay 호출');
-
     PortOne.request_pay(data, (response: PortOneResponse) => {
       console.log('callback 호출됨:', response);
       callback(response);
@@ -90,28 +88,27 @@ const PointCharge: React.FC = () => {
 
   const callback = async (response: PortOneResponse) => {
     console.log('✅ callback 호출됨:', response);
-    const { success, error_msg, imp_uid, merchant_uid, paid_amount } = response;
+    const { success, error_msg, imp_uid, merchant_uid, paid_amount, pay_method } = response;
 
     if (success) {
       alert('✅ 결제 성공!');
       try {
         console.log('🔹 검증 요청 imp_uid:', imp_uid);
-
-        // 결제 검증 요청
         const verifyResponse = await pointAPI.verify(imp_uid);
         console.log('🔹 검증 응답:', verifyResponse);
 
         if (verifyResponse.response?.status === 'paid') {
           console.log('✅ 결제 검증 성공, 포인트 충전 요청');
 
-          // ✅ `PointchargeRequest` 형식으로 데이터 구성
-          const chargeData: PointchargeRequest = {
-            price: paid_amount, // 결제 금액
-            impUid: imp_uid, // 결제 고유 ID
-            merchantUid: merchant_uid, // 주문 번호
+          const chargeData = {
+            impUid: imp_uid,
+            merchantUid: merchant_uid,
+            point: paid_amount,
+            chargedBy: verifyResponse.response.payMethod,
+            status: 'PENDING',
+            chargedAt: new Date(verifyResponse.response.paidAt).toISOString(),
           };
 
-          // 🔹 포인트 충전 요청
           const chargeResponse = await pointAPI.charge(chargeData);
           console.log('🔹 충전 응답:', chargeResponse);
 

@@ -32,6 +32,7 @@ const MyPoint: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [balance, setBalance] = useState<number>(0);
   const [chargeHistory, setChargeHistory] = useState([]);
+  const [nextPageData, setNextPageData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,14 +69,12 @@ const MyPoint: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (chargeHistory.length > 0) return; // 기존 데이터가 있으면 API 요청 안 함
-
         setLoading(true);
         setError(null);
 
         const [balanceRes, chargeRes] = await Promise.all([
           pointAPI.balance(),
-          pointAPI.transactionscharge(),
+          pointAPI.transactionscharge(currentPage, itemsPerPage), // ✅ itemsPerPage 추가
         ]);
 
         if (balanceRes.isSuccess && balanceRes.result) {
@@ -86,7 +85,12 @@ const MyPoint: React.FC = () => {
 
         if (chargeRes.isSuccess && chargeRes.result) {
           setChargeHistory(chargeRes.result.pointList ?? []);
-          setTotalPages(chargeRes.result.totalPage || 1);
+
+          // ✅ totalPages 정확하게 업데이트
+          const calculatedTotalPages = Math.ceil(
+            (chargeRes.result.totalElements || 0) / itemsPerPage,
+          );
+          setTotalPages(calculatedTotalPages);
         } else {
           throw new Error('포인트 충전 내역을 불러올 수 없습니다.');
         }
@@ -99,7 +103,7 @@ const MyPoint: React.FC = () => {
     };
 
     fetchData();
-  }, [chargeHistory]);
+  }, [currentPage]);
 
   return (
     <Container>
