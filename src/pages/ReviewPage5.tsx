@@ -70,7 +70,7 @@ const ReviewPage5 = () => {
         description: '',
       }));
 
-      const response = await saveRoute(reviewData.reviewId, routeData);
+      const response = await saveRoute(reviewData.route.routeId, routeData);
 
       if (response.isSuccess) {
         alert('루트가 성공적으로 저장되었습니다.');
