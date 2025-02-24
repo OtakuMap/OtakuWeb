@@ -9,12 +9,10 @@ export const fetchReviews = async (
   sort: SortType = 'latest',
 ): Promise<ReviewResponse> => {
   try {
-    // localStorage에서 토큰 가져오기
-    const token = localStorage.getItem('accessToken'); // 또는 다른 방식으로 저장된 토큰
+    const token = localStorage.getItem('accessToken');
 
     const response = await instance.get(`/places/${placeId}/reviews`, {
       params: {
-        // URL 파라미터를 params 객체로 전달
         page,
         size,
         sort,
@@ -25,12 +23,10 @@ export const fetchReviews = async (
       },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch reviews');
-    }
-
-    return await response.json();
+    // axios에서는 바로 response.data를 반환
+    return response.data;
   } catch (error) {
+    console.error('Review fetch error:', error);
     throw new Error(error instanceof Error ? error.message : 'Error fetching reviews');
   }
 };
