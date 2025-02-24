@@ -68,7 +68,7 @@ const ReviewPage3 = () => {
         }
 
         // Fetch reviews
-        const reviewResponse = await fetchReviews(placeId, currentPage, 10, sort);
+        const reviewResponse = await fetchReviews(placeId, currentPage - 1, 10, sort);
         if (reviewResponse.isSuccess) {
           setReviewData(reviewResponse.result);
           setError(null);
