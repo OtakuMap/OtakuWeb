@@ -175,12 +175,12 @@ const ReviewPage7 = () => {
         visibility: selectedVisibility === '전체 열람가능' ? 'PUBLIC' : 'PURCHASERS_ONLY',
         routeItems: locations
           .filter((location) => location.name.trim() !== '')
-          .map((location, index) => ({
+          .map((location) => ({
             name: location.name,
             lat: location.latitude,
             lng: location.longitude,
             detail: location.detail || '',
-            order: index,
+            order: location.order,
           })),
       };
 
@@ -188,7 +188,7 @@ const ReviewPage7 = () => {
 
       if (response.isSuccess) {
         alert('리뷰가 성공적으로 등록되었습니다.');
-        navigate('/reviews');
+        navigate('/review6');
       }
     } catch (error) {
       console.error('리뷰 등록 실패:', error);

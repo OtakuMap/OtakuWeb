@@ -62,7 +62,7 @@ const ReviewPage5 = () => {
     const data = {
       pg: 'kakaopay.TC0ONETIME',
       pay_method: 'card',
-      merchant_uid: order_${new Date().getTime()},
+      merchant_uid: `order_${new Date().getTime()}`,
       name: '리뷰 결제',
       amount: '500',
       buyer_name: '홍길동',
@@ -239,11 +239,11 @@ const ReviewPage5 = () => {
             <S.Avatar>
               <img
                 src={reviewData.profileImage?.fileUrl || defaultProfileImage}
-                alt={${reviewData.userName}의 프로필}
+                alt={`${reviewData.nickname}의 프로필`}
               />
             </S.Avatar>
             <S.UserInfo>
-              <S.Username>{reviewData.userName}</S.Username>
+              <S.Username>{reviewData.nickname}</S.Username>
               <S.Date>{new Date(reviewData.createdAt).toLocaleDateString()}</S.Date>
             </S.UserInfo>
           </S.MetaInfo>
@@ -280,7 +280,7 @@ const ReviewPage5 = () => {
             <S.RouteButtonContainer>
               <S.Button
                 onClick={() =>
-                  navigate(/route/${reviewData.route.routeId}, {
+                  navigate(`/route/${reviewData.route.routeId}`, {
                     state: {
                       routeSource: RouteSource.REVIEW,
                     },
@@ -323,5 +323,4 @@ const ReviewPage5 = () => {
   );
 };
 
-export default ReviewPage5;  
-
+export default ReviewPage5;
