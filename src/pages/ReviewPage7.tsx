@@ -183,7 +183,7 @@ const ReviewPage7 = () => {
             order: location.order,
           })),
       };
-
+      console.log('업로드할 이미지:', uploadedImage ? uploadedImage.name : '없음');
       const response = await submitReview(reviewData, uploadedImage ? [uploadedImage] : undefined);
 
       if (response.isSuccess) {
