@@ -12,15 +12,18 @@ export const fetchReviews = async (
     // localStorage에서 토큰 가져오기
     const token = localStorage.getItem('accessToken'); // 또는 다른 방식으로 저장된 토큰
 
-    const response = await instance.get(
-      `/places/${placeId}/reviews?page=${page}&size=${size}&sort=${sort}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Bearer 토큰 방식 사용
-          'Content-Type': 'application/json',
-        },
+    const response = await instance.get(`/places/${placeId}/reviews`, {
+      params: {
+        // URL 파라미터를 params 객체로 전달
+        page,
+        size,
+        sort,
       },
-    );
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');
