@@ -9,19 +9,8 @@ import * as S from '../styles/review/ReviewPage.style';
 import { ReviewDetail, ReviewType } from '@/types/review/review';
 import { RouteData } from '@/types/review/route';
 import { RouteSource } from '@/types/map/routeSource';
-//import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { pointAPI } from '@/api/point/pointAPI';
-
-interface PortOneResponse {
-  success: boolean;
-  error_msg?: string;
-  imp_uid: string;
-  merchant_uid: string;
-  pay_method: string;
-  paid_amount: number;
-  status: string;
-}
 
 const ReviewPage5 = () => {
   const navigate = useNavigate();
@@ -33,7 +22,7 @@ const ReviewPage5 = () => {
   const [error, setError] = useState<string | null>(null);
   const { reviewId } = useParams();
   const [searchParams] = useSearchParams();
-  const type = searchParams.get('type') || 'PLACE'; // ✅ 기본값 설정
+  const type = searchParams.get('type') || 'PLACE';
 
   const [isPurchasePopupOpen, setIsPurchasePopupOpen] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
@@ -42,76 +31,32 @@ const ReviewPage5 = () => {
   const openPurchasePopup = () => setIsPurchasePopupOpen(true);
   const closePurchasePopup = () => setIsPurchasePopupOpen(false);
 
-  const onClickPayment = async () => {
-    console.log('현재 reviewId:', reviewId); // ✅ reviewId 확인
-    console.log('현재 type:', type); // ✅ type 확인 (undefined인지 체크)
-
-    if (!type) {
-      console.error('Error: type 값이 없습니다.');
+  const handlePurchase = async () => {
+    if (!reviewId || !type) {
+      console.error('Error: reviewId 또는 type 값이 없습니다.');
       return;
     }
 
-    const PortOne = window.IMP;
-    if (!PortOne) {
-      console.error('PortOne 객체가 로드되지 않았습니다.');
-      return;
-    }
+    try {
+      const purchaseCredentials = {
+        reviewId: Number(reviewId),
+        type: String(type),
+      };
 
-    PortOne.init('imp87071777');
+      const purchaseResponse = await pointAPI.purchase(purchaseCredentials);
 
-    const data = {
-      pg: 'kakaopay.TC0ONETIME',
-      pay_method: 'card',
-      merchant_uid: `order_${new Date().getTime()}`,
-      name: '리뷰 결제',
-      amount: '500',
-      buyer_name: '홍길동',
-      buyer_tel: '010-1234-5678',
-      buyer_email: 'test@example.com',
-      buyer_addr: '서울시 강남구',
-      buyer_postalcode: '123-456',
-      m_redirect_url: 'http://localhost:3000/payment-success',
-    };
-
-    console.log('결제 요청 데이터:', data);
-
-    PortOne.request_pay(data, async (response: PortOneResponse) => {
-      console.log('callback 호출됨:', response);
-
-      if (response.success) {
-        console.log('Payment successful:', response);
-
-        try {
-          // ✅ API 호출 시 reviewId와 type 추가
-          const purchaseCredentials = {
-            reviewId: Number(reviewId), // URL 파라미터로 전달할 reviewId
-            type: String(type), // URL 파라미터로 전달할 type ('event' 또는 'place')
-            imp_uid: response.imp_uid,
-            merchant_uid: response.merchant_uid,
-            amount: response.paid_amount,
-            status: response.status,
-          };
-
-          console.log('보내는 데이터:', purchaseCredentials); // 확인용 로그
-
-          const purchaseResponse = await pointAPI.purchase(purchaseCredentials);
-
-          if (purchaseResponse.isSuccess) {
-            console.log('Purchase success:', purchaseResponse);
-            alert('구매가 완료되었습니다!');
-          } else {
-            console.error('Purchase failed:', purchaseResponse.message);
-            alert('구매 처리에 실패했습니다.');
-          }
-        } catch (error) {
-          console.error('Error during purchase API call:', error);
-          alert('구매 API 요청 중 오류가 발생했습니다.');
-        }
+      if (purchaseResponse.isSuccess) {
+        console.log('Purchase success:', purchaseResponse);
+        alert('구매가 완료되었습니다!');
+        closePurchasePopup();
       } else {
-        console.error('Payment failed:', response.error_msg || 'Unknown error');
-        alert('결제에 실패했습니다.');
+        console.error('Purchase failed:', purchaseResponse.message);
+        alert('구매 처리에 실패했습니다.');
       }
-    });
+    } catch (error) {
+      console.error('Error during purchase:', error);
+      alert('구매 처리 중 오류가 발생했습니다.');
+    }
   };
 
   const callback = async (response: PortOneResponse) => {
@@ -195,12 +140,11 @@ const ReviewPage5 = () => {
 
     try {
       setIsSaving(true);
-      // Convert API route items to RouteData format
       const routeData: RouteData[] = reviewData.route.routeItems.map((item) => ({
         id: item.placeId,
         order: item.itemOrder,
         name: item.name,
-        description: '', // Add description if needed from your data
+        description: '',
       }));
 
       const response = await saveRoute(reviewData.route.routeId, routeData);
@@ -310,7 +254,7 @@ const ReviewPage5 = () => {
                       <S.Text>
                         잔여 포인트: <S.Point>{balance - 500} P</S.Point>
                       </S.Text>
-                      <S.PurchaseButton onClick={onClickPayment}>구매하기</S.PurchaseButton>
+                      <S.PurchaseButton onClick={handlePurchase}>구매하기</S.PurchaseButton>
                     </S.PopupContent>
                   </S.PurchasePopup>
                 </S.PurchasePopupOverlay>
