@@ -199,6 +199,9 @@ const ReviewPage3 = () => {
     setSort(newSort);
     setCurrentPage(1); // Reset to first page when sorting changes
   };
+  const handleReviewClick = (reviewId: number) => {
+    navigate(`/review/${reviewId}`);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -301,7 +304,7 @@ const ReviewPage3 = () => {
           {selectedAnimation &&
             reviewData?.animationGroups
               .find((group) => group.animationId === selectedAnimation.animationId)
-              ?.hashTags.map((tag) => <S.Tag key={tag.hashTagId}>#{tag.name}</S.Tag>)}
+              ?.hashTags.map((tag) => <S.Tag key={tag.hashTagId}>{tag.name}</S.Tag>)}
         </S.TagContainer>
       </S.NavigationWrapper>
 
@@ -333,7 +336,11 @@ const ReviewPage3 = () => {
             <div key={group.animationId}>
               <h3>{group.animationName}</h3>
               {group.reviews.map((review) => (
-                <S.ReviewItem key={review.reviewId}>
+                <S.ReviewItem
+                  key={review.reviewId}
+                  onClick={() => handleReviewClick(review.reviewId)}
+                  style={{ cursor: 'pointer' }} // 클릭 가능함을 시각적으로 표시
+                >
                   <S.ReviewContent>
                     <S.ReviewTitle>{review.title}</S.ReviewTitle>
                     <S.ReviewText>{review.content}</S.ReviewText>
