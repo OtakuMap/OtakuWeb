@@ -188,7 +188,7 @@ const ReviewPage7 = () => {
 
       if (response.isSuccess) {
         alert('리뷰가 성공적으로 등록되었습니다.');
-        navigate('/reviews');
+        navigate('/review6');
       }
     } catch (error) {
       console.error('리뷰 등록 실패:', error);
