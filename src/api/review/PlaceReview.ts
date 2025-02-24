@@ -1,5 +1,5 @@
 // api/review/review.ts
-
+import instance from '@/api/axios';
 import { ReviewResponse, SortType } from '../../types/review/PlaceReview';
 
 export const fetchReviews = async (
@@ -12,8 +12,8 @@ export const fetchReviews = async (
     // localStorage에서 토큰 가져오기
     const token = localStorage.getItem('accessToken'); // 또는 다른 방식으로 저장된 토큰
 
-    const response = await fetch(
-      `/api/places/${placeId}/reviews?page=${page}&size=${size}&sort=${sort}`,
+    const response = await instance.get(
+      `/places/${placeId}/reviews?page=${page}&size=${size}&sort=${sort}`,
       {
         headers: {
           Authorization: `Bearer ${token}`, // Bearer 토큰 방식 사용
