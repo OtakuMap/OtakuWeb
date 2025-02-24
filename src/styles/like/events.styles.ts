@@ -26,18 +26,6 @@ export const Container = styled.div`
   }
 `;
 
-export const Divider = styled.hr`
-  border: 0;
-  height: 1px;
-  background-color: #d1c1ff;
-  width: 100%;
-  margin-top: 51px;
-
-  @media (max-width: ${breakpoints.tablet}) {
-    margin-top: 30px;
-  }
-`;
-
 export const IconContainer = styled.div`
   position: absolute;
   top: 105px;
@@ -68,6 +56,7 @@ export const ContentWrapper = styled.div`
   width: 100%;
   max-width: 1100px;
   margin: 0 60px;
+  margin-top: 30px;
 
   @media (max-width: ${breakpoints.largeDesktop}) {
     margin: 0 30px;
@@ -141,7 +130,7 @@ export const Tab = styled.button<{ active?: boolean }>`
 
 export const EventListContainer = styled.div`
   background: white;
-  width: 1550px;
+  width: 1350px;
   border-radius: 0px 20px 20px 20px;
   padding: 45px 72px;
   margin-top: -1px;

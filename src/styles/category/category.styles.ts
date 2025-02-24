@@ -430,3 +430,11 @@ export const LoadingIndicator = styled.div`
     margin: 20px 0;
   }
 `;
+
+export const NoResultsMessage = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 40px 0;
+  font-size: 16px;
+  color: #666;
+`;

@@ -399,6 +399,23 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     }
   };
 
+  // const handleReviewClick = () => {
+  //   if (currentItem) {
+  //     if (currentItem.type === 'event') {
+  //       navigate(`/event/${currentItem.data.eventId}`);
+  //     } else {
+  //       navigate(`/places/${currentItem.data.placeId}/review`);
+  //     }
+  //     return;
+  //   }
+
+  //   if (isEvent && eventId) {
+  //     navigate(`/event/${eventId}`);
+  //   } else {
+  //     navigate(`/places/${location.id}/review`);
+  //   }
+  // };
+
   const handleFavClick = async () => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());

@@ -2,41 +2,46 @@ import instance from '@/api/axios';
 import { EventsResponse, Genre, EventType, EventStatus } from '@/types/category/category';
 
 export const getEventsByCategory = async (params: {
-  genre?: Genre;
+  genre?: Genre | null;
   status?: EventStatus;
   type?: EventType;
   page: number;
   size: number;
   title?: string;
+  isAnimeTab?: boolean;
 }) => {
-  // 열거형 값을 문자열로 변환하여 새 객체 생성
-  const convertedParams = {
+  // Remove the incorrect genre nullification
+  const requestParams = {
     page: params.page,
     size: params.size,
     title: params.title,
-    // 열거형 값을 문자열로 변환 (undefined일 경우 전달하지 않음)
-    genre: params.genre !== undefined ? Genre[params.genre] : undefined,
-    status: params.status !== undefined ? EventStatus[params.status] : undefined,
-    type: params.type !== undefined ? EventType[params.type] : undefined,
+    genre: params.genre, // Don't override genre based on isAnimeTab
+    status: params.status,
+    type: params.type,
   };
 
-  // undefined 값 제거
+  // Clean up undefined/null values
   const cleanParams = Object.fromEntries(
-    Object.entries(convertedParams).filter(([_, value]) => value !== undefined),
+    Object.entries(requestParams).filter(([_, value]) => value !== undefined && value !== null),
   );
 
   console.log('API 요청 파라미터:', cleanParams);
+  console.log('장르:', params.genre);
+  console.log('애니메이션 탭 여부:', params.isAnimeTab);
 
   try {
     const response = await instance.get<EventsResponse>('/events/category', {
       params: cleanParams,
     });
+
+    if (response.data.isSuccess && response.data.result) {
+      console.log(`받은 이벤트 수: ${response.data.result.events.length}`);
+      console.log('장르별 필터링 적용됨:', params.genre);
+    }
+
     return response.data;
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);
-    if (error.response) {
-      console.error('서버 응답:', error.response.data);
-    }
     throw error;
   }
 };

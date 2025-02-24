@@ -175,12 +175,12 @@ const ReviewPage7 = () => {
         visibility: selectedVisibility === '전체 열람가능' ? 'PUBLIC' : 'PURCHASERS_ONLY',
         routeItems: locations
           .filter((location) => location.name.trim() !== '')
-          .map((location, index) => ({
+          .map((location) => ({
             name: location.name,
             lat: location.latitude,
             lng: location.longitude,
             detail: location.detail || '',
-            order: index,
+            order: location.order,
           })),
       };
 

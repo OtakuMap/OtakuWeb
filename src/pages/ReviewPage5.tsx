@@ -239,11 +239,11 @@ const ReviewPage5 = () => {
             <S.Avatar>
               <img
                 src={reviewData.profileImage?.fileUrl || defaultProfileImage}
-                alt={`${reviewData.userName}의 프로필`}
+                alt={`${reviewData.nickname}의 프로필`}
               />
             </S.Avatar>
             <S.UserInfo>
-              <S.Username>{reviewData.userName}</S.Username>
+              <S.Username>{reviewData.nickname}</S.Username>
               <S.Date>{new Date(reviewData.createdAt).toLocaleDateString()}</S.Date>
             </S.UserInfo>
           </S.MetaInfo>

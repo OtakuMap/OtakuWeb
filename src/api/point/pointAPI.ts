@@ -71,7 +71,6 @@ const handleError = <T>(error: unknown): T => {
 
 export const pointAPI = {
   // 후기 구매
-  // 후기 구매
   purchase: async (credentials: ReviewpurchaseRequest): Promise<ReviewpurchaseResponse> => {
     try {
       const { reviewId, type, ...rest } = credentials; // reviewId, type 분리
@@ -93,7 +92,6 @@ export const pointAPI = {
       return handleError<ReviewpurchaseResponse>(error);
     }
   },
-
   validatePurchase: async (reviewId: number, type: string): Promise<purchasereviewResponse> => {
     try {
       console.log('Validating review purchase:', {

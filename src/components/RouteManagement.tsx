@@ -136,6 +136,10 @@ const RouteManagement: React.FC = () => {
     navigate('/saved-events');
   };
 
+  const handleNavigateToReview = (reviewId: number, type: string) => {
+    navigate(`/review/${reviewId}?type=${type.toUpperCase()}`);
+  };
+
   const handleDeleteSelected = async () => {
     if (selectedRoutes.length === 0) return;
 
@@ -226,10 +230,9 @@ const RouteManagement: React.FC = () => {
                     })
                   }
                 >
-                  <span>지도에서 보기</span>
+                  <span>지도에서 보기 </span>
                 </S.ViewButton>
-                <S.Divider>|</S.Divider>
-                <S.ViewButton onClick={() => navigate(`/review/${route.id}`)}>
+                <S.ViewButton onClick={() => handleNavigateToReview(route.reviewId, route.type)}>
                   <span>후기에서 보기</span>
                 </S.ViewButton>
               </S.RouteContent>
