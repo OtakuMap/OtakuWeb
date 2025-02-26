@@ -10,26 +10,47 @@ export const writeReview = async (
   images?: File[],
 ): Promise<WriteReviewResponse> => {
   try {
-    const formData = new FormData();
+    // 먼저 이미지 업로드 처리
+    let imageUrls: string[] = [];
 
-    // JSON 데이터를 request 키로 추가
-    formData.append(
-      'request',
-      new Blob([JSON.stringify(reviewData)], { type: 'application/json' }),
-    );
-
-    // 이미지 파일들 추가
     if (images?.length) {
-      images.forEach((image) => {
-        formData.append('images', image);
-      });
+      imageUrls = await Promise.all(
+        images.map(async (image) => {
+          const imageFormData = new FormData();
+          // 백엔드 요구사항에 맞게 폴더 정보 추가
+          imageFormData.append('folder', JSON.stringify({ folder: 'review' }));
+          imageFormData.append('image', image);
+
+          // instance에 이미 /api가 포함되어 있으므로 /images로 요청
+          const imageResponse = await instance.post('/images', imageFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+
+          // 이미지 URL 반환 (응답 구조에 맞게 수정 필요)
+          return imageResponse.data.result;
+        }),
+      );
     }
 
-    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    // 이미지 URL을 reviewData에 추가
+    const updatedReviewData = {
+      ...reviewData,
+      imageUrls: imageUrls, // 백엔드 API 요구사항에 맞게 필드명 조정
+    };
+
+    // 리뷰 데이터 전송 (REVIEW_API_ENDPOINT는 '/reviews'이므로 전체 경로는 '/api/reviews')
+    const response = await instance.post<WriteReviewResponse>(
+      REVIEW_API_ENDPOINT,
+      updatedReviewData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
+
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
