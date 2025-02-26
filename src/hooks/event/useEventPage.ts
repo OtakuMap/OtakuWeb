@@ -3,7 +3,12 @@ import { useState, useEffect } from 'react';
 import { EventDetails } from '@/types/event/details';
 import { EventShortReview } from '@/types/event/short-review';
 import { getEventDetails } from '@/api/event/details';
-import { createShortReview, updateShortReview, deleteShortReview } from '@/api/event/short-review';
+import {
+  createShortReview,
+  updateShortReview,
+  deleteShortReview,
+  toggleShortReviewReaction,
+} from '@/api/event/short-review';
 
 // EventDetails hook (기존 코드 동일)
 export const useEventDetails = (eventId: number) => {
@@ -45,6 +50,7 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
   const [editText, setEditText] = useState('');
   const [editRating, setEditRating] = useState(0);
   const [editError, setEditError] = useState<string | null>(null);
+  const [isReactionLoading, setIsReactionLoading] = useState(false);
 
   const handleEditStart = (review: EventShortReview) => {
     if (!review || typeof review.id !== 'number') {
@@ -120,37 +126,86 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
     }
   };
 
-  const handleLike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          const newLikes = review.userVote === 'like' ? review.likes - 1 : review.likes + 1;
-          return {
-            ...review,
-            likes: newLikes,
-            userVote: review.userVote === 'like' ? null : 'like',
-          };
-        }
-        return review;
-      }),
-    );
+  const handleLike = async (reviewId: number, isLoggedIn: boolean) => {
+    if (!isLoggedIn) return;
+    if (isReactionLoading) return;
+
+    try {
+      setIsReactionLoading(true);
+
+      // 좋아요는 reactionType: 1로 설정
+      const response = await toggleShortReviewReaction(reviewId, 1);
+
+      if (response.isSuccess) {
+        setReviews((prevReviews) =>
+          prevReviews.map((review) => {
+            if (review.id === reviewId) {
+              // API 응답에 따라 좋아요/싫어요 상태와 개수를 업데이트
+              return {
+                ...review,
+                likes: response.result.likeCount,
+                dislikes: response.result.dislikeCount,
+                isLiked: response.result.isLiked,
+                isDisliked: response.result.isDisliked,
+                userVote: response.result.isLiked
+                  ? 'like'
+                  : response.result.isDisliked
+                    ? 'dislike'
+                    : null,
+              };
+            }
+            return review;
+          }),
+        );
+      } else {
+        console.error('Failed to toggle like:', response.message);
+      }
+    } catch (error) {
+      console.error('Error when liking review:', error);
+    } finally {
+      setIsReactionLoading(false);
+    }
   };
 
-  const handleDislike = (reviewId: number) => {
-    setReviews(
-      reviews.map((review) => {
-        if (review.id === reviewId) {
-          const newDislikes =
-            review.userVote === 'dislike' ? review.dislikes - 1 : review.dislikes + 1;
-          return {
-            ...review,
-            dislikes: newDislikes,
-            userVote: review.userVote === 'dislike' ? null : 'dislike',
-          };
-        }
-        return review;
-      }),
-    );
+  const handleDislike = async (reviewId: number, isLoggedIn: boolean) => {
+    if (!isLoggedIn) return;
+    if (isReactionLoading) return;
+
+    try {
+      setIsReactionLoading(true);
+
+      // 싫어요는 reactionType: 0으로 설정
+      const response = await toggleShortReviewReaction(reviewId, 0);
+
+      if (response.isSuccess) {
+        setReviews((prevReviews) =>
+          prevReviews.map((review) => {
+            if (review.id === reviewId) {
+              // API 응답에 따라 좋아요/싫어요 상태와 개수를 업데이트
+              return {
+                ...review,
+                likes: response.result.likeCount,
+                dislikes: response.result.dislikeCount,
+                isLiked: response.result.isLiked,
+                isDisliked: response.result.isDisliked,
+                userVote: response.result.isLiked
+                  ? 'like'
+                  : response.result.isDisliked
+                    ? 'dislike'
+                    : null,
+              };
+            }
+            return review;
+          }),
+        );
+      } else {
+        console.error('Failed to toggle dislike:', response.message);
+      }
+    } catch (error) {
+      console.error('Error when disliking review:', error);
+    } finally {
+      setIsReactionLoading(false);
+    }
   };
 
   return {
@@ -168,6 +223,7 @@ export const useReviews = (initialReviews: EventShortReview[]) => {
     handleDelete,
     handleLike,
     handleDislike,
+    isReactionLoading,
   };
 };
 
