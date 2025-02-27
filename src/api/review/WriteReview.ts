@@ -2,41 +2,56 @@
 import { AxiosError } from 'axios';
 import instance from '@/api/axios';
 import { WriteReviewRequest, WriteReviewResponse } from '@/types/review/WriteReview';
+import { uploadImage } from '@/api/review/image';
 
 const REVIEW_API_ENDPOINT = '/reviews';
 
-// api/review/WriteReview.ts 수정
 export const writeReview = async (
   reviewData: WriteReviewRequest,
   images?: File[],
 ): Promise<WriteReviewResponse> => {
   try {
-    const formData = new FormData();
+    // 이미지가 있다면 먼저 이미지 API를 통해 업로드
+    let imageUrls: string[] = [];
 
-    // JSON 데이터를 request 키로 추가
-    formData.append(
-      'request',
-      new Blob([JSON.stringify(reviewData)], { type: 'application/json' }),
-    );
-
-    // 이미지 파일들 추가 - 'image' 필드명 사용
     if (images?.length) {
-      images.forEach((image) => {
-        formData.append('image', image); // 백엔드가 기대하는 필드명 'image' 사용
-      });
+      // 이미지 업로드 API를 사용하여 각 이미지 업로드
+      const uploadPromises = images.map((image) => uploadImage('review', image));
+
+      const responses = await Promise.all(uploadPromises);
+
+      // 각 응답에서 이미지 URL 추출
+      imageUrls = responses
+        .map((response) => {
+          if (response.isSuccess) {
+            // 응답에서 URL을 추출하는 로직
+            // 예: "이미지가 성공적으로 업로드되었습니다. URL: http://example.com/image.jpg"
+            const resultText = response.result;
+            if (typeof resultText === 'string' && resultText.includes('URL: ')) {
+              return resultText.split('URL: ')[1].trim();
+            }
+          }
+          return '';
+        })
+        .filter((url) => url !== '');
     }
 
-    console.log('업로드 전 FormData 확인:', {
-      requestData: JSON.stringify(reviewData),
-      hasImages: images?.length > 0,
-      imageNames: images?.map((img) => img.name),
-    });
+    // 업로드된 이미지 URL을 리뷰 데이터에 포함
+    const updatedReviewData = {
+      ...reviewData,
+      imageUrls: imageUrls, // 백엔드가 기대하는 필드명으로 변경 가능
+    };
 
-    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    // 리뷰 데이터만 JSON 형식으로 전송
+    const response = await instance.post<WriteReviewResponse>(
+      REVIEW_API_ENDPOINT,
+      updatedReviewData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     return response.data;
   } catch (error) {
