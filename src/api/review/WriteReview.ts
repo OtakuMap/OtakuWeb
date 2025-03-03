@@ -1,4 +1,3 @@
-// api/review/WriteReview.ts
 import { AxiosError } from 'axios';
 import instance from '@/api/axios';
 import { WriteReviewRequest, WriteReviewResponse } from '@/types/review/WriteReview';
@@ -11,38 +10,59 @@ export const writeReview = async (
   images?: File[],
 ): Promise<WriteReviewResponse> => {
   try {
-    // 이미지가 있다면 먼저 이미지 API를 통해 업로드
-    let imageUrls: string[] = [];
+    console.log('리뷰 작성 시작. 이미지 수:', images?.length || 0);
+
+    // 이미지 URL을 저장할 배열
+    const imageUrls: string[] = [];
 
     if (images?.length) {
-      // 이미지 업로드 API를 사용하여 각 이미지 업로드
-      const uploadPromises = images.map((image) => uploadImage('review', image));
+      // 각 이미지를 순차적으로 업로드
+      for (const image of images) {
+        try {
+          console.log(`이미지 업로드 시작: ${image.name}`);
+          const response = await uploadImage('review', image);
 
-      const responses = await Promise.all(uploadPromises);
-
-      // 각 응답에서 이미지 URL 추출
-      imageUrls = responses
-        .map((response) => {
-          if (response.isSuccess) {
-            // 응답에서 URL을 추출하는 로직
-            // 예: "이미지가 성공적으로 업로드되었습니다. URL: http://example.com/image.jpg"
-            const resultText = response.result;
-            if (typeof resultText === 'string' && resultText.includes('URL: ')) {
-              return resultText.split('URL: ')[1].trim();
+          if (response.isSuccess && response.result) {
+            // 백엔드 응답에서 URL 추출: "이미지가 성공적으로 업로드되었습니다. URL: 실제URL"
+            const resultStr = response.result as string;
+            if (resultStr.includes('URL: ')) {
+              const imageUrl = resultStr.split('URL: ')[1].trim();
+              console.log('추출된 이미지 URL:', imageUrl);
+              imageUrls.push(imageUrl);
             }
           }
-          return '';
-        })
-        .filter((url) => url !== '');
+        } catch (uploadError) {
+          console.error('이미지 업로드 오류:', uploadError);
+        }
+      }
     }
 
-    // 업로드된 이미지 URL을 리뷰 데이터에 포함
+    console.log('업로드된 이미지 URL들:', imageUrls);
+
+    // 이미지 URL이 있으면 reviewImages 배열 생성
+    // 백엔드는 {id, uuid, fileName, fileUrl} 형태의 객체를 기대하지만,
+    // 실제로는 URL만 전송하면 백엔드가 알아서 처리해줄 가능성이 있음
+    // 정확한 형태는 백엔드 개발자와 확인 필요
+    const reviewImages = imageUrls.map((url) => {
+      // URL에서 UUID 추출 (파일명 부분)
+      const urlParts = url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+
+      return {
+        fileUrl: url,
+        fileName: `review/${fileName}`,
+      };
+    });
+
+    // 업로드된 이미지 정보를 리뷰 데이터에 포함
     const updatedReviewData = {
       ...reviewData,
-      imageUrls: imageUrls, // 백엔드가 기대하는 필드명으로 변경 가능
+      reviewImages: reviewImages.length > 0 ? reviewImages : undefined,
     };
 
-    // 리뷰 데이터만 JSON 형식으로 전송
+    console.log('백엔드로 전송할 리뷰 데이터:', updatedReviewData);
+
+    // 리뷰 데이터 JSON 형식으로 전송
     const response = await instance.post<WriteReviewResponse>(
       REVIEW_API_ENDPOINT,
       updatedReviewData,
