@@ -18,8 +18,6 @@ export const uploadImage = async (
     formData.append('folder', folder);
     formData.append('image', image);
 
-    console.log(`이미지 업로드 요청: 폴더=${folder}, 파일=${image.name}`);
-
     const response = await instance.post<ImageUploadResponse>('/images', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
