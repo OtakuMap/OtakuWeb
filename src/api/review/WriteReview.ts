@@ -39,10 +39,6 @@ export const writeReview = async (
 
     console.log('업로드된 이미지 URL들:', imageUrls);
 
-    // 이미지 URL이 있으면 reviewImages 배열 생성
-    // 백엔드는 {id, uuid, fileName, fileUrl} 형태의 객체를 기대하지만,
-    // 실제로는 URL만 전송하면 백엔드가 알아서 처리해줄 가능성이 있음
-    // 정확한 형태는 백엔드 개발자와 확인 필요
     const reviewImages = imageUrls.map((url) => {
       // URL에서 UUID 추출 (파일명 부분)
       const urlParts = url.split('/');
