@@ -25,13 +25,10 @@ export const writeReview = async (
       });
     }
 
-    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData);
     return response.data;
   } catch (error) {
+    // 에러 처리 부분은 동일
     if (error instanceof AxiosError) {
       const errorMessage = error.response?.data?.message || '리뷰 작성 중 오류가 발생했습니다.';
       throw new Error(errorMessage);
