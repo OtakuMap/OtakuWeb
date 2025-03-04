@@ -1,7 +1,9 @@
+// api/review/WriteReview.ts
 import { AxiosError } from 'axios';
 import instance from '@/api/axios';
 import { WriteReviewRequest, WriteReviewResponse } from '@/types/review/WriteReview';
-import { tokenStorage } from '@/utils/token'; // tokenStorage import 추가
+
+const REVIEW_API_ENDPOINT = '/reviews';
 
 export const writeReview = async (
   reviewData: WriteReviewRequest,
@@ -23,27 +25,48 @@ export const writeReview = async (
       });
     }
 
-    // 현재 토큰 가져오기
-    const token = tokenStorage.getAccessToken();
-    console.log('사용하는 토큰:', token); // 디버깅용
-
-    // Authorization 헤더에 토큰 직접 추가
-    const response = await instance.post<WriteReviewResponse>('/reviews', formData, {
+    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
       },
     });
-
     return response.data;
   } catch (error) {
-    // 에러 로깅 더 자세히
     if (error instanceof AxiosError) {
-      console.error('상세 에러:', error.response?.data);
-      console.error('에러 상태:', error.response?.status);
-      console.error('에러 헤더:', error.response?.headers);
       const errorMessage = error.response?.data?.message || '리뷰 작성 중 오류가 발생했습니다.';
       throw new Error(errorMessage);
     }
     throw new Error('알 수 없는 오류가 발생했습니다.');
   }
+};
+
+// Hook implementation
+import { useState } from 'react';
+
+export const useWriteReview = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submitReview = async (reviewData: WriteReviewRequest, images?: File[]) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await writeReview(reviewData, images);
+      return response;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : '리뷰 작성 중 오류가 발생했습니다.';
+      setError(errorMessage);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    submitReview,
+    isLoading,
+    error,
+  };
 };

@@ -18,7 +18,7 @@ export const uploadImage = async (
     formData.append('folder', folder);
     formData.append('image', image);
 
-    const response = await instance.post<ImageUploadResponse>('/images', formData, {
+    const response = await instance.post<ImageUploadResponse>('/api/images', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
