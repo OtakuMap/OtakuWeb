@@ -12,11 +12,8 @@ export const writeReview = async (
   try {
     const formData = new FormData();
 
-    // JSON 데이터를 request 키로 추가
-    formData.append(
-      'request',
-      new Blob([JSON.stringify(reviewData)], { type: 'application/json' }),
-    );
+    // Blob 대신 JSON 문자열로 직접 추가
+    formData.append('request', JSON.stringify(reviewData));
 
     // 이미지 파일들 추가
     if (images?.length) {
