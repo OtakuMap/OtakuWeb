@@ -12,19 +12,29 @@ export const writeReview = async (
   try {
     const formData = new FormData();
 
-    // JSON 데이터를 문자열로 직접 추가 (Blob 사용하지 않음)
-    formData.append('request', JSON.stringify(reviewData));
+    // JSON 데이터를 request 키로 추가
+    formData.append(
+      'request',
+      new Blob([JSON.stringify(reviewData)], { type: 'application/json' }),
+    );
 
-    // 이미지 파일들 추가 (하나씩)
+    // 이미지 파일들 추가
     if (images?.length) {
       images.forEach((image) => {
         formData.append('images', image);
       });
     }
 
-    // Content-Type 헤더를 명시적으로 설정하지 않음 (axios가 자동으로 설정)
-    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData);
+    // 토큰을 직접 가져와서 헤더에 추가 (localStorage에서 직접 접근)
+    const token = localStorage.getItem('accessToken');
+    console.log('Using token for review submission:', token);
 
+    const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Review submission error:', error);
