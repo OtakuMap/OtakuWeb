@@ -25,14 +25,21 @@ export const writeReview = async (
       });
     }
 
+    // 토큰을 직접 가져와서 헤더에 추가 (localStorage에서 직접 접근)
+    const token = localStorage.getItem('accessToken');
+    console.log('Using token for review submission:', token);
+
     const response = await instance.post<WriteReviewResponse>(REVIEW_API_ENDPOINT, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
     return response.data;
   } catch (error) {
+    console.error('Review submission error:', error);
     if (error instanceof AxiosError) {
+      console.error('Error response:', error.response?.data);
       const errorMessage = error.response?.data?.message || '리뷰 작성 중 오류가 발생했습니다.';
       throw new Error(errorMessage);
     }
