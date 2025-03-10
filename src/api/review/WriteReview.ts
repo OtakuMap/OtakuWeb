@@ -18,7 +18,7 @@ export const writeReview = async (
     // 이미지 파일들 추가
     if (images?.length) {
       images.forEach((image) => {
-        formData.append('images', image);
+        formData.append('review images', image);
       });
     }
 
